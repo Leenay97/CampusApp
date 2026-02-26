@@ -1,0 +1,25 @@
+@import '@app/globals.css';
+
+.raiting {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.add-btn {
+    border: 0;
+    background-color: var(--primary-button-color);
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}

@@ -1,0 +1,25 @@
+@import '@app/globals.css';
+
+.workshop-counter {
+    height: 20px;
+    position: relative;
+    background-color: rgb(255, 244, 218);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    &__text {
+        font-size: 14px;
+        color: #666;
+        position: absolute;
+        z-index: 10;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+  &__scale {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--accent-orange);
+  }
+}

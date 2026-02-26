@@ -1,0 +1,26 @@
+@import '@app/globals.css';
+
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+
+    &__input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+
+        &--error {
+            padding: 8px;
+            border: 1px solid var(--error-color);
+            border-radius: 4px;
+        }
+    }
+
+    label {
+        font-weight: 500;
+        font-size: 16px;
+    }
+
+}

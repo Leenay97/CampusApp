@@ -1,0 +1,23 @@
+.prohibited-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    &__header {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-height: auto;
+
+        &--hidden {
+            max-height: 0;
+            overflow: hidden;
+        }
+    }
+}

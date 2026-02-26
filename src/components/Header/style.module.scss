@@ -1,0 +1,69 @@
+@import '@app/globals.css';
+.header {
+    width: 100%;
+    border-radius: 5px;
+    padding: 10px 20px;
+    position: fixed;
+    z-index: 200;
+
+    &__container {
+        position: relative;
+        display: flex;
+        min-height: 55px;
+        justify-content: space-between;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+
+        &--white {
+            position: relative;
+            display: flex;
+            min-height: 55px;
+            justify-content: space-between;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    &__logo {
+        width: 60px;
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0 auto;
+        height: auto;
+        object-fit: contain;
+    }
+    
+    &__menu {
+        display: flex;
+        height: 100%;
+        width: 800px;
+        justify-content: space-between;
+    }
+    &__menu-option {
+        padding: 10px 20px;
+        width: 100%;
+        color: var(--text-primary);
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background-color: #8dd0e1;
+        }
+    }
+}

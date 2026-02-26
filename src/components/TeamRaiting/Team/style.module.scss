@@ -1,0 +1,28 @@
+.team {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 30px 1fr auto;
+    min-width: 250px;
+    background-color: #e7e8fe;
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(49, 47, 47, 0.098);
+    color: rgb(52, 43, 43);
+    border-radius: 5px;
+
+    &__place {
+        font-weight: bold;
+    }
+    &--1 {
+        background-color: #ffdbfa;
+        padding: 15px 20px;
+        }
+    &--2 {
+        background-color: #f9e2ff;
+        padding: 13px 20px;
+        }
+    &--3 {
+        background-color: #efe5ff;
+        padding: 12px 20px;
+        }
+
+}

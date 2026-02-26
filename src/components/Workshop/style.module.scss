@@ -1,0 +1,35 @@
+@import '@app/globals.css';
+
+.workshop {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    
+  &__description {
+    font-size: 12px;
+    color: #666;
+  }
+  &__place {
+    font-size: 14px;
+    color: #666;
+  }
+  &__teacher {
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .teacher-photo {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    background-color: var(--color-light-blue);
+  }
+}

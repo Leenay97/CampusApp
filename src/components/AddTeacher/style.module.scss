@@ -1,0 +1,9 @@
+.add-teacher {
+
+    &__input {
+      display: flex;
+      height: 35px;
+      flex-direction: row;
+      gap: 12px;
+    }
+}

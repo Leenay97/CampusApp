@@ -1,0 +1,44 @@
+@import '@app/globals.css';
+
+.groups-list {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    overflow-y: scroll;
+    max-width: 300px;
+    max-height: 300px;
+    border: 1px solid #eee;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    &__item {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    &__group {
+        padding: 5px 0;
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+
+    &__delete {
+        height: 20px;
+        width: 20px;
+        color: red;
+        font-weight: bold;
+        font-size: 20px;
+        cursor: pointer;
+        border: 0;
+        background-color: white;
+        border-radius: 5px;
+
+        &:hover {
+            background-color: red;
+            color: white;
+        }
+    }
+}

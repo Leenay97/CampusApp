@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@graphql/*": ["./src/graphql/*"],
+      "@app/*": ["./src/app/*"]
     }
   },
   "include": [
@@ -29,6 +32,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "server/models/Workshop.js", "src/lib/apollo.ts"  ],
   "exclude": ["node_modules"]
 }
