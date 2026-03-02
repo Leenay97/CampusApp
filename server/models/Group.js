@@ -15,4 +15,7 @@ export const Group = sequelize.define('Group', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  teacherIds: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+  },
 });

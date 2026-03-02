@@ -1,4 +1,6 @@
 import { User, Workshop, Group } from '../../models/index.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const userResolvers = {
   Query: {
@@ -7,7 +9,7 @@ export const userResolvers = {
         where: { userLevel: 'STUDENT' },
         include: [
           { model: Group, as: 'group' },
-          { model: Workshop, as: 'workshops' },
+          { model: Workshop, as: 'attendingWorkshops' },
         ],
       });
     },
@@ -16,7 +18,7 @@ export const userResolvers = {
         where: { userLevel: 'TEACHER' },
         include: [
           { model: Group, as: 'group' },
-          { model: Workshop, as: 'workshops' },
+          { model: Workshop, as: 'teachingWorkshops' },
         ],
       });
     },
@@ -24,7 +26,7 @@ export const userResolvers = {
       return await User.findByPk(id, {
         include: [
           { model: Group, as: 'group' },
-          { model: Workshop, as: 'workshops' },
+          { model: Workshop, as: 'attendingWorkshops' },
         ],
       });
     },
@@ -35,7 +37,7 @@ export const userResolvers = {
         where: { groupId },
         include: [
           { model: Group, as: 'group' },
-          { model: Workshop, as: 'workshops' },
+          { model: Workshop, as: 'attendingWorkshops' },
         ],
       });
     },
@@ -49,13 +51,29 @@ export const userResolvers = {
         where: { id: workshop.userId },
         include: [
           { model: Group, as: 'group' },
-          { model: Workshop, as: 'workshops' },
+          { model: Workshop, as: 'attendingWorkshops' },
         ],
       });
     },
   },
 
   Mutation: {
+    login: async (_, { login, password }) => {
+      const user = await User.findOne({ where: { login } });
+      if (!user) throw new Error('Пользователя не существует');
+
+      const isValid = await bcrypt.compare(password, user.hashedPassword);
+      if (!isValid) throw new Error('Неверный пароль');
+
+      const token = jwt.sign({ id: user.id, userLevel: user.userLevel }, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+      });
+
+      return {
+        token,
+        user,
+      };
+    },
     createStudent: async (_, { name, russianName, groupId }) => {
       const user = await User.create({
         name,
@@ -77,6 +95,40 @@ export const userResolvers = {
       });
 
       return user;
+    },
+
+    registerTeacher: async (_, { token, id, login, password, confirmPassword }) => {
+      if (!login || !password) throw new Error('Введите пароль и логин');
+
+      if (password !== confirmPassword) throw new Error('Пароли не совпадают');
+
+      if (token !== process.env.TEACHER_REGISTRATION_TOKEN) throw new Error('Неверная ссылка');
+
+      const teacher = await User.findByPk(id);
+
+      if (!teacher) throw new Error('Учителя не существует');
+      if (teacher.isActive) throw new Error('Учитель уже зарегистрирован');
+
+      const existingLogin = await User.findOne({ where: { login } });
+      if (existingLogin) throw new Error('Логин уже занят');
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      teacher.hashedPassword = hashedPassword;
+      teacher.login = login;
+      teacher.isActive = true;
+
+      await teacher.save();
+
+      const tokenForLogin = jwt.sign(
+        { id: teacher.id, userLevel: teacher.userLevel },
+        process.env.JWT_SECRET,
+        { expiresIn: '30d' },
+      );
+
+      return {
+        token: tokenForLogin,
+        user: teacher,
+      };
     },
 
     updateUser: async (_, { id, name, russianName, groupId }) => {

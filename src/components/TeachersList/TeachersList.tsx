@@ -3,16 +3,25 @@ import styles from './style.module.scss';
 
 type TeachersListProps = {
   teachers: Teacher[];
-  onDelete: (id: string, name: string) => void;
+  isLoading: boolean;
+  onDelete: (teacher: Teacher | null) => void;
 };
 
-export function TeachersList({ teachers, onDelete }: TeachersListProps) {
+export function TeachersList({ teachers, isLoading, onDelete }: TeachersListProps) {
   const sortedTeachers = useMemo(() => {
     if (!Array.isArray(teachers)) return [];
     return [...teachers].sort((a, b) => a.name.localeCompare(b.name));
   }, [teachers]);
 
-  if (!sortedTeachers.length) return;
+  console.log(sortedTeachers);
+
+  if (isLoading) {
+    return <div className="section">Loading...</div>;
+  }
+
+  if (!sortedTeachers.length) {
+    return <div className="section">Нет учителей</div>;
+  }
 
   return (
     <div className="className">
@@ -22,10 +31,7 @@ export function TeachersList({ teachers, onDelete }: TeachersListProps) {
           sortedTeachers.map((teacher) => (
             <li key={teacher.id}>
               <div className={styles['teachers-list__teacher']}>{teacher.name}</div>
-              <button
-                className={styles['teachers-list__delete']}
-                onClick={() => onDelete(teacher.id, teacher.name)}
-              >
+              <button className={styles['teachers-list__delete']} onClick={() => onDelete(teacher)}>
                 &times;
               </button>
             </li>

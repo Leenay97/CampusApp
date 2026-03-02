@@ -7,7 +7,7 @@ export const workshopTypeDefs = gql`
     description: String!
     place: String!
     teacher: User
-    users: [User]
+    students: [User]
     maxStudents: Int
     isClosed: Boolean
   }
@@ -21,7 +21,7 @@ export const workshopTypeDefs = gql`
   extend type Mutation {
     createWorkshop(
       name: String!
-      description: String!
+      description: String
       place: String!
       teacherId: ID!
       maxStudents: Int

@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import styles from './style.module.scss';
 
 type GroupsListProps = {
-  groups: Group[];
-  onDelete: (id: string, name: string) => void;
+  groups: GroupInput[];
+  onDelete: (name: string) => void;
 };
 
 export function GroupsList({ groups, onDelete }: GroupsListProps) {
@@ -20,11 +20,11 @@ export function GroupsList({ groups, onDelete }: GroupsListProps) {
       <ul className={styles['groups-list']}>
         {sortedGroups &&
           sortedGroups.map((group) => (
-            <li key={group.id} className={styles['groups-list__item']}>
+            <li key={group.name} className={styles['groups-list__item']}>
               <div className={styles['groups-list__group']}>{group.name}</div>
               <button
                 className={styles['groups-list__delete']}
-                onClick={() => onDelete(group.id, group.name)}
+                onClick={() => onDelete(group.name)}
               >
                 &times;
               </button>

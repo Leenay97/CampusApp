@@ -1,0 +1,38 @@
+.profile {
+    height: 55px;
+    width: 240px;
+    cursor: pointer;
+    z-index: 300;
+    right: 0px;
+    top: 0px;
+    position: absolute;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    padding: 0 20px;
+
+    &__img {
+        height: 40px;
+        width: 40px;
+        background-color: wheat;
+        border-radius: 20px;
+    }
+    &__info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__balance {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 14px;
+        gap: 5px;
+        img {
+            height: 12px;
+            width: 12px;
+        }
+    }
+}

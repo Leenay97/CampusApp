@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { InputField } from '@components/InputField/InputField';
 import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
-import { ApolloError, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { mutations } from '@graphql/mutations';
 
 type AddTeacherProps = {
-  onAdd: () => void;
+  onAdd?: () => void;
 };
 
 export function AddTeacher({ onAdd }: AddTeacherProps) {
@@ -20,7 +20,7 @@ export function AddTeacher({ onAdd }: AddTeacherProps) {
       const result = await createTeacher({ variables: { name: teacherName } });
       console.log('Учитель создан:', result.data.createTeacher);
       setTeacherName('');
-      onAdd();
+      onAdd?.();
     } catch (err) {
       return;
     }

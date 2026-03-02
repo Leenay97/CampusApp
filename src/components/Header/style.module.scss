@@ -4,7 +4,13 @@
     border-radius: 5px;
     padding: 10px 20px;
     position: fixed;
+    top: 0;
+    left: 0;
     z-index: 200;
+
+    &--hidden {
+        transform: translateY(-100%);
+    }
 
     &__container {
         position: relative;

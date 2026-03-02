@@ -1,0 +1,29 @@
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+
+    &__header{
+        display: flex;
+        align-items: center;
+        padding-bottom: 10px;
+        gap: 20px;
+        border-bottom: 1px solid rgba(117, 93, 205, 0.208);
+    }
+
+    &__input {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    &__logo {
+        width: 80px;
+        height: auto;
+        margin-left: auto;
+    }
+}

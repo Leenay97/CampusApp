@@ -1,0 +1,54 @@
+@import '@app/globals.css';
+
+.profile-menu {
+    max-height: 450px;
+    width: 200px;
+    z-index: 100;
+    margin-top: 60px;
+    right: 0;
+    background-color: white;
+    position: absolute;
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    &__wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-height: 100vh;
+    }
+    
+    &__option {
+        padding: 10px 0;
+        width: 100%;
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        font-size: 14px;
+
+        &:hover {
+            background-color: #8dd0e1;
+        }
+
+    }
+
+    &--hidden {
+        overflow: hidden;
+        margin-top: 60px;
+        right: 0;
+        position: absolute;
+        max-height: 0;
+        width: 240px;
+        opacity: 0;
+        overflow: hidden;
+    }
+    
+}

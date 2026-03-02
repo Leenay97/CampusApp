@@ -1,0 +1,59 @@
+@import '@app/globals.css';
+
+.custom-select {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    margin-bottom: 10px;
+    
+    &__input {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        height: 35px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 200px;
+    }
+
+    &__field {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    &__list {
+        display: flex;
+        flex-wrap: nowrap;
+        background-color: white;
+        flex-direction: column;
+        list-style: none;
+        max-height: 150px;
+        width: 200px;
+        overflow-y: scroll;
+        z-index: 10;
+        position: absolute;
+        top: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    &__option {
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+
+        &--archived {
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #a8a8a87f;
+        }
+
+        &:hover {
+            background-color: #f0f0f0;
+        }   
+    }
+
+}

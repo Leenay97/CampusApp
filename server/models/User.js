@@ -6,5 +6,8 @@ export const User = sequelize.define('User', {
   russianName: { type: DataTypes.STRING, allowNull: true },
   coins: { type: DataTypes.INTEGER, allowNull: true },
   photoUrl: { type: DataTypes.STRING, allowNull: true },
-  userLevel: { type: DataTypes.STRING, allowNull: true },
+  userLevel: { type: DataTypes.ENUM('STUDENT', 'TEACHER', 'ADMIN'), allowNull: true },
+  login: { type: DataTypes.STRING, allowNull: true, unique: true },
+  hashedPassword: { type: DataTypes.STRING, allowNull: true },
+  isActive: { type: DataTypes.BOOLEAN, defaultValue: false },
 });

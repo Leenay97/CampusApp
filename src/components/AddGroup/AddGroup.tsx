@@ -1,18 +1,15 @@
 import { useState } from 'react';
 import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
-import { useMutation } from '@apollo/client';
-import { CREATE_GROUP } from '@graphql/mutations/CreateGroup';
 import { MultipleSelect } from '@components/MultipleSelect/MultipleSelect';
 
 type AddGroupProps = {
-  onAdd: () => void;
+  onAdd: (group: GroupInput) => void;
   teachers: Teacher[];
 };
 
 export function AddGroup({ onAdd, teachers }: AddGroupProps) {
   const [groupTeachers, setGroupTeachers] = useState<Teacher[]>([]);
-  const [CreateGroup] = useMutation(CREATE_GROUP);
 
   async function handleCreateGroup() {
     if (!groupTeachers.length) return;
@@ -21,12 +18,9 @@ export function AddGroup({ onAdd, teachers }: AddGroupProps) {
       const groupName = groupTeachers.map((teacher) => teacher.name).join('-');
       const teacherIds = groupTeachers.map((teacher) => teacher.id);
       console.log(teacherIds);
-      const result = await CreateGroup({
-        variables: { name: groupName, teacherIds: teacherIds },
-      });
-      console.log('Группа создана:', result.data.createTeacher);
+      const newGroup: GroupInput = { name: groupName, teacherIds: teacherIds };
       setGroupTeachers([]);
-      onAdd();
+      onAdd(newGroup);
     } catch (err) {
       console.error('Ошибка при создании группы:', err);
     }

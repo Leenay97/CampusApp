@@ -29,6 +29,7 @@ const startServer = async () => {
 
     // 🔥 Создание таблиц
     await sequelize.sync({ alter: true });
+    // await sequelize.sync({ force: true });
     console.log('✅ Tables synced');
   } catch (error) {
     console.error('❌ Database error:', error);

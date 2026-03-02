@@ -1,0 +1,30 @@
+.not-found {
+    
+    &__container {
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 500px;
+        position: relative;
+    }
+
+    &__content {
+        display: flex;
+        background-color: white;
+        flex-direction: column;
+        gap: 30px;
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 500px;
+    }
+    &__image {
+        height: 85px;
+        width: 130px;
+        margin-right: 40px;
+        position: absolute;
+        top: -85px;
+        right: 70px;
+    }
+}
+

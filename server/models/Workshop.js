@@ -6,5 +6,7 @@ export const Workshop = sequelize.define('Workshop', {
   description: { type: DataTypes.STRING, allowNull: false },
   place: { type: DataTypes.STRING, allowNull: false },
   maxStudents: { type: DataTypes.INTEGER, allowNull: true },
+  teacherId: { type: DataTypes.UUID, allowNull: false },
+  type: { type: DataTypes.STRING, allowNull: false },
   isClosed: { type: DataTypes.BOOLEAN, defaultValue: false },
 });
