@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import styles from './style.module.scss';
+import { GroupInput } from '@/app/types';
 
 type GroupsListProps = {
   groups: GroupInput[];

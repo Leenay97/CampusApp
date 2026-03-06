@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import styles from './style.module.scss';
 import { Burger } from '../Burger/Burger';
 import BurgerMenu from '../BurgerMenu/BurgerMenu';
@@ -17,6 +17,10 @@ function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { user } = useUser();
+
+  const userLevel = useMemo(() => {
+    return user?.userLevel;
+  }, [user?.userLevel]);
 
   function handleBurgerClick() {
     setIsBurgerOpen((prev) => !prev);
@@ -84,7 +88,7 @@ function Header() {
       >
         <Image className={styles['header__logo']} src={Logo} alt="Logo" />
         <Burger isOpen={isBurgerOpen} onClick={handleBurgerClick} />
-        <BurgerMenu isOpen={isBurgerOpen} onClose={handleBurgerClose} />
+        <BurgerMenu userLevel={userLevel} isOpen={isBurgerOpen} onClose={handleBurgerClose} />
         <HeaderProfile user={user} isExpanded={hasMenu} onClick={handleProfileClick} />
         <ProfileMenu isOpen={isProfileOpen} onClose={handleProfileClose} />
       </div>

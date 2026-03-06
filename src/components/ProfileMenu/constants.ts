@@ -3,7 +3,7 @@ type MenuOption = {
   link: string;
 };
 
-export const HeaderMenuOptions: MenuOption[] = [
+export const BurgerMenuOptions: MenuOption[] = [
   { name: 'Перевести coins', link: '/' },
   { name: 'Мои мастерклассы', link: '/workshops' },
   { name: 'Выйти', link: '/login' },

@@ -4,11 +4,13 @@
 .input-field {
     display: flex;
     flex-direction: column;
+    
 
     &__input {
         padding: 8px;
         border: 1px solid #ccc;
         border-radius: 4px;
+        height: 35px;
 
         &--error {
             padding: 8px;

@@ -1,0 +1,18 @@
+
+@import '@app/globals.css';
+
+.checkbox {
+    height: 20px;
+    width: 20px;
+    border: 0;
+
+    &__label {
+        border-radius: 5px;
+        border: 2px solid var(--primary-button-color);
+        color: var(--primary-button-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px;
+    }
+}

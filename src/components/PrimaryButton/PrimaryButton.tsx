@@ -4,12 +4,20 @@ import styles from './style.module.scss';
 type PrimaryButtonProps = {
   children: React.ReactNode;
   width?: string;
-  onClick: () => void;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  onClick?: () => void;
 };
 
-function PrimaryButton({ children, width, onClick }: PrimaryButtonProps) {
+function PrimaryButton({ children, width, type, disabled = false, onClick }: PrimaryButtonProps) {
   return (
-    <button className={styles['primary-button']} onClick={onClick} style={{ width: width }}>
+    <button
+      type={type}
+      className={styles['primary-button']}
+      onClick={onClick}
+      style={{ width: width }}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

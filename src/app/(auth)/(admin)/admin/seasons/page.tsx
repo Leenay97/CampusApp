@@ -7,15 +7,21 @@ import { GroupsList } from '@components/GroupsList/GroupsList';
 import styles from './style.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import { AddSeason } from '@/components/AddSeason/AddSeason';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import mutations from '@/graphql/mutations';
 import { SeasonSelect } from '@/components/SeasonSelect/SeasonSelect';
 import Modal from '@/components/Modal/Modal';
+import { GroupInput, Season, Teacher } from '@/app/types';
 
 function SeasonsPage() {
   const [seasonGroups, setSeasonGroups] = useState<GroupInput[]>([]);
-  const [seeasonData, setSeasonData] = useState({ year: '', number: '' });
+  const [seasonData, setSeasonData] = useState({
+    year: '',
+    number: '',
+    startDate: '',
+    endDate: '',
+  });
   const [password, setPassword] = useState<string>('');
   const [selectedSeason, setSelectedSeason] = useState<Partial<Season>>({ id: '' });
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -24,6 +30,10 @@ function SeasonsPage() {
   const { loading: seasonsLoading, data: seasonsData } = useQuery(queries.GET_SEASONS);
   const [createSeason] = useMutation(mutations.CREATE_SEASON);
   const [activateSeason] = useMutation(mutations.ACTIVATE_SEASON);
+
+  useEffect(() => {
+    console.log(seasonData);
+  }, [seasonData]);
 
   const teachers = teachersData?.teachers ?? [];
 
@@ -45,16 +55,23 @@ function SeasonsPage() {
     setSeasonGroups((prev) => [...prev, group]);
   }
 
-  function handleChangeSeasonData(year: string, number: string) {
-    setSeasonData({ year, number });
+  function handleChangeSeasonData(
+    year: string,
+    number: string,
+    startDate: string,
+    endDate: string,
+  ) {
+    setSeasonData({ year, number, startDate, endDate });
   }
 
   async function handleCreateSeason() {
     try {
       await createSeason({
         variables: {
-          year: seeasonData.year,
-          number: seeasonData.number,
+          year: seasonData.year,
+          number: seasonData.number,
+          startDate: seasonData.startDate,
+          endDate: seasonData.endDate,
           groupTeachers: seasonGroups,
         },
       });
@@ -93,8 +110,10 @@ function SeasonsPage() {
           >
             <h1 className="title">Добавить сезон</h1>
             <AddSeason
-              year={seeasonData.year}
-              number={seeasonData.number}
+              year={seasonData.year}
+              number={seasonData.number}
+              startDate={seasonData.startDate}
+              endDate={seasonData.endDate}
               onChange={handleChangeSeasonData}
             />
             <AddGroup onAdd={handleAddGroup} teachers={formattedTeachers} />
@@ -102,6 +121,7 @@ function SeasonsPage() {
             <PrimaryButton onClick={handleCreateSeason}>Создать сезон</PrimaryButton>
           </div>
         </div>
+
         <div className={styles['prohibited-section']}>
           <h1 className="title">Активировать сезон</h1>
           <div className={styles['flex-row']}>

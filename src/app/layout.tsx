@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import '@app/globals.css';
+import './globals.css';
 import { ApolloWrapper } from '@/lib/ApolloWrapper';
 import { UserProvider } from '@/contexts/UserContext';
 
@@ -26,6 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preload" href="/bg-colored.png" as="image" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ApolloWrapper>
           <UserProvider>

@@ -7,6 +7,9 @@ export const seasonTypeDefs = gql`
     number: String!
     isActive: Boolean!
     isArchived: Boolean!
+    startDate: String!
+    endDate: String!
+    groups: [Group!]!
   }
 
   input GroupInput {
@@ -17,10 +20,17 @@ export const seasonTypeDefs = gql`
   extend type Query {
     seasons: [Season]!
     season: Season!
+    activeSeason: Season!
   }
 
   extend type Mutation {
-    createSeason(year: String!, number: String!, groupTeachers: [GroupInput!]!): Season
+    createSeason(
+      year: String!
+      number: String!
+      groupTeachers: [GroupInput!]!
+      startDate: String!
+      endDate: String!
+    ): Season
     activateSeason(id: ID!): Season
     updateSeason(id: ID!): Season
     deleteSeason(id: ID!): Season

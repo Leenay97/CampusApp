@@ -18,4 +18,7 @@ export const Group = sequelize.define('Group', {
   teacherIds: {
     type: DataTypes.ARRAY(DataTypes.STRING),
   },
+  places: {
+    type: DataTypes.JSONB,
+  },
 });

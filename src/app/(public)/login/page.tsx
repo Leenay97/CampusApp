@@ -17,12 +17,14 @@ export default function LoginPage(): JSX.Element {
   const router = useRouter();
   const { setUser } = useUser();
 
-  async function handleLogin() {
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
     try {
       const { data } = await loginUser({ variables: { login, password } });
       localStorage.setItem('token', data.login.token);
+      console.log(data);
       setUser(data.login.user);
-      console.log(data.login.user);
       router.push('/');
     } catch (error) {
       console.error(error);
@@ -32,21 +34,24 @@ export default function LoginPage(): JSX.Element {
   return (
     <div className="fullscreen-container">
       <div className="centered-container">
-        <div className={style['section']}>
+        <form className={style['section']} onSubmit={handleLogin}>
           <div className={style['section__header']}>
             <p className="title">Hey, friend!</p>
             <Image className={style['section__logo']} src={Logo} alt="Логотип" />
           </div>
+
           <div className={style['section__input']}>
             <h1 className="subtitle">Логин</h1>
             <InputField value={login} onChange={setLogin} />
           </div>
+
           <div className={style['section__input']}>
             <h2 className="subtitle">Пароль</h2>
             <InputField value={password} onChange={setPassword} />
           </div>
-          <PrimaryButton onClick={handleLogin}>Войти</PrimaryButton>
-        </div>
+
+          <PrimaryButton type="submit">Войти</PrimaryButton>
+        </form>
       </div>
     </div>
   );

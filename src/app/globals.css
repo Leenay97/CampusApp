@@ -14,7 +14,6 @@
   text-decoration: none;
   user-select: none;
   font-family: 'ChironGoRoundTC', sans-serif;
-  color: var(--text-primary);
 }
 
 :root {
@@ -29,6 +28,7 @@
 
   --color-white: #FFFFFF;
   --color-dark-blue: #2c77a9;
+  --color-dark-blue-transparent: #2c77a984;
 
   --bg-primary: var(--color-blue);
   --bg-secondary: var(--color-turquoise);
@@ -38,12 +38,14 @@
   --accent-orange: var(--color-orange);
   --border-color: var(--color-light-green);
   --primary-button-color: var(--color-dark-blue);
+  --primary-button-disabled: var(--color-dark-blue-transparent);
   --error-color: var(--color-red);
 }
 
 body {
-  background-image: url('@/assets/img/bg-colored.png');
+  background-image: url('/img/bg-colored.png');
   background-size: 200px;
+  background-repeat: repeat;
   color: var(--foreground);
 }
 
@@ -55,6 +57,10 @@ body {
   margin: 0 auto;
   max-width: 800px;
   border-radius: 8px;
+}
+
+.wide {
+  max-width: 1200px;
 }
 
 .fullscreen-container {
@@ -116,4 +122,12 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+.no-padding {
+  padding: 20px;
+}
+
+.no-margin {
+  margin: 0;
 }

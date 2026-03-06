@@ -1,18 +1,21 @@
 import { JSX, memo } from 'react';
-import { HeaderMenuOptions } from './constants';
+import { getHeaderMenuOptions } from './constants';
 import styles from './style.module.scss';
 import Link from 'next/link';
+import { UserLevel } from '@/app/types';
 
 type BurgerMenuProps = {
   isOpen: boolean;
+  userLevel: UserLevel;
   onClose: () => void;
 };
 
-function BurgerMenu({ isOpen, onClose }: BurgerMenuProps): JSX.Element {
+function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Element {
+  const options = getHeaderMenuOptions(userLevel);
   return (
     <div className={isOpen ? styles['burger-menu'] : styles['burger-menu--hidden']}>
       <nav className={styles['burger-menu__wrapper']}>
-        {Object.values(HeaderMenuOptions).map((option) => (
+        {options?.map((option) => (
           <Link
             key={option.link}
             href={option.link}

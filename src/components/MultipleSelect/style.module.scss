@@ -48,12 +48,13 @@
 }
     }
 
-    &__teacher {
+    &__item {
         padding: 5px 10px;
         font-size: 14px;
         border-radius: 5px;
         border: 1px solid var(--primary-button-color);
         cursor: pointer;
+        width: max-content;
     }
 
     &__selected {

@@ -4,7 +4,12 @@ import jwt from 'jsonwebtoken';
 
 export const userResolvers = {
   Query: {
-    students: async () => {
+    students: async (_, { groupId }) => {
+      if (groupId) {
+        return await User.findAll({
+          where: { userLevel: 'STUDENT', groupId },
+        });
+      }
       return await User.findAll({
         where: { userLevel: 'STUDENT' },
         include: [
@@ -59,7 +64,13 @@ export const userResolvers = {
 
   Mutation: {
     login: async (_, { login, password }) => {
-      const user = await User.findOne({ where: { login } });
+      const user = await User.findOne({
+        where: { login },
+        include: [
+          { model: Group, as: 'group' },
+          { model: Workshop, as: 'attendingWorkshops' },
+        ],
+      });
       if (!user) throw new Error('Пользователя не существует');
 
       const isValid = await bcrypt.compare(password, user.hashedPassword);
@@ -74,12 +85,16 @@ export const userResolvers = {
         user,
       };
     },
-    createStudent: async (_, { name, russianName, groupId }) => {
+    createStudent: async (_, { russianName, groupId }) => {
+      const group = await Group.findByPk(groupId);
+      if (!group) throw new Error('Группы не существует');
+      if (!group.seasonId) throw new Error('Группа не принадлежит сезону');
       const user = await User.create({
-        name,
         russianName,
-        groupId,
+        groupId: group.id,
+        seasonId: group.seasonId,
         coins: 0,
+        userLevel: 'STUDENT',
       });
 
       return user;
@@ -128,6 +143,45 @@ export const userResolvers = {
       return {
         token: tokenForLogin,
         user: teacher,
+      };
+    },
+
+    registerStudent: async (_, { token, id, name, login, password, confirmPassword }) => {
+      if (!login || !password) throw new Error('Введите пароль и логин');
+
+      if (password !== confirmPassword) throw new Error('Пароли не совпадают');
+
+      const group = await Group.findByPk(token);
+
+      if (!group) throw new Error('Группа не существует');
+
+      if (!name) throw new Error('Введите английское имя');
+
+      const student = await User.findByPk(id);
+
+      if (!student) throw new Error('Студента не существует');
+      if (student.isActive) throw new Error('Студент уже зарегистрирован');
+
+      const existingLogin = await User.findOne({ where: { login } });
+      if (existingLogin) throw new Error('Логин уже занят');
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      student.hashedPassword = hashedPassword;
+      student.login = login;
+      student.name = name;
+      student.isActive = true;
+
+      await student.save();
+
+      const tokenForLogin = jwt.sign(
+        { id: student.id, userLevel: student.userLevel },
+        process.env.JWT_SECRET,
+        { expiresIn: '30d' },
+      );
+
+      return {
+        token: tokenForLogin,
+        user: student,
       };
     },
 

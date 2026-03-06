@@ -1,62 +1,62 @@
-import { useEffect, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import styles from './style.module.scss';
 
-type MultipleSelectProps = {
-  teachers: Teacher[];
-  value: Teacher[];
-  onChange: (value: Teacher[]) => void;
+type MultipleSelectProps<T> = {
+  items: T[];
+  value: T[];
+  onChange: (value: T[]) => void;
 };
 
-export function MultipleSelect({ teachers, value, onChange }: MultipleSelectProps) {
-  const [filterValue, setFilterValue] = useState<string>('');
+export function MultipleSelect<
+  T extends { id: string; name: string; russianName?: string; color?: string },
+>({ items, value, onChange }: MultipleSelectProps<T>) {
+  const [filterValue, setFilterValue] = useState('');
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  console.log(teachers);
-
-  const filteredTeachers = (teachers || []).filter(
-    (teacher) =>
-      teacher.name.toLowerCase().includes(filterValue.toLowerCase()) &&
-      !value.includes(teacher) &&
-      teacher.group === null,
-  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(event.target.value);
   };
 
-  const handleTeacherSelect = (teacher: Teacher) => {
-    onChange([...value, teacher]);
+  const availableItems = useMemo(() => {
+    return items
+      .filter((item) => !value.some((v) => v.id === item.id))
+      .filter((item) =>
+        (item.russianName ?? item.name).toLowerCase().includes(filterValue.toLowerCase()),
+      )
+      .sort((a, b) => (a.russianName ?? a.name).localeCompare(b.russianName ?? b.name));
+  }, [items, value, filterValue]);
+
+  const handleSelect = (item: T) => {
+    onChange([...value, item]);
     setFilterValue('');
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+
+    inputRef.current?.focus();
   };
 
-  const handleRemoveTeacher = (teacher: Teacher) => {
-    const filteredValue = value.filter((t) => t !== teacher);
-    onChange(filteredValue);
+  const handleRemove = (item: T) => {
+    onChange(value.filter((v) => v.id !== item.id));
   };
-
-  useEffect(() => {
-    onChange(value);
-  }, [value, onChange]);
 
   return (
     <div className={styles['multiple-select']}>
       <div className={styles['multiple-select__field']}>
         <div className={styles['multiple-select__input']}>
           <div className={styles['multiple-select__selected']}>
-            {value.map((teacher) => (
+            {value.map((item) => (
               <div
-                key={teacher.id}
-                className={styles['multiple-select__teacher']}
-                onClick={() => handleRemoveTeacher(teacher)}
+                key={item.id}
+                className={styles['multiple-select__item']}
+                style={
+                  item.color ? { backgroundColor: item.color, color: '#FFFFFF', border: 0 } : {}
+                }
+                onClick={() => handleRemove(item)}
               >
-                {teacher.name}
+                {item.russianName ?? item.name}
               </div>
             ))}
           </div>
+
           <input
             value={filterValue}
             onChange={handleInputChange}
@@ -65,14 +65,16 @@ export function MultipleSelect({ teachers, value, onChange }: MultipleSelectProp
           />
         </div>
       </div>
+
       <div className={styles['multiple-select__options']}>
-        {filteredTeachers.map((teacher) => (
+        {availableItems.map((item) => (
           <div
-            key={teacher.id}
-            onClick={() => handleTeacherSelect(teacher)}
-            className={styles['multiple-select__teacher']}
+            key={item.id}
+            onClick={() => handleSelect(item)}
+            className={styles['multiple-select__item']}
+            style={item.color ? { backgroundColor: item.color, color: '#FFFFFF', border: 0 } : {}}
           >
-            {teacher.name}
+            {item.russianName ?? item.name}
           </div>
         ))}
       </div>

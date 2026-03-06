@@ -23,11 +23,9 @@ const startServer = async () => {
   const PORT = 5000;
 
   try {
-    // 🔥 Подключение к БД
     await sequelize.authenticate();
     console.log('✅ Database connected');
 
-    // 🔥 Создание таблиц
     await sequelize.sync({ alter: true });
     // await sequelize.sync({ force: true });
     console.log('✅ Tables synced');

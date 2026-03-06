@@ -1,0 +1,23 @@
+.places-grid {
+    display: grid;
+    grid-template-columns: 150px repeat(var(--dates-count), 80px);
+    gap: 5px;
+    margin: 0 auto;
+    font-size: 14px;
+
+  &__header {
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: #86b4f0;
+    color: white;
+    font-weight: 500;
+  }
+
+  &__cell-wrapper {
+    position: relative;
+  }
+
+}

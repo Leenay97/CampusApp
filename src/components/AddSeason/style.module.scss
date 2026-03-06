@@ -1,4 +1,7 @@
-.add-teacher {
+.add-season {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
     &__input {
       display: flex;

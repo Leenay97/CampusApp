@@ -89,11 +89,12 @@ export const groupResolvers = {
       });
     },
 
-    addPoints: async (_, { id, amount }) => {
+    updateGroup: async (_, { id, amount, places }) => {
       const group = await Group.findByPk(id);
       if (!group) throw new Error('Group not found');
 
       group.points += amount;
+      group.places = places;
       await group.save();
       return group;
     },

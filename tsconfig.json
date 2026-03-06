@@ -19,6 +19,7 @@
       }
     ],
     "paths": {
+      "@assets": ["./assets/*"],
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
       "@graphql/*": ["./src/graphql/*"],

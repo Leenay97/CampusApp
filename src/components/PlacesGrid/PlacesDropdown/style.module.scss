@@ -1,0 +1,22 @@
+.dropdown {
+    position: absolute;
+    top: 35px;
+    left: 0px;
+    width: 100%;
+    background-color: white;
+    z-index: 2;
+    border-radius: 5px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+
+    &__item {
+    padding: 5px 10px;
+    font-size: 10px;
+    
+      &:hover {
+        background-color: #86b4f0;
+      }
+  }
+
+}

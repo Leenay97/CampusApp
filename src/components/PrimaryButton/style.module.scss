@@ -12,8 +12,17 @@
   height: 35px;
   cursor: pointer;
 
+  &:disabled {
+    background-color: var(--primary-button-disabled);
+
+    &:hover {
+      background-color: var(--primary-button-disabled);
+      color: white;
+    }
+  }
+
   &:hover {
-    background-color: white;
-    color: var(--primary-button-color);
+    background-color: var(--primary-button-disabled);
+    color: white;
   }
 }

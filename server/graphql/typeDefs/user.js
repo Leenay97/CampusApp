@@ -3,7 +3,7 @@ import { gql } from 'apollo-server-express';
 export const userTypeDefs = gql`
   type User {
     id: ID!
-    name: String!
+    name: String
     russianName: String
     coins: Int
     group: Group
@@ -18,7 +18,7 @@ export const userTypeDefs = gql`
   }
 
   extend type Query {
-    students: [User]
+    students(groupId: ID): [User]
     teachers: [User]
     user(id: ID!): User
     usersByGroup(groupId: ID!): [User]
@@ -27,11 +27,19 @@ export const userTypeDefs = gql`
 
   extend type Mutation {
     login(login: String!, password: String!): AuthPayload!
-    createStudent(name: String!, russianName: String!, groupId: ID!): User
+    createStudent(russianName: String!, groupId: ID!): User
     createTeacher(name: String!): User
     registerTeacher(
       token: String!
       id: ID!
+      login: String!
+      password: String!
+      confirmPassword: String!
+    ): AuthPayload!
+    registerStudent(
+      token: String!
+      id: ID!
+      name: String!
       login: String!
       password: String!
       confirmPassword: String!

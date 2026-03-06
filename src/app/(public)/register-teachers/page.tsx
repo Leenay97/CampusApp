@@ -5,13 +5,14 @@ import { queries } from '@graphql/queries/index';
 import styles from './style.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import { useState } from 'react';
-import { TeacherCustomSelect } from '@/components/TeacherCustomSelect/TeacherCustomSelect';
+import { UserCustomSelect } from '@/components/UserCustomSelect/UserCustomSelect';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import { useSearchParams } from 'next/navigation';
 import mutations from '@/graphql/mutations';
+import { User } from '@/app/types';
 
 function RegisterTeacherPage() {
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher>({} as Teacher);
+  const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -23,7 +24,7 @@ function RegisterTeacherPage() {
   const { loading: teachersLoading, data: teachers } = useQuery(queries.GET_TEACHERS);
   const [registerTeacher] = useMutation(mutations.REGISTER_TEACHER);
 
-  function handleAddTeacher(value: Teacher) {
+  function handleAddTeacher(value: User) {
     setSelectedTeacher(value);
   }
 
@@ -52,9 +53,9 @@ function RegisterTeacherPage() {
           <div className={styles['prohibited-section__content']}>
             <h1 className="title">Ну привет, училка</h1>
             <h2 className="subtitle">Найди себя</h2>
-            <TeacherCustomSelect
-              teachers={teachers?.teachers}
-              value={selectedTeacher}
+            <UserCustomSelect
+              users={teachers?.teachers}
+              isLoading={teachersLoading}
               onChange={handleAddTeacher}
             />
           </div>

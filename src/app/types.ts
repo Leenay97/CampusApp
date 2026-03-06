@@ -1,24 +1,25 @@
-type Teacher = {
+export type Teacher = {
   id: string;
   name: string;
   photoUrl?: string;
   group?: Record<string, string>;
 };
 
-type Group = {
+export type Group = {
   id: string;
   name: string;
   teacherIds: string[];
   users: Record<string, string>;
   points: number;
+  places: string;
 };
 
-type GroupInput = {
+export type GroupInput = {
   name: string;
   teacherIds: string[];
 };
 
-type Workshop = {
+export type Workshop = {
   id: string;
   name: string;
   description?: string;
@@ -30,7 +31,15 @@ type Workshop = {
   isClosed: boolean;
 };
 
-type Season = {
+export type Place = {
+  id: string;
+  name: string;
+  isReserved: boolean;
+  isTeamPlace: boolean;
+  color: string;
+};
+
+export type Season = {
   id: string;
   number: string;
   year: string;
@@ -38,11 +47,20 @@ type Season = {
   isArchived: boolean;
 };
 
-type User = {
+export type User = {
   id: string;
   name: string;
   russianName?: string;
   coins: number;
-  userLevel: 'ADMIN' | 'TEACHER' | 'STUDENT';
+  userLevel: UserLevel;
   group?: Group;
+  isActive: boolean;
 };
+
+export enum UserLevel {
+  Admin = 'ADMIN',
+  Teacher = 'TEACHER',
+  Student = 'STUDENT',
+}
+
+export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';

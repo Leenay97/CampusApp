@@ -1,7 +1,6 @@
 'use client';
 
-import { AddTeacher } from '@components/AddTeacher/AddTeacher';
-import { TeachersList } from '@components/TeachersList/TeachersList';
+import { AddTeacher } from '@/components/AddTeacher/AddTeacher';
 import { useQuery } from '@apollo/client';
 import { queries } from '@graphql/queries/index';
 import { mutations } from '@graphql/mutations';
@@ -11,6 +10,8 @@ import styles from './style.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import { useState } from 'react';
 import { AuthGuard } from '@/auth/AuthGuard';
+import { List } from '@/components/List/List';
+import { User, UserLevel } from '@/app/types';
 
 function GroupsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,9 +46,13 @@ function GroupsPage() {
     }
   };
 
-  async function handleDeleteUser(id: string, name: string) {
-    setSelectedIdToDelete(id);
-    setModalText({ text: `Ты точно хочешь удалить учителя?`, description: name });
+  async function handleDeleteUser(user: User | null) {
+    if (!user) return;
+    setSelectedIdToDelete(user.id);
+    setModalText({
+      text: `Ты точно хочешь удалить учителя?`,
+      description: user.name ?? user.russianName,
+    });
     setIsModalOpen(true);
   }
 
@@ -71,7 +76,11 @@ function GroupsPage() {
             >
               <h1>Добавить учителя</h1>
               <AddTeacher onAdd={handleRefetch} />
-              <TeachersList teachers={teachers?.teachers} onDelete={handleDeleteUser} />
+              <List<User>
+                items={teachers?.teachers}
+                isLoading={teachersLoading}
+                onDelete={handleDeleteUser}
+              />
             </div>
           </div>
         </div>

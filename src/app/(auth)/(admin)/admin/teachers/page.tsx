@@ -1,7 +1,8 @@
 'use client';
+import { User } from '@/app/types';
 import { AddTeacher } from '@/components/AddTeacher/AddTeacher';
 import Modal from '@/components/Modal/Modal';
-import { TeachersList } from '@/components/TeachersList/TeachersList';
+import { List } from '@/components/List/List';
 import { mutations } from '@/graphql/mutations';
 import { queries } from '@/graphql/queries';
 import { useMutation, useQuery } from '@apollo/client';
@@ -9,7 +10,7 @@ import { useState } from 'react';
 
 export default function TeachersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
+  const [teacherToDelete, setTeacherToDelete] = useState<User | null>(null);
   const {
     loading: teachersLoading,
     data: teachersData,
@@ -18,8 +19,8 @@ export default function TeachersPage() {
 
   const [deleteTeacher] = useMutation(mutations.DELETE_USER);
 
-  function openModal(teacher: Teacher | null) {
-    setTeacherToDelete(teacher);
+  function openModal(user: User | null) {
+    setTeacherToDelete(user);
     setIsModalOpen(true);
   }
 
@@ -41,8 +42,8 @@ export default function TeachersPage() {
       <div className="centered-container">
         <div className="section">
           <AddTeacher onAdd={refetchTeachers} />
-          <TeachersList
-            teachers={teachersData?.teachers}
+          <List<User>
+            items={teachersData?.teachers}
             isLoading={teachersLoading}
             onDelete={openModal}
           />

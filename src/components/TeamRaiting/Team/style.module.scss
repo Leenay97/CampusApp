@@ -1,28 +1,37 @@
+@import url('@app/globals.css');
 .team {
     width: 100%;
     display: grid;
     grid-template-columns: 30px 1fr auto;
     min-width: 250px;
-    background-color: #e7e8fe;
     padding: 10px 20px;
     border-bottom: 1px solid rgba(49, 47, 47, 0.098);
-    color: rgb(52, 43, 43);
     border-radius: 5px;
+    color: white;
+    background: linear-gradient(90deg, #9598ffb3 0%, #a2d5ff 100%);
 
     &__place {
         font-weight: bold;
-    }
-    &--1 {
-        background-color: #ffdbfa;
-        padding: 15px 20px;
-        }
-    &--2 {
-        background-color: #f9e2ff;
-        padding: 13px 20px;
-        }
-    &--3 {
-        background-color: #efe5ff;
-        padding: 12px 20px;
-        }
 
+    }
+
+// &:nth-child(1) {
+//   background: linear-gradient(90deg, #6faee8 0%, #b9ddfb 100%);
+//   color: #ffffff;
+// }
+
+&:nth-child(2) {
+  background: linear-gradient(90deg, #b17fee 0%, #98d0fd 100%);
+  padding: 15px 20px;
+}
+
+&:nth-child(3) {
+  background: linear-gradient(90deg, #b17feedd 0%, #98d0fd 100%);
+  padding: 13px 20px;
+}
+
+&:nth-child(4) {
+  background: linear-gradient(90deg, #b17feeb0 0%, #98d0fd 100%);
+  padding: 12px 20px;
+}
 }

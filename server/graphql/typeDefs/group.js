@@ -6,6 +6,7 @@ export const groupTypeDefs = gql`
     name: String
     students: [User]
     teachers: [User]
+    places: String
     points: Int
   }
 
@@ -17,7 +18,7 @@ export const groupTypeDefs = gql`
 
   extend type Mutation {
     createGroup(name: String!, userIds: [ID!]!): Group
-    addPoints(id: ID!, amount: Int): Group
+    updateGroup(id: ID!, amount: Int, places: String): Group
     deleteGroup(id: ID!): Group
   }
 `;

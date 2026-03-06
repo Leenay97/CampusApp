@@ -6,6 +6,7 @@ import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import CreateWorkshopModal from '@/components/CreateWorkshopModal/CreateWorkshopModal';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
+import { Workshop as WorkshopType } from '@/app/types';
 
 export default function WorkShopsPage(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,7 +30,7 @@ export default function WorkShopsPage(): JSX.Element {
           Добавить мастеркласс
         </PrimaryButton>
         <CreateWorkshopModal isOpen={isModalOpen} onSubmit={refetch} onClose={handleCloseModal} />
-        {(data?.workshops || []).map((workshop: Workshop) => (
+        {(data?.workshops || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}
             name={workshop.name}

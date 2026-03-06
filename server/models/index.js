@@ -3,6 +3,7 @@ import { User } from './User.js';
 import { Group } from './Group.js';
 import { Workshop } from './Workshop.js';
 import { Season } from './Season.js';
+import { Place } from './Place.js';
 
 Season.hasMany(Group, { foreignKey: 'seasonId', as: 'groups' });
 Group.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
@@ -31,4 +32,10 @@ Workshop.belongsToMany(User, {
   foreignKey: 'workshopId',
 });
 
-export { sequelize, User, Group, Workshop, Season };
+Group.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
+Place.hasOne(Group, { foreignKey: 'placeId', as: 'group' });
+
+Workshop.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
+Place.hasOne(Workshop, { foreignKey: 'placeId', as: 'workshop' });
+
+export { sequelize, User, Group, Workshop, Season, Place };

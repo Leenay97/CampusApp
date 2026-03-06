@@ -5,10 +5,11 @@ import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import { InputField } from '../InputField/InputField';
-import { TeacherCustomSelect } from '@components/TeacherCustomSelect/TeacherCustomSelect';
 import { useMutation, useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
+import { Teacher, User } from '@/app/types';
+import { UserCustomSelect } from '../UserCustomSelect/UserCustomSelect';
 
 type ModalProps = {
   isOpen: boolean;
@@ -17,7 +18,7 @@ type ModalProps = {
 };
 
 function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher>({ id: '', name: '' });
+  const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
   const [name, setName] = useState<string>('');
   const [location, setLocation] = useState<string>('');
   const [capacity, setCapacity] = useState<string>('');
@@ -43,7 +44,7 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
   const modalRoot = document.getElementById('modal-root');
   if (!modalRoot) return null;
 
-  function handleChangeTeacher(teacher: Teacher) {
+  function handleChangeTeacher(teacher: User) {
     setSelectedTeacher(teacher);
   }
 
@@ -53,7 +54,7 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
 
   function handleClose() {
     onClose();
-    setSelectedTeacher({ id: '', name: '' });
+    setSelectedTeacher({} as User);
     setName('');
     setLocation('');
     setCapacity('');
@@ -92,9 +93,9 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
           <div className="subtitle">Название</div>
           <InputField value={name} onChange={setName} />
           <div className="subtitle">Учитель</div>
-          <TeacherCustomSelect
-            teachers={teachers}
-            value={selectedTeacher}
+          <UserCustomSelect
+            users={teachers}
+            isLoading={teachersLoading}
             onChange={handleChangeTeacher}
           />
           <div className="subtitle">Место</div>

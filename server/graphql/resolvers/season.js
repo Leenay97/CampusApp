@@ -8,16 +8,28 @@ export const seasonResolvers = {
     season: async (_, { id }) => {
       return await Season.findByPk(id);
     },
+    activeSeason: async () => {
+      return await Season.findOne({
+        where: { isActive: true },
+        include: {
+          model: Group,
+          as: 'groups',
+        },
+      });
+    },
   },
 
   Mutation: {
-    createSeason: async (_, { number, year, groupTeachers }) => {
+    createSeason: async (_, { number, year, groupTeachers, startDate, endDate }) => {
       const existingSeason = await Season.findOne({ where: { number, year } });
       if (existingSeason) {
         throw new Error('Сезон уже существует');
       }
+      if (!number || !year || !startDate || !endDate) {
+        throw new Error('Все поля обязательны для заполнения');
+      }
 
-      const season = await Season.create({ number, year });
+      const season = await Season.create({ number, year, startDate, endDate });
 
       for (const groupData of groupTeachers) {
         await Group.create({

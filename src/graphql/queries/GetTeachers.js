@@ -6,6 +6,7 @@ export const GET_TEACHERS = gql`
       id
       name
       group {
+        id
         name
       }
     }

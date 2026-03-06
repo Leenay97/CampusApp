@@ -2,14 +2,15 @@ import { useState } from 'react';
 import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import { MultipleSelect } from '@components/MultipleSelect/MultipleSelect';
+import { GroupInput, User } from '@/app/types';
 
 type AddGroupProps = {
   onAdd: (group: GroupInput) => void;
-  teachers: Teacher[];
+  teachers: User[];
 };
 
 export function AddGroup({ onAdd, teachers }: AddGroupProps) {
-  const [groupTeachers, setGroupTeachers] = useState<Teacher[]>([]);
+  const [groupTeachers, setGroupTeachers] = useState<User[]>([]);
 
   async function handleCreateGroup() {
     if (!groupTeachers.length) return;
@@ -26,7 +27,7 @@ export function AddGroup({ onAdd, teachers }: AddGroupProps) {
     }
   }
 
-  function handleChangeTeacher(value: Teacher[]) {
+  function handleChangeTeacher(value: User[]) {
     setGroupTeachers(value);
   }
 
@@ -34,7 +35,11 @@ export function AddGroup({ onAdd, teachers }: AddGroupProps) {
     <div className={styles['add-group']}>
       <h1 className="subtitle">Добавить группу</h1>
       <div className={styles['add-group__input']}>
-        <MultipleSelect value={groupTeachers} teachers={teachers} onChange={handleChangeTeacher} />
+        <MultipleSelect<User>
+          value={groupTeachers}
+          items={teachers}
+          onChange={handleChangeTeacher}
+        />
         <PrimaryButton onClick={handleCreateGroup}>Добавить</PrimaryButton>
       </div>
     </div>
