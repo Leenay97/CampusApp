@@ -1,49 +1,65 @@
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import styles from './style.module.scss';
 import Team from '@components/TeamRaiting/Team/Team';
+import { Group } from '@/app/types';
+import PrimaryButton from '../PrimaryButton/PrimaryButton';
+import SecondaryButton from '../SecondaryButton/SecondaryButton';
 
 type AddPointsProps = {
   groups: Group[];
-  onAdd: (id: string, amount: number) => void;
+  onSave: (changedGroups: Group[]) => void;
 };
 
-function AddPoints({ groups, onAdd }: AddPointsProps) {
-  const sortedGroups = useMemo(() => {
-    if (!groups) return [];
-    return [...groups].sort((a, b) => b.points - a.points);
+function AddPoints({ groups, onSave }: AddPointsProps) {
+  const [changedGroups, setChangedGroups] = useState<Group[]>([]);
+
+  useEffect(() => {
+    if (Array.isArray(groups)) {
+      const sorted = [...groups].sort((a, b) => b.points - a.points);
+
+      /*eslint-disable react-hooks/set-state-in-effect*/
+      setChangedGroups(sorted);
+    }
   }, [groups]);
 
-  const maxPoints = useMemo(() => sortedGroups[0]?.points || 0, [sortedGroups]);
+  function handleChange(groupId: string, amount: number) {
+    setChangedGroups((prev) =>
+      prev.map((group) =>
+        group.id === groupId ? { ...group, points: (group.points ?? 0) + amount } : group,
+      ),
+    );
+  }
 
+  function handleSave() {
+    onSave(changedGroups);
+  }
   return (
-    <div className={styles['raiting']}>
-      <h1 className={styles['title']}>Рейтинг команд</h1>
-      {sortedGroups.map((team, index) => (
-        <div key={team.name} className={styles['team']}>
-          <Team
-            key={team.name}
-            team={team}
-            place={index + 1}
-            width={maxPoints > 0 ? (team.points / maxPoints) * 100 : 0}
-          />
-          <button
-            className={styles['add-btn']}
-            onClick={() => {
-              onAdd(team.id, -100);
-            }}
-          >
-            -100
-          </button>
-          <button
-            className={styles['add-btn']}
-            onClick={() => {
-              onAdd(team.id, 100);
-            }}
-          >
-            +100
-          </button>
+    <div className="centered-container">
+      <div className="section">
+        <h1 className="title">Добавить очки</h1>
+        <div className={styles['save-btn']}>
+          <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
         </div>
-      ))}
+
+        {changedGroups.map((team, index) => {
+          const originalTeam = Array.isArray(groups)
+            ? groups.find((g) => g.id === team.id)
+            : undefined;
+          const changedPoints = team.points - (originalTeam?.points ?? 0);
+
+          return (
+            <div key={team.id} className={styles['team']}>
+              <Team team={team} place={index + 1} changedPoints={changedPoints} />
+              <button className={styles['add-btn']} onClick={() => handleChange(team.id, -100)}>
+                -100
+              </button>
+              <button className={styles['add-btn']} onClick={() => handleChange(team.id, 100)}>
+                +100
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

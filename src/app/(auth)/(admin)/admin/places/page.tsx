@@ -124,6 +124,7 @@ export default function PlacesPage() {
     <div className="centered-container wide flex-container">
       <div className="section">
         <div ref={gridRef}>
+          <h1 className="title">Расписание групповых мест</h1>
           <PlacesGrid
             groups={groups}
             dates={dates}

@@ -40,62 +40,6 @@ function TeamRaiting() {
         ) : (
           <div className={styles['empty']}>Нет команд</div>
         )}
-        <Team
-          key={'dadsadsa'}
-          team={{
-            name: 'string',
-            points: 0,
-          }}
-          place={2}
-        />
-        <Team
-          key={'dadsadsa'}
-          team={{
-            name: 'string',
-            points: 0,
-          }}
-          place={3}
-        />
-        <Team
-          key={'dadsadsa'}
-          team={{
-            name: 'string',
-            points: 0,
-          }}
-          place={4}
-        />
-        <Team
-          key={'dadsadsa'}
-          team={{
-            name: 'string',
-            points: 0,
-          }}
-          place={5}
-        />
-        <Team
-          key={'dadsadsa'}
-          team={{
-            name: 'string',
-            points: 0,
-          }}
-          place={6}
-        />
-        <Team
-          key={'dadsadsa'}
-          team={{
-            name: 'string',
-            points: 0,
-          }}
-          place={7}
-        />
-        <Team
-          key={'dadsadsa'}
-          team={{
-            name: 'string',
-            points: 0,
-          }}
-          place={8}
-        />
       </div>
     </div>
   );
