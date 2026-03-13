@@ -7,6 +7,8 @@ import { LoadingType } from '@/app/types';
 import Waiting from '@/assets/img/waiting.gif';
 import Image from 'next/image';
 import Title from '../Title/Title';
+import Loader from '../Loader/Loaader';
+import Subtitle from '../Subtitle/Subtitle';
 
 type ModalLoadingProps = {
   text?: string;
@@ -44,20 +46,8 @@ function ModalLoading({ onClose, loadingState }: ModalLoadingProps) {
   return createPortal(
     <div className={styles['modal']} onClick={handleOverlayClick}>
       <div className={styles['modal__content']} onClick={handleContentClick}>
-        <div className={styles['modal__header']}>
-          <Title>Идет загрузка</Title>
-          <div className={styles['close-button']} onClick={onClose}>
-            &times;
-          </div>
-        </div>
-        <div className={styles['modal__body']}>
-          <Image src={Waiting} alt="wait" />
-        </div>
-        <div className={styles['modal__footer']}>
-          <PrimaryButton disabled={loadingState === 'LOADING'} onClick={onClose}>
-            {statusText}
-          </PrimaryButton>
-        </div>
+        <Loader />
+        <Subtitle noMargin>{statusText}</Subtitle>
       </div>
     </div>,
     modalRoot,

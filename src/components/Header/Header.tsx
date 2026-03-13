@@ -24,8 +24,6 @@ function Header() {
     return user?.userLevel;
   }, [user?.userLevel]);
 
-  console.log(user);
-
   function handleBurgerClick() {
     setIsBurgerOpen((prev) => !prev);
     setIsProfileOpen(false);

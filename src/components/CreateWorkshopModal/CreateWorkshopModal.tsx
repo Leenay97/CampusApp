@@ -28,7 +28,6 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    /*eslint-disable react-hooks/set-state-in-effect*/
     setMounted(true);
   }, []);
 
@@ -68,9 +67,9 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
     setMaxAge('');
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     try {
-      createWorkshop({
+      await createWorkshop({
         variables: {
           name,
           placeId: selectedPlace.id,

@@ -1,39 +1,38 @@
 'use client';
 
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 import { GET_PLACES } from '@/graphql/queries/GetPlaces';
 import { CREATE_PLACE } from '@/graphql/mutations/CreatePlace';
 import PlacesGrid from '@components/PlacesGrid/PlacesGrid';
 import AddPlaceForm from '@components/AddPlaceForm/AddPlaceForm';
-import { LoadingType, Place } from '@/app/types';
+import { Place } from '@/app/types';
 import { buildGridFromGroups, generateTeamPlacesGrid } from './helpers';
 import { List } from '@/components/List/List';
 import { MultipleSelect } from '@/components/MultipleSelect/MultipleSelect';
 import { buildPlacesPayload } from './helpers';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
-import mutations from '@/graphql/mutations';
 import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
 import html2canvas from 'html2canvas';
 import styles from './style.module.scss';
-import ModalLoading from '@/components/ModalLoading/ModalLoading';
 import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import Title from '@/components/Title/Title';
 import Subtitle from '@/components/Subtitle/Subtitle';
 import Loader from '@/components/Loader/Loaader';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import { UPDATE_GROUP } from '@/graphql/mutations/UpdateGroup';
 
 export default function PlacesPage() {
   const { data, loading } = useQuery(GET_ACTIVE_SEASON);
   const { data: placesData, loading: placesLoading, refetch } = useQuery(GET_PLACES);
-  const [updateGroup] = useMutation(mutations.UPDATE_GROUP);
-  const [createPlace] = useMutation(CREATE_PLACE);
+  const [updateGroup] = useGlobalLoadingMutation(UPDATE_GROUP);
+  const [createPlace] = useGlobalLoadingMutation(CREATE_PLACE);
 
   const [grid, setGrid] = useState<(Place | undefined)[][]>([]);
   const [color, setColor] = useState<string>('');
   const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([]);
-  const [someLoading, setSomeLoading] = useState<LoadingType>('NONE');
 
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -82,21 +81,17 @@ export default function PlacesPage() {
   async function handleSave() {
     if (!grid) return;
     const payload = buildPlacesPayload(groups, dates, grid);
-    setSomeLoading('LOADING');
 
     try {
       for (const item of payload) {
         await updateGroup({
-          variables: {
-            id: item.groupId,
-            amount: 0,
-            places: item.places,
-          },
+          id: item.groupId,
+          amount: 0,
+          places: item.places,
         });
       }
-      setSomeLoading('SUCCESS');
-    } catch {
-      setSomeLoading('ERROR');
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -112,15 +107,11 @@ export default function PlacesPage() {
   }
 
   async function handleCreate(name: string, isTeam: boolean) {
-    setSomeLoading('LOADING');
     try {
-      await createPlace({
-        variables: { name, isTeamPlace: isTeam, color },
-      });
-      setSomeLoading('SUCCESS');
+      await createPlace({ name, isTeamPlace: isTeam, color });
       refetch();
-    } catch {
-      setSomeLoading('ERROR');
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -166,9 +157,6 @@ export default function PlacesPage() {
         <AddPlaceForm onCreate={handleCreate} color={color} changeColor={setColor} />
         <List items={places} isLoading={loading} />
       </Section>
-      {someLoading !== 'NONE' && (
-        <ModalLoading onClose={() => setSomeLoading('NONE')} loadingState={someLoading} />
-      )}
     </CenteredContainer>
   );
 }

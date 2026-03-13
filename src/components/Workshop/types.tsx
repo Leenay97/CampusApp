@@ -11,6 +11,7 @@ export type Workshop = {
   place: string;
   toClose?: boolean;
   isClosed?: boolean;
+  noButtons?: boolean;
   handleJoin?: () => void;
 };
 

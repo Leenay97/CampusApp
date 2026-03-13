@@ -13,8 +13,12 @@ import Loader from '@/components/Loader/Loaader';
 
 export default function WorkShopsPage(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showClosed, setShowClosed] = useState<boolean>(false);
 
   const { data, loading, refetch } = useQuery(queries.GET_WORKSHOPS);
+
+  const activeWorkshops = [...(data?.workshops ?? [])].filter((w) => !w.isClosed);
+  const closedWorkshops = [...(data?.workshops ?? [])].filter((w) => w.isClosed);
 
   function handleOpenModal() {
     setIsModalOpen(true);
@@ -23,12 +27,12 @@ export default function WorkShopsPage(): JSX.Element {
   function handleCloseModal() {
     setIsModalOpen(false);
   }
+  function handleSubmit() {
+    setIsModalOpen(false);
+    refetch();
+  }
 
-  const sortedWorkshops = [...(data?.workshops ?? [])].sort(
-    (a: WorkshopType, b: WorkshopType) => Number(a.isClosed) - Number(b.isClosed),
-  );
-
-  console.log(sortedWorkshops);
+  console.log(data);
 
   if (loading)
     return (
@@ -45,8 +49,12 @@ export default function WorkShopsPage(): JSX.Element {
         <PrimaryButton onClick={handleOpenModal} width="100%">
           Добавить мастеркласс
         </PrimaryButton>
-        <CreateWorkshopModal isOpen={isModalOpen} onSubmit={refetch} onClose={handleCloseModal} />
-        {(sortedWorkshops || []).map((workshop: WorkshopType) => (
+        <CreateWorkshopModal
+          isOpen={isModalOpen}
+          onSubmit={handleSubmit}
+          onClose={handleCloseModal}
+        />
+        {(activeWorkshops || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}
             name={workshop.name}
@@ -56,8 +64,27 @@ export default function WorkShopsPage(): JSX.Element {
             place={workshop.place?.name}
             teacher={workshop.teacher.name}
             isClosed={workshop.isClosed}
+            noButtons
           />
         ))}
+        <PrimaryButton onClick={() => setShowClosed((prev) => !prev)}>
+          {showClosed ? 'Скрыть закрытые' : 'Показать закрытые'}
+        </PrimaryButton>
+        {showClosed &&
+          closedWorkshops.map((workshop: WorkshopType) => (
+            <Workshop
+              key={workshop.id}
+              name={workshop.name}
+              description={workshop.description}
+              students={workshop.students ?? []}
+              maxStudentAmount={workshop.maxStudents}
+              place={workshop.place?.name}
+              teacher={workshop.teacher?.name}
+              maxAge={workshop.maxAge}
+              toClose
+              isClosed={workshop.isClosed}
+            />
+          ))}
       </div>
     </CenteredContainer>
   );

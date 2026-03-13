@@ -13,7 +13,6 @@ export const GET_TODAY_WORKSHOPS = gql`
         id
         name
       }
-      placeId
       place {
         id
         name

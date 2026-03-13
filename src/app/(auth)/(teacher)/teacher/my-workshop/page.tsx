@@ -11,9 +11,11 @@ import { Fragment, useState } from 'react';
 import CloseWorkshopModal from '@/components/CloseWorkshopModal/CloseWorkshopModal';
 import Loader from '@/components/Loader/Loaader';
 import { CLOSE_WORKSHOP } from '@/graphql/mutations/CloseWorkshop';
+import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 
 export default function MyWorkshopPage() {
   const [activeWorkshopId, setActiveWorkshopId] = useState<string | null>(null);
+  const [showClosed, setShowClosed] = useState<boolean>(false);
   const [closeWorkshop] = useMutation(CLOSE_WORKSHOP);
   const { user } = useUser();
   const { data, loading, refetch } = useQuery(GET_WORKSHOPS_BY_TEACHER, {
@@ -32,9 +34,8 @@ export default function MyWorkshopPage() {
     }
   }
 
-  const sortedWorkshops = [...(data?.workshopsByTeacher ?? [])].sort(
-    (a: WorkshopType, b: WorkshopType) => Number(a.isClosed) - Number(b.isClosed),
-  );
+  const activeWorkshops = [...(data?.workshopsByTeacher ?? [])].filter((w) => !w.isClosed);
+  const closedWorkshops = [...(data?.workshopsByTeacher ?? [])].filter((w) => w.isClosed);
 
   if (loading)
     return (
@@ -50,7 +51,7 @@ export default function MyWorkshopPage() {
       <Section>
         <Title>Мои мастерклассы</Title>
       </Section>
-      {sortedWorkshops.map((workshop: WorkshopType) => (
+      {activeWorkshops.map((workshop: WorkshopType) => (
         <Fragment key={workshop.id}>
           <Workshop
             name={workshop.name}
@@ -74,6 +75,27 @@ export default function MyWorkshopPage() {
           )}
         </Fragment>
       ))}
+      <PrimaryButton onClick={() => setShowClosed((prev) => !prev)}>
+        {showClosed ? 'Скрыть закрытые' : 'Показать закрытые'}
+      </PrimaryButton>
+
+      {showClosed &&
+        closedWorkshops.map((workshop: WorkshopType) => (
+          <Fragment key={workshop.id}>
+            <Workshop
+              name={workshop.name}
+              description={workshop.description}
+              students={workshop.students ?? []}
+              maxStudentAmount={workshop.maxStudents}
+              place={workshop.place?.name}
+              teacher={workshop.teacher?.name}
+              maxAge={workshop.maxAge}
+              toClose
+              isClosed={workshop.isClosed}
+              handleJoin={() => setActiveWorkshopId(workshop.id)}
+            />
+          </Fragment>
+        ))}
     </CenteredContainer>
   );
 }

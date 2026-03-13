@@ -17,67 +17,54 @@ function Workshop({
   place,
   toClose,
   isClosed,
+  noButtons,
   handleJoin,
 }: WorkshopType) {
+  const studentCount = students?.length ?? 0;
+  const isFull = studentCount >= (maxStudentAmount ?? 0);
+
+  // Если мастер-класс закрыт — отдельный блок
   if (isClosed) {
     return (
-      <div className={styles['workshop--closed']}>
+      <div className={styles['workshop--active']}>
         <div className={styles['workshop__name']}>{name}</div>
         <div className={styles['workshop__teacher']}>
-          <div className={styles['teacher-photo']}></div>
+          <div className={styles['teacher-photo']} />
           {teacher}
         </div>
-        <WorkshopCounter number={students?.length ?? 0} maxNumber={maxStudentAmount} />
+        <WorkshopCounter number={studentCount} maxNumber={maxStudentAmount} />
         <SecondaryButton disabled>Мастеркласс закрыт</SecondaryButton>
       </div>
     );
   }
-  if (joined) {
-    return (
-      <div className={styles['workshop--active']}>
-        <div className={styles['workshop__name']}>{name}</div>
-        <div className={styles['workshop__place']}>{place}</div>
-        {description ? <div className={styles['workshop__description']}>{description}</div> : null}
-        <div className={styles['workshop__teacher']}>
-          <div className={styles['teacher-photo']}></div>
-          {teacher}
-        </div>
-        {maxAge && <div className={styles['workshop__place']}>Возраст: {maxAge}+</div>}
-        <WorkshopCounter number={students?.length ?? 0} maxNumber={maxStudentAmount} />
-        <SecondaryButton
-          disabled={students?.length >= maxStudentAmount && !toClose}
-          onClick={handleJoin}
-        >
-          Отменить
-        </SecondaryButton>
-      </div>
-    );
-  }
+
+  console.log(noButtons);
+
+  // Общий блок для остальных состояний
   return (
-    <div className={styles['workshop']}>
+    <div className={joined ? styles['workshop--active'] : styles['workshop']}>
       <div className={styles['workshop__name']}>{name}</div>
-      <div className={styles['workshop__place']}>{place}</div>
-      {description ? <div className={styles['workshop__description']}>{description}</div> : null}
+      {place && <div className={styles['workshop__place']}>{place}</div>}
+      {description && <div className={styles['workshop__description']}>{description}</div>}
       <div className={styles['workshop__teacher']}>
-        <div className={styles['teacher-photo']}></div>
+        <div className={styles['teacher-photo']} />
         {teacher}
       </div>
       {maxAge && <div className={styles['workshop__place']}>Возраст: {maxAge}+</div>}
-      <WorkshopCounter number={students?.length ?? 0} maxNumber={maxStudentAmount} />
-      {toClose ? (
-        <PrimaryButton
-          disabled={students?.length >= maxStudentAmount && !toClose}
-          onClick={handleJoin}
-        >
-          Закрыть
-        </PrimaryButton>
-      ) : (
-        <PrimaryButton
-          disabled={students?.length >= maxStudentAmount && !toClose}
-          onClick={handleJoin}
-        >
-          Записаться
-        </PrimaryButton>
+      <WorkshopCounter number={studentCount} maxNumber={maxStudentAmount} />
+
+      {!noButtons && (
+        <>
+          {joined ? (
+            <SecondaryButton disabled={isFull && !toClose} onClick={handleJoin}>
+              Отменить
+            </SecondaryButton>
+          ) : (
+            <PrimaryButton disabled={isFull && !toClose} onClick={handleJoin}>
+              {toClose ? 'Закрыть' : 'Записаться'}
+            </PrimaryButton>
+          )}
+        </>
       )}
     </div>
   );

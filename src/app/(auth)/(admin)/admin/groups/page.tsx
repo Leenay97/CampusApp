@@ -3,8 +3,6 @@
 import { AddTeacher } from '@/components/AddTeacher/AddTeacher';
 import { useQuery } from '@apollo/client';
 import { queries } from '@graphql/queries/index';
-import { mutations } from '@graphql/mutations';
-import { useMutation } from '@apollo/client';
 import Modal from '@components/Modal/Modal';
 import styles from './style.module.scss';
 import { InputField } from '@/components/InputField/InputField';
@@ -16,6 +14,8 @@ import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import Subtitle from '@/components/Subtitle/Subtitle';
 import Loader from '@/components/Loader/Loaader';
+import { DELETE_USER } from '@/graphql/mutations/DeleteUser';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 
 function GroupsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,8 +25,7 @@ function GroupsPage() {
   });
   const [selectedIdToDelete, setSelectedIdToDelete] = useState<string | null>(null);
   const [password, setPassword] = useState<string>('');
-  const [deleteUser] = useMutation(mutations.DELETE_USER);
-  // const [deleteGroup] = useMutation(mutations.DELETE_GROUP);
+  const [deleteUser] = useGlobalLoadingMutation(DELETE_USER);
 
   const {
     loading: teachersLoading,
@@ -41,7 +40,7 @@ function GroupsPage() {
   const modalSubmit = async () => {
     if (!selectedIdToDelete) return;
     try {
-      await deleteUser({ variables: { id: selectedIdToDelete } });
+      await deleteUser({ id: selectedIdToDelete });
       setIsModalOpen(false);
       setSelectedIdToDelete(null);
       handleRefetch();

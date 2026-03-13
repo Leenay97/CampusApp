@@ -17,17 +17,19 @@ export default function AddPlaceForm({ color, changeColor, onCreate }: Props) {
 
   async function handleSubmit() {
     if (!name) return;
-
-    await onCreate(name, isTeam);
-
-    setName('');
+    try {
+      await onCreate(name, isTeam);
+      setName('');
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   useEffect(() => {
     if (!isTeam) {
       changeColor('');
     }
-  }, [isTeam]);
+  }, [isTeam, changeColor]);
 
   return (
     <div className={styles['add-place']}>
