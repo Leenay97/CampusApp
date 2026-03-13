@@ -11,6 +11,15 @@
   height: 35px;
   cursor: pointer;
 
+  &:disabled {
+    background-color: transparent;
+
+    &:hover {
+      background-color: var(--primary-button-disabled);
+      color: white;
+    }
+  }
+
   &:hover {
     background-color: var(--primary-button-color);
     color: white;

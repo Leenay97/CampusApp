@@ -4,7 +4,7 @@ import Workshop from '@components/Workshop/Workshop';
 import style from './style.module.scss';
 import { useMutation, useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
-import { Workshop as WorkshopType } from '@/app/types';
+import { User, Workshop as WorkshopType } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import { JOIN_WORKSHOP } from '@/graphql/mutations/JoinWorkshop';
@@ -36,10 +36,17 @@ export default function WorkShopsPage(): JSX.Element {
       </CenteredContainer>
     );
 
+  const workshopsToShow = (() => {
+    const joinedWorkshop = data?.todayWorkshops.find((workshop: WorkshopType) =>
+      workshop.students.some((student: User) => student.id === user?.id),
+    );
+    return joinedWorkshop ? [joinedWorkshop] : data?.todayWorkshops;
+  })();
+
   return (
     <CenteredContainer>
       <div className={style['workshops-wrapper']}>
-        {(data?.todayWorkshops || []).map((workshop: WorkshopType) => (
+        {(workshopsToShow || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}
             name={workshop.name}
@@ -50,6 +57,7 @@ export default function WorkShopsPage(): JSX.Element {
             teacher={workshop.teacher.name}
             maxAge={workshop.maxAge}
             handleJoin={() => handleJoin(workshop.id)}
+            joined={workshop.students.some((student) => student.id === user?.id)}
           />
         ))}
       </div>

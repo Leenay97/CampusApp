@@ -33,6 +33,6 @@ export const workshopTypeDefs = gql`
       type: String!
     ): Workshop
     joinWorkshop(studentId: ID!, workshopId: ID!): Workshop
-    closeWorkshop(id: ID!): Workshop
+    closeWorkshop(studentIds: [ID!]!, workshopId: ID!): Workshop
   }
 `;

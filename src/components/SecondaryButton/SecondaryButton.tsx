@@ -4,7 +4,7 @@ import styles from './style.module.scss';
 type PrimaryButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 };
 
 function SecondaryButton({ disabled, children, onClick }: PrimaryButtonProps) {

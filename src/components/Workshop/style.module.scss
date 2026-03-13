@@ -8,6 +8,63 @@
     flex-direction: column;
     gap: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+
+  &--closed {
+    background-color: rgba(255, 255, 255, 0.666);
+    border: 5px solid rgb(128, 186, 92);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+
+     &__teacher {
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  
+    .teacher-photo {
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      background-color: var(--color-light-blue);
+    }
+
+  }
+
+  &--active {
+    background-color: rgb(255, 255, 255);
+    border: 5px solid rgb(128, 186, 92);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+
+     &__teacher {
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  
+    .teacher-photo {
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      background-color: var(--color-light-blue);
+    }
+
+  }
 
     
   &__description {

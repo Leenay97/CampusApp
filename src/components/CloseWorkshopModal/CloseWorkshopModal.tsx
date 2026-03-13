@@ -9,10 +9,11 @@ import Checkbox from '../Checkbox/Checkbox';
 
 type ModalProps = {
   students: User[];
+  onSubmit: (studentIds: string[]) => void;
   onClose: () => void;
 };
 
-function CloseWorkshopModal({ students, onClose }: ModalProps) {
+function CloseWorkshopModal({ students, onSubmit, onClose }: ModalProps) {
   const [checkedStudents, setCheckedStudents] = useState<string[]>(students.map((s) => s.id));
   if (typeof window === 'undefined') return null;
 
@@ -39,6 +40,10 @@ function CloseWorkshopModal({ students, onClose }: ModalProps) {
     });
   }
 
+  function handleSubmit() {
+    onSubmit(checkedStudents);
+  }
+
   return createPortal(
     <div className={styles['modal']} onClick={handleOverlayClick}>
       <div className={styles['modal__content']} onClick={handleContentClick}>
@@ -60,7 +65,7 @@ function CloseWorkshopModal({ students, onClose }: ModalProps) {
           ))}
         </div>
         <div className={styles['modal__footer']}>
-          <PrimaryButton onClick={() => {}}>Принять</PrimaryButton>
+          <PrimaryButton onClick={handleSubmit}>Принять</PrimaryButton>
         </div>
       </div>
     </div>,

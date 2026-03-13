@@ -24,6 +24,12 @@ export default function WorkShopsPage(): JSX.Element {
     setIsModalOpen(false);
   }
 
+  const sortedWorkshops = [...(data?.workshops ?? [])].sort(
+    (a: WorkshopType, b: WorkshopType) => Number(a.isClosed) - Number(b.isClosed),
+  );
+
+  console.log(sortedWorkshops);
+
   if (loading)
     return (
       <CenteredContainer>
@@ -40,7 +46,7 @@ export default function WorkShopsPage(): JSX.Element {
           Добавить мастеркласс
         </PrimaryButton>
         <CreateWorkshopModal isOpen={isModalOpen} onSubmit={refetch} onClose={handleCloseModal} />
-        {(data?.workshops || []).map((workshop: WorkshopType) => (
+        {(sortedWorkshops || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}
             name={workshop.name}
@@ -49,7 +55,7 @@ export default function WorkShopsPage(): JSX.Element {
             maxStudentAmount={workshop.maxStudents}
             place={workshop.place?.name}
             teacher={workshop.teacher.name}
-            // isClosed={workshop.isClosed}
+            isClosed={workshop.isClosed}
           />
         ))}
       </div>

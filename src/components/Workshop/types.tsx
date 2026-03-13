@@ -2,6 +2,7 @@ import { User } from '@/app/types';
 
 export type Workshop = {
   teacher: string;
+  joined?: boolean;
   name: string;
   description?: string;
   students: Partial<User>[];
@@ -9,6 +10,7 @@ export type Workshop = {
   maxAge?: number;
   place: string;
   toClose?: boolean;
+  isClosed?: boolean;
   handleJoin?: () => void;
 };
 

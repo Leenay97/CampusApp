@@ -13,6 +13,7 @@ import { REGISTER_STUDENT } from './RegisterStudent';
 import { CREATE_PLACE } from './CreatePlace';
 import { UPDATE_SCHEDULE } from './UpdateSchedule';
 import { JOIN_WORKSHOP } from './JoinWorkshop';
+import { CLOSE_WORKSHOP } from './CloseWorkshop';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -30,5 +31,6 @@ export const mutations = {
   CREATE_PLACE,
   UPDATE_SCHEDULE,
   JOIN_WORKSHOP,
+  CLOSE_WORKSHOP,
 };
 export default mutations;

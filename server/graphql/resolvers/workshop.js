@@ -8,7 +8,20 @@ export const workshopResolvers = {
     workshops: async () => {
       return await Workshop.findAll({
         include: [
-          { model: User, as: 'teacher' }, // учитель
+          { model: User, as: 'teacher' },
+          {
+            model: User,
+            as: 'students',
+            through: {
+              model: UserWorkshop,
+            },
+            attributes: ['id', 'name'],
+          },
+          {
+            model: Place,
+            as: 'place',
+            attributes: ['id', 'name'],
+          },
         ],
       });
     },
@@ -128,25 +141,31 @@ export const workshopResolvers = {
           throw new Error('MK не найден');
         }
 
-        // Проверяем, не записан ли уже студент
+        // Проверяем, есть ли запись на этот мастер-класс
         const existingEntry = await UserWorkshop.findOne({
-          where: {
-            userId: studentId,
-            workshopId: workshopId,
-          },
+          where: { userId: studentId, workshopId: workshopId },
         });
 
         if (existingEntry) {
-          throw new Error('Вы уже записаны на этот мастеркласс');
+          // Если есть — удаляем (отменяем запись)
+          await existingEntry.destroy();
+        } else {
+          // Если нет — удаляем все остальные записи и добавляем новую
+          const otherEntries = await UserWorkshop.findAll({
+            where: { userId: studentId },
+          });
+
+          if (otherEntries.length > 0) {
+            await Promise.all(otherEntries.map((entry) => entry.destroy()));
+          }
+
+          await UserWorkshop.create({
+            userId: studentId,
+            workshopId: workshopId,
+          });
         }
 
-        // Создаем запись в through-таблице
-        await UserWorkshop.create({
-          userId: studentId,
-          workshopId: workshopId,
-        });
-
-        // Получаем обновленный workshop со студентами
+        // Возвращаем обновленный мастер-класс
         const updatedWorkshop = await Workshop.findByPk(workshopId, {
           include: [
             {
@@ -167,9 +186,18 @@ export const workshopResolvers = {
       }
     },
 
-    closeWorkshop: async (_, { id }) => {
-      const workshop = await Workshop.findByPk(id);
+    closeWorkshop: async (_, { studentIds, workshopId }) => {
+      const workshop = await Workshop.findByPk(workshopId);
       if (!workshop) throw new Error('Workshop not found');
+
+      const students = await User.findAll({ where: { id: studentIds } });
+
+      await Promise.all(
+        students.map((student) => {
+          student.coins += 100;
+          return student.save();
+        }),
+      );
 
       workshop.isClosed = true;
       await workshop.save();
