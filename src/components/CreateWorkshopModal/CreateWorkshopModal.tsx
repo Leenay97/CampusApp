@@ -8,8 +8,10 @@ import { InputField } from '../InputField/InputField';
 import { useMutation, useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
-import { Teacher, User } from '@/app/types';
-import { UserCustomSelect } from '../UserCustomSelect/UserCustomSelect';
+import { LoadingType, Place, Teacher, User } from '@/app/types';
+import { CustomSelect } from '@components/CustomSelect/CustomSelect';
+import Title from '../Title/Title';
+import Subtitle from '../Subtitle/Subtitle';
 
 type ModalProps = {
   isOpen: boolean;
@@ -19,25 +21,26 @@ type ModalProps = {
 
 function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
   const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
+  const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
   const [name, setName] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
+  const [maxAge, setMaxAge] = useState<string>('');
   const [capacity, setCapacity] = useState<string>('');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    /*eslint-disable react-hooks/set-state-in-effect*/
     setMounted(true);
   }, []);
 
-  const {
-    loading: teachersLoading,
-    data,
-    refetch: refetchTeachers,
-  } = useQuery(queries.GET_TEACHERS);
+  const { loading: teachersLoading, data: teachersData } = useQuery(queries.GET_TEACHERS);
+
+  const { loading: placesLoading, data: placesData } = useQuery(queries.GET_PLACES);
 
   const [createWorkshop] = useMutation(mutations.CREATE_WORKSHOP);
 
-  const teachers = data?.teachers ?? [];
+  const teachers = teachersData?.teachers ?? [];
+
+  const places = placesData?.places ?? [];
 
   if (!isOpen || !mounted) return null;
 
@@ -48,6 +51,10 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
     setSelectedTeacher(teacher);
   }
 
+  function handleChangePlace(place: Place) {
+    setSelectedPlace(place);
+  }
+
   const handleContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -55,24 +62,25 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
   function handleClose() {
     onClose();
     setSelectedTeacher({} as User);
+    setSelectedPlace({} as Place);
     setName('');
-    setLocation('');
     setCapacity('');
+    setMaxAge('');
   }
 
   function handleSubmit() {
-    console.log('Selected teacher:', selectedTeacher, name, location, capacity);
     try {
       createWorkshop({
         variables: {
           name,
-          place: location,
+          placeId: selectedPlace.id,
           teacherId: selectedTeacher.id,
           maxStudents: parseInt(capacity, 10),
+          maxAge: parseInt(maxAge),
+          type: 'WORKSHOP',
         },
       });
       onSubmit();
-      handleClose();
     } catch (error) {
       console.error('Error creating workshop:', error);
     }
@@ -82,26 +90,38 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
     <div className={styles['modal']}>
       <div className={styles['modal__content']} onClick={handleContentClick}>
         <div className={styles['modal__header']}>
-          <h2 className="title" style={{ margin: '0' }}>
-            Добавить мастеркласс
-          </h2>
+          <Title>Добавить мастеркласс</Title>
           <div className={styles['close-button']} onClick={onClose}>
             &times;
           </div>
         </div>
         <div className={styles['modal__body']}>
-          <div className="subtitle">Название</div>
-          <InputField value={name} onChange={setName} />
-          <div className="subtitle">Учитель</div>
-          <UserCustomSelect
-            users={teachers}
-            isLoading={teachersLoading}
-            onChange={handleChangeTeacher}
-          />
-          <div className="subtitle">Место</div>
-          <InputField value={location} onChange={setLocation} />
-          <div className="subtitle">Количество человек</div>
-          <InputField value={capacity} onChange={setCapacity} />
+          <div>
+            <Subtitle>Название</Subtitle>
+            <InputField value={name} onChange={setName} />
+          </div>
+          <div>
+            <Subtitle>Учитель</Subtitle>
+            <CustomSelect
+              items={teachers}
+              isLoading={teachersLoading}
+              onChange={handleChangeTeacher}
+            />
+          </div>
+          <div>
+            <Subtitle>Место</Subtitle>
+            <CustomSelect items={places} isLoading={placesLoading} onChange={handleChangePlace} />
+          </div>
+          <div>
+            <Subtitle>Количество человек</Subtitle>
+            <InputField value={capacity} onChange={setCapacity} />
+          </div>
+          <div>
+            <Subtitle>Максимальный возраст</Subtitle>
+            <div className={styles['modal__age']}>
+              <InputField maxLength={2} width="40px" value={maxAge} onChange={setMaxAge} />+
+            </div>
+          </div>
         </div>
         <div className={styles['modal__footer']}>
           <SecondaryButton onClick={handleClose}>Отмена</SecondaryButton>

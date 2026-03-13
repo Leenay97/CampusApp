@@ -15,8 +15,8 @@ export const StudentHeaderMenuOptions: MenuOption[] = [
 export const TeacherHeaderMenuOptions: MenuOption[] = [
   { name: 'Главная', link: '/' },
   { name: 'Мастерклассы', link: '/workshops' },
-  { name: 'Мой мастеркласс', link: 'teacher/my-workshop' },
-  { name: 'Моя группа', link: 'teacher/my-group' },
+  { name: 'Мой мастеркласс', link: '/teacher/my-workshop' },
+  { name: 'Моя группа', link: '/teacher/my-group' },
   { name: 'Расписание', link: '/schedule' },
   { name: 'iPod', link: '/ipod' },
   { name: '[Редактировать группу]', link: '/teacher/group' },
@@ -25,12 +25,14 @@ export const TeacherHeaderMenuOptions: MenuOption[] = [
 
 export const AdminHeaderMenuOptions: MenuOption[] = [
   { name: 'Главная', link: '/' },
-  { name: 'Мастерклассы', link: '/workshops' },
   { name: 'Расписание', link: '/schedule' },
+  { name: 'Мастерклассы', link: '/workshops' },
   { name: '[Сезоны]', link: '/admin/seasons' },
   { name: '[Учителя]', link: '/admin/teachers' },
   { name: '[Points]', link: '/admin/points' },
   { name: '[Места]', link: '/admin/places' },
+  { name: '[Мастерклассы]', link: '/admin/workshops' },
+  { name: '[Распорядок дня]', link: '/admin/schedule' },
 ];
 
 export function getHeaderMenuOptions(userLevel: UserLevel) {

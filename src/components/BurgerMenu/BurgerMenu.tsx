@@ -6,12 +6,12 @@ import { UserLevel } from '@/app/types';
 
 type BurgerMenuProps = {
   isOpen: boolean;
-  userLevel: UserLevel;
+  userLevel?: UserLevel;
   onClose: () => void;
 };
 
 function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Element {
-  const options = getHeaderMenuOptions(userLevel);
+  const options = getHeaderMenuOptions(userLevel ?? UserLevel.Student);
   return (
     <div className={isOpen ? styles['burger-menu'] : styles['burger-menu--hidden']}>
       <nav className={styles['burger-menu__wrapper']}>

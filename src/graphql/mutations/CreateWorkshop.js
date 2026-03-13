@@ -4,21 +4,25 @@ export const CREATE_WORKSHOP = gql`
   mutation CreateWorkshop(
     $name: String!
     $description: String
-    $place: String!
-    $teacherId: ID!
-    $maxStudents: Int!
+    $placeId: ID
+    $teacherId: ID
+    $maxStudents: Int
+    $maxAge: Int
+    $type: String!
   ) {
     createWorkshop(
       name: $name
       description: $description
-      place: $place
+      placeId: $placeId
       teacherId: $teacherId
       maxStudents: $maxStudents
+      maxAge: $maxAge
+      type: $type
     ) {
       id
       name
       description
-      place
+      placeId
       maxStudents
     }
   }

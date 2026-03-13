@@ -1,0 +1,12 @@
+.centered-container {
+  position: relative;
+  padding: 20px;
+  padding-top: 80px;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 800px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

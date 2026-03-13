@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { HeaderProfile } from './HeaderProfile/HeaderProfile';
 import ProfileMenu from '../ProfileMenu/ProfileMenu';
 import { useUser } from '@/contexts/UserContext';
+import { useApp } from '@/contexts/AppContext';
 
 function Header() {
   const [hasMenu, setHasMenu] = useState(false);
@@ -17,10 +18,13 @@ function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { user } = useUser();
+  const { app } = useApp();
 
   const userLevel = useMemo(() => {
     return user?.userLevel;
   }, [user?.userLevel]);
+
+  console.log(user);
 
   function handleBurgerClick() {
     setIsBurgerOpen((prev) => !prev);
@@ -86,7 +90,16 @@ function Header() {
       <div
         className={isBurgerOpen ? styles['header__container--white'] : styles['header__container']}
       >
-        <Image className={styles['header__logo']} src={Logo} alt="Logo" />
+        {isBurgerOpen && app?.todayPlace?.name ? (
+          <div
+            className={styles['header__place']}
+            style={{ backgroundColor: app?.todayPlace?.color }}
+          >
+            {app?.todayPlace?.name}
+          </div>
+        ) : (
+          <Image className={styles['header__logo']} src={Logo} alt="Logo" />
+        )}
         <Burger isOpen={isBurgerOpen} onClick={handleBurgerClick} />
         <BurgerMenu userLevel={userLevel} isOpen={isBurgerOpen} onClose={handleBurgerClose} />
         <HeaderProfile user={user} isExpanded={hasMenu} onClick={handleProfileClick} />

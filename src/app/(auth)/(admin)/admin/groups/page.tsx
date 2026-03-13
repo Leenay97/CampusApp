@@ -11,7 +11,11 @@ import { InputField } from '@/components/InputField/InputField';
 import { useState } from 'react';
 import { AuthGuard } from '@/auth/AuthGuard';
 import { List } from '@/components/List/List';
-import { User, UserLevel } from '@/app/types';
+import { User } from '@/app/types';
+import Section from '@/components/Section/Section';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Subtitle from '@/components/Subtitle/Subtitle';
+import Loader from '@/components/Loader/Loaader';
 
 function GroupsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,7 +26,7 @@ function GroupsPage() {
   const [selectedIdToDelete, setSelectedIdToDelete] = useState<string | null>(null);
   const [password, setPassword] = useState<string>('');
   const [deleteUser] = useMutation(mutations.DELETE_USER);
-  const [deleteGroup] = useMutation(mutations.DELETE_GROUP);
+  // const [deleteGroup] = useMutation(mutations.DELETE_GROUP);
 
   const {
     loading: teachersLoading,
@@ -56,34 +60,40 @@ function GroupsPage() {
     setIsModalOpen(true);
   }
 
+  if (teachersLoading)
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
+
   return (
     <AuthGuard allowedRoles={['TEACHER']}>
-      <div className="centered-container">
-        <div className="flex-container">
-          <h1 className="title">Admin Dashboard</h1>
-          <div className={styles['prohibited-section']}>
-            <div className={styles['prohibited-section__header']}>
-              <h2 className="subtitle">Prohibited Actions</h2>
-              <div>Введите пароль чтобы открыть секцию.</div>
-              <InputField value={password} onChange={setPassword} width="200px" />
-            </div>
-            <div
-              className={
-                password == process.env.NEXT_PUBLIC_PROHIBITED_SECTION_PASSWORD
-                  ? styles['prohibited-section__content']
-                  : styles['prohibited-section__content--hidden']
-              }
-            >
-              <h1>Добавить учителя</h1>
-              <AddTeacher onAdd={handleRefetch} />
-              <List<User>
-                items={teachers?.teachers}
-                isLoading={teachersLoading}
-                onDelete={handleDeleteUser}
-              />
-            </div>
+      <CenteredContainer>
+        <Section>
+          <div className={styles['prohibited-section__header']}>
+            <Subtitle>Prohibited Actions</Subtitle>
+            <div>Введите пароль чтобы открыть секцию.</div>
+            <InputField value={password} onChange={setPassword} width="200px" />
           </div>
-        </div>
+          <div
+            className={
+              password == process.env.NEXT_PUBLIC_PROHIBITED_SECTION_PASSWORD
+                ? styles['prohibited-section__content']
+                : styles['prohibited-section__content--hidden']
+            }
+          >
+            <h1>Добавить учителя</h1>
+            <AddTeacher onAdd={handleRefetch} />
+            <List<User>
+              items={teachers?.teachers}
+              isLoading={teachersLoading}
+              onDelete={handleDeleteUser}
+            />
+          </div>
+        </Section>
         {isModalOpen && (
           <Modal
             text={modalText.text}
@@ -95,7 +105,7 @@ function GroupsPage() {
             isOpen={isModalOpen}
           />
         )}
-      </div>
+      </CenteredContainer>
     </AuthGuard>
   );
 }

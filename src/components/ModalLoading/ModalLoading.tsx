@@ -6,6 +6,7 @@ import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import { LoadingType } from '@/app/types';
 import Waiting from '@/assets/img/waiting.gif';
 import Image from 'next/image';
+import Title from '../Title/Title';
 
 type ModalLoadingProps = {
   text?: string;
@@ -44,9 +45,7 @@ function ModalLoading({ onClose, loadingState }: ModalLoadingProps) {
     <div className={styles['modal']} onClick={handleOverlayClick}>
       <div className={styles['modal__content']} onClick={handleContentClick}>
         <div className={styles['modal__header']}>
-          <h2 className="title" style={{ margin: '0' }}>
-            Идет загрузка
-          </h2>
+          <Title>Идет загрузка</Title>
           <div className={styles['close-button']} onClick={onClose}>
             &times;
           </div>

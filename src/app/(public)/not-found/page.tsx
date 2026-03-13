@@ -5,25 +5,29 @@ import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Seagull from '@/assets/img/seagull-top.png';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import FullscreenContainer from '@/components/FullscreenContainer/FullscreenContainer';
+import Title from '@/components/Title/Title';
+import Subtitle from '@/components/Subtitle/Subtitle';
 
 function NotFoundPage() {
   const router = useRouter();
 
   return (
-    <div className="fullscreen-container">
-      <div className="centered-container">
+    <FullscreenContainer>
+      <CenteredContainer>
         <div className={styles['not-found']}>
           <div className={styles['not-found__container']}>
             <Image className={styles['not-found__image']} src={Seagull} alt="404 Not Found" />
             <div className={styles['not-found__content']}>
-              <h1 className="title">Кажется ты заблудился</h1>
-              <h1 className="subtitle">Давай вернемся, откуда пришли</h1>
+              <Title>Кажется ты заблудился</Title>
+              <Subtitle>Давай вернемся, откуда пришли</Subtitle>
               <PrimaryButton onClick={() => router.push('/')}>Вернуться</PrimaryButton>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CenteredContainer>
+    </FullscreenContainer>
   );
 }
 

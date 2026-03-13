@@ -15,6 +15,7 @@ export const userTypeDefs = gql`
   type AuthPayload {
     token: String!
     user: User!
+    group: Group!
   }
 
   extend type Query {

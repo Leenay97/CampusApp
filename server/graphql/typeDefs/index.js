@@ -4,6 +4,7 @@ import { groupTypeDefs } from './group.js';
 import { workshopTypeDefs } from './workshop.js';
 import { seasonTypeDefs } from './season.js';
 import { placeTypeDefs } from './place.js';
+import { scheduleTypeDefs } from './schedule.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -12,4 +13,5 @@ export const typeDefs = [
   workshopTypeDefs,
   seasonTypeDefs,
   placeTypeDefs,
+  scheduleTypeDefs,
 ];

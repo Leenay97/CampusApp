@@ -15,6 +15,9 @@ interface AuthGuardProps {
 interface JWTPayload {
   id: string;
   userLevel: string;
+  seasonId: string;
+  today: number;
+  todayPlace: string;
   iat?: number;
   exp?: number;
 }
@@ -24,27 +27,31 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
-  // Получаем userId из токена
-  let userId: string | null = null;
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode<JWTPayload>(token);
-        console.log(decoded);
-        userId = decoded.id;
-      } catch {
-        localStorage.removeItem('token');
-      }
-    }
-  }
+  // ✅ Получаем userId напрямую при рендере, без useState и useEffect
+  const getUserId = (): string | null => {
+    if (typeof window === 'undefined') return null;
 
-  // Запрос user только если есть userId
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const decoded = jwtDecode<JWTPayload>(token);
+      return decoded.id;
+    } catch {
+      localStorage.removeItem('token');
+      return null;
+    }
+  };
+
+  const userId = getUserId(); // ✅ Вычисляется при каждом рендере
+
+  // Запрос данных пользователя (оставляем как есть)
   const { data, loading } = useQuery(queries.GET_USER, {
     variables: { id: userId },
-    skip: !userId, // пропускаем запрос если userId нет
+    skip: !userId,
   });
 
+  // Эффект только для проверки авторизации и установки пользователя
   useEffect(() => {
     const checkAuth = () => {
       if (!userId) {

@@ -4,6 +4,7 @@ import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import { useMutation } from '@apollo/client';
 import { mutations } from '@graphql/mutations';
+import Subtitle from '../Subtitle/Subtitle';
 
 type AddTeacherProps = {
   groupId: string | undefined;
@@ -34,7 +35,7 @@ export function AddStudent({ onAdd, groupId }: AddTeacherProps) {
 
   return (
     <div className={styles['add-teacher']}>
-      <h1 className="subtitle">Добавить студента</h1>
+      <Subtitle>Добавить студента</Subtitle>
       <div className={styles['add-teacher__input']}>
         <InputField value={studentName} onChange={handleChange} placeholder="Вася Пупкин" />
         <PrimaryButton onClick={handleCreateTeacher}>Добавить</PrimaryButton>

@@ -25,6 +25,7 @@
   --color-orange: #FF9F68;
   --color-light-blue: #A4D7E1;
   --color-red: #FF4D4D;
+  --color-dark-red: #d73535;
 
   --color-white: #FFFFFF;
   --color-dark-blue: #4a90be;
@@ -49,60 +50,9 @@ body {
   color: var(--foreground);
 }
 
-.centered-container {
-  position: relative;
-  padding: 20px;
-  padding-top: 80px;
-  width: 100%;
-  margin: 0 auto;
-  max-width: 800px;
-  border-radius: 8px;
-}
-
-.wide {
-  max-width: 1200px;
-}
-
-.fullscreen-container {
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-}
-
-.subtitle {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-}
-
 .error-text {
   font-size: 12px;
   color: var(--error-color);
-}
-
-.section {
-  padding: 20px;
-  border-radius: 8px;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
 }
 
 ::-webkit-scrollbar {
@@ -122,10 +72,6 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
-}
-
-.no-padding {
-  padding: 20px;
 }
 
 .no-margin {

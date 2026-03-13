@@ -9,7 +9,11 @@ export const GET_WORKSHOPS = gql`
       teacher {
         name
       }
-      place
+      students {
+        id
+        name
+      }
+      placeId
       maxStudents
       isClosed
     }

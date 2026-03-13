@@ -18,10 +18,15 @@ import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
 import html2canvas from 'html2canvas';
 import styles from './style.module.scss';
 import ModalLoading from '@/components/ModalLoading/ModalLoading';
+import Section from '@/components/Section/Section';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Title from '@/components/Title/Title';
+import Subtitle from '@/components/Subtitle/Subtitle';
+import Loader from '@/components/Loader/Loaader';
 
 export default function PlacesPage() {
-  const { data } = useQuery(GET_ACTIVE_SEASON);
-  const { data: placesData, loading, refetch } = useQuery(GET_PLACES);
+  const { data, loading } = useQuery(GET_ACTIVE_SEASON);
+  const { data: placesData, loading: placesLoading, refetch } = useQuery(GET_PLACES);
   const [updateGroup] = useMutation(mutations.UPDATE_GROUP);
   const [createPlace] = useMutation(CREATE_PLACE);
 
@@ -47,7 +52,8 @@ export default function PlacesPage() {
     return arr;
   }, [data?.activeSeason]);
 
-  const groups = data?.activeSeason?.groups ?? [];
+  const groups = useMemo(() => data?.activeSeason?.groups ?? [], [data?.activeSeason]);
+
   const places: Place[] = useMemo(() => {
     return placesData?.places ?? [];
   }, [placesData?.places]);
@@ -89,8 +95,7 @@ export default function PlacesPage() {
         });
       }
       setSomeLoading('SUCCESS');
-    } catch (err) {
-      console.log(err);
+    } catch {
       setSomeLoading('ERROR');
     }
   }
@@ -114,17 +119,25 @@ export default function PlacesPage() {
       });
       setSomeLoading('SUCCESS');
       refetch();
-    } catch (err) {
-      console.log(err);
+    } catch {
       setSomeLoading('ERROR');
     }
   }
 
+  if (placesLoading || loading)
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
+
   return (
-    <div className="centered-container wide flex-container">
-      <div className="section">
+    <CenteredContainer wide>
+      <Section>
         <div ref={gridRef}>
-          <h1 className="title">Расписание групповых мест</h1>
+          <Title>Расписание групповых мест</Title>
           <PlacesGrid
             groups={groups}
             dates={dates}
@@ -135,7 +148,7 @@ export default function PlacesPage() {
           />
         </div>
         <div>
-          <h2 className="subtitle">Выбрать места для заполнения (иначе будут использованы все)</h2>
+          <Subtitle>Выбрать места для заполнения (иначе будут использованы все)</Subtitle>
           <MultipleSelect<Place>
             items={teamPlaces}
             value={selectedPlaces}
@@ -148,14 +161,14 @@ export default function PlacesPage() {
           </PrimaryButton>
           <SecondaryButton onClick={handleDownloadPNG}>Скачать PNG</SecondaryButton>
         </div>
-      </div>
-      <div className="section">
+      </Section>
+      <Section>
         <AddPlaceForm onCreate={handleCreate} color={color} changeColor={setColor} />
         <List items={places} isLoading={loading} />
-      </div>
+      </Section>
       {someLoading !== 'NONE' && (
         <ModalLoading onClose={() => setSomeLoading('NONE')} loadingState={someLoading} />
       )}
-    </div>
+    </CenteredContainer>
   );
 }

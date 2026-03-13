@@ -1,27 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './style.module.scss';
-import { User } from '@/app/types';
 import ChevronIcon from '@components/Icons/ChevronIcon/ChevronIcon';
 import SearchIcon from '@components/Icons/SearchIcon/SearchIcon';
 import CrossIcon from '../Icons/CrossIcon/CrossIcon';
 
-type CustomSelectProps = {
-  users: User[];
+type CustomSelectProps<T> = {
+  items: T[];
   isLoading: boolean;
-  onChange: (value: User) => void;
+  onChange: (value: T) => void;
 };
 
-export function UserCustomSelect({ users, isLoading, onChange }: CustomSelectProps) {
+export function CustomSelect<T extends { id: string; name: string; russianName?: string }>({
+  items,
+  isLoading,
+  onChange,
+}: CustomSelectProps<T>) {
   const [value, setValue] = useState<string>('');
   const [filterValue, setFilterValue] = useState<string>('');
-  const [showUsers, setShowUsers] = useState<boolean>(false);
+  const [showItems, setShowItems] = useState<boolean>(false);
 
   const selectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        setShowUsers(false);
+        setShowItems(false);
       }
     };
 
@@ -32,32 +35,32 @@ export function UserCustomSelect({ users, isLoading, onChange }: CustomSelectPro
     };
   }, []);
 
-  if (!users || !users.length) return null;
+  if (!items || !items.length) return null;
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user?.name?.toLowerCase().includes(filterValue.toLowerCase()) ||
-      user?.russianName?.toLowerCase().includes(filterValue.toLowerCase()),
+  const filteredItems = items.filter(
+    (item) =>
+      item?.name?.toLowerCase().includes(filterValue.toLowerCase()) ||
+      item?.russianName?.toLowerCase().includes(filterValue.toLowerCase()),
   );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(event.target.value);
   };
 
-  const handleUserSelect = (user: User) => {
-    onChange(user);
-    setValue(user?.name ?? user?.russianName ?? '');
-    setShowUsers(false);
+  const handleItemSelect = (item: T) => {
+    onChange(item);
+    setValue(item?.name ?? item?.russianName ?? '');
+    setShowItems(false);
   };
 
   return (
     <div ref={selectRef} className={styles['custom-select']}>
-      <div className={styles['custom-select__input']} onClick={() => setShowUsers(true)}>
+      <div className={styles['custom-select__input']} onClick={() => setShowItems(true)}>
         <span>{value}</span>
-        <ChevronIcon isOpen={showUsers} />
+        <ChevronIcon isOpen={showItems} />
       </div>
 
-      {showUsers && (
+      {showItems && (
         <ul className={styles['custom-select__list']}>
           <li key="input" className={styles['custom-select__option']}>
             <input
@@ -75,13 +78,13 @@ export function UserCustomSelect({ users, isLoading, onChange }: CustomSelectPro
             )}
           </li>
 
-          {filteredUsers.map((user) => (
+          {filteredItems.map((item) => (
             <li
-              key={user.id}
+              key={item.id}
               className={styles['custom-select__option']}
-              onClick={() => handleUserSelect(user)}
+              onClick={() => handleItemSelect(item)}
             >
-              {user.name ?? user.russianName}
+              {item.name ?? item.russianName}
             </li>
           ))}
         </ul>

@@ -1,3 +1,6 @@
+import Loader from '../Loader/Loaader';
+import Section from '../Section/Section';
+import Subtitle from '../Subtitle/Subtitle';
 import styles from './style.module.scss';
 
 type ListProps<T> = {
@@ -17,12 +20,16 @@ export function List<
   },
 >({ items, title, isLoading, onDelete }: ListProps<T>) {
   if (isLoading) {
-    return <div className="section">Loading...</div>;
+    return (
+      <Section>
+        <Loader />
+      </Section>
+    );
   }
 
   return (
-    <div className="className">
-      <h2 className="subtitle">{title}</h2>
+    <>
+      <Subtitle>{title}</Subtitle>
       <ul className={styles['list']}>
         {items &&
           items.map((item) => (
@@ -40,6 +47,6 @@ export function List<
             </li>
           ))}
       </ul>
-    </div>
+    </>
   );
 }

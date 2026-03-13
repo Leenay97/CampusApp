@@ -1,48 +1,58 @@
 'use client';
-import { JSX, useState } from 'react';
+import { JSX } from 'react';
 import Workshop from '@components/Workshop/Workshop';
 import style from './style.module.scss';
-import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
-import CreateWorkshopModal from '@/components/CreateWorkshopModal/CreateWorkshopModal';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { Workshop as WorkshopType } from '@/app/types';
+import { useUser } from '@/contexts/UserContext';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import { JOIN_WORKSHOP } from '@/graphql/mutations/JoinWorkshop';
+import Section from '@/components/Section/Section';
+import Loader from '@/components/Loader/Loaader';
 
 export default function WorkShopsPage(): JSX.Element {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data, loading, refetch } = useQuery(queries.GET_TODAY_WORKSHOPS);
+  const [joinWorkshop] = useMutation(JOIN_WORKSHOP);
+  const { user } = useUser();
 
-  const { data, loading, error, refetch } = useQuery(queries.GET_WORKSHOPS);
-
-  function handleOpenModal() {
-    setIsModalOpen(true);
+  async function handleJoin(workshopId: string) {
+    try {
+      await joinWorkshop({
+        variables: { studentId: user?.id, workshopId: workshopId },
+      });
+      refetch();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  function handleCloseModal() {
-    setIsModalOpen(false);
-  }
-
-  console.log('Workshops data:', data);
+  if (loading)
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
 
   return (
-    <div className="centered-container">
+    <CenteredContainer>
       <div className={style['workshops-wrapper']}>
-        <PrimaryButton onClick={handleOpenModal} width="100%">
-          Добавить мастеркласс
-        </PrimaryButton>
-        <CreateWorkshopModal isOpen={isModalOpen} onSubmit={refetch} onClose={handleCloseModal} />
-        {(data?.workshops || []).map((workshop: WorkshopType) => (
+        {(data?.todayWorkshops || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}
             name={workshop.name}
             description={workshop.description}
-            studentAmount={0}
+            students={workshop.students ?? []}
             maxStudentAmount={workshop.maxStudents}
-            place={workshop.place}
+            place={workshop.place.name}
             teacher={workshop.teacher.name}
-            // isClosed={workshop.isClosed}
+            maxAge={workshop.maxAge}
+            handleJoin={() => handleJoin(workshop.id)}
           />
         ))}
       </div>
-    </div>
+    </CenteredContainer>
   );
 }

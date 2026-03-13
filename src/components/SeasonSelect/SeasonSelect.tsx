@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import styles from './style.module.scss';
+import { Season } from '@/app/types';
 
 type CustomSelectProps = {
   seasons: Season[];

@@ -5,27 +5,34 @@ export const workshopTypeDefs = gql`
     id: ID!
     name: String!
     description: String!
-    place: String!
+    placeId: ID!
+    place: Place
     teacher: User
     students: [User]
     maxStudents: Int
+    maxAge: Int
     isClosed: Boolean
   }
 
   extend type Query {
     workshops: [Workshop]
     workshop(id: ID!): Workshop
+    todayWorkshops: [Workshop]
     workshopsByUser(userId: ID!): [Workshop]
+    workshopsByTeacher(userId: ID!): [Workshop]
   }
 
   extend type Mutation {
     createWorkshop(
       name: String!
       description: String
-      place: String!
-      teacherId: ID!
+      placeId: ID
+      teacherId: ID
       maxStudents: Int
+      maxAge: Int
+      type: String!
     ): Workshop
+    joinWorkshop(studentId: ID!, workshopId: ID!): Workshop
     closeWorkshop(id: ID!): Workshop
   }
 `;

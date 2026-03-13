@@ -8,6 +8,7 @@ export const GET_USER = gql`
       group {
         id
         name
+        places
       }
       russianName
       coins

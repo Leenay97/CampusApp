@@ -8,4 +8,6 @@ export const Workshop = sequelize.define('Workshop', {
   teacherId: { type: DataTypes.UUID, allowNull: false },
   type: { type: DataTypes.STRING, allowNull: false },
   isClosed: { type: DataTypes.BOOLEAN, defaultValue: false },
+  date: { type: DataTypes.DATE, allowNull: false },
+  maxAge: { type: DataTypes.INTEGER, allowNull: true },
 });

@@ -1,5 +1,7 @@
 'use client';
 
+import FullscreenContainer from '@/components/FullscreenContainer/FullscreenContainer';
+import Section from '@/components/Section/Section';
 import { useUser } from '@/contexts/UserContext';
 import { QRCodeCanvas } from 'qrcode.react';
 
@@ -9,11 +11,9 @@ function TeacherGroupPage() {
   const groupUrl = `${window.location.origin}/register?token=${user?.group?.id}`;
 
   return (
-    <div className="fullscreen-container">
-      <div className="section">
-        {user?.group?.id && <QRCodeCanvas value={groupUrl} size={200} />}
-      </div>
-    </div>
+    <FullscreenContainer>
+      <Section>{user?.group?.id && <QRCodeCanvas value={groupUrl} size={200} />}</Section>
+    </FullscreenContainer>
   );
 }
 

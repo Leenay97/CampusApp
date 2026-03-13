@@ -8,6 +8,9 @@ import { mutations } from '@graphql/mutations/index';
 import { Group, LoadingType } from '@/app/types';
 import { useState } from 'react';
 import ModalLoading from '@/components/ModalLoading/ModalLoading';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Section from '@/components/Section/Section';
+import Loader from '@/components/Loader/Loaader';
 
 function PointsPage() {
   const { loading, data, refetch } = useQuery(queries.GET_GROUPS);
@@ -31,13 +34,23 @@ function PointsPage() {
       console.error('Error saving points:', error);
     }
   }
+
+  if (loading)
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
+
   return (
-    <div className="centered-container">
+    <CenteredContainer>
       <AddPoints groups={data?.groups as Group[]} onSave={handleSaveGroups} />
       {someLoading !== 'NONE' && (
         <ModalLoading onClose={() => setSomeLoading('NONE')} loadingState={someLoading} />
       )}
-    </div>
+    </CenteredContainer>
   );
 }
 

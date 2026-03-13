@@ -33,6 +33,7 @@
 
     &__body {
         display: flex;
+        gap: 20px;
         flex-direction: column;
     }
 
@@ -40,6 +41,14 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
+    }
+
+    &__age {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: bolder;
+        font-size: 24px;
     }
 
     .close-button {

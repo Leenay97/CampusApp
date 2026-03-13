@@ -1,4 +1,4 @@
-import { User, Workshop, Group } from '../../models/index.js';
+import { User, Workshop, Group, Season } from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -73,16 +73,34 @@ export const userResolvers = {
       });
       if (!user) throw new Error('Пользователя не существует');
 
+      const userLevel = user.userLevel;
+
       const isValid = await bcrypt.compare(password, user.hashedPassword);
       if (!isValid) throw new Error('Неверный пароль');
 
-      const token = jwt.sign({ id: user.id, userLevel: user.userLevel }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
-      });
+      const season = await Season.findOne({ where: { isActive: true } });
+
+      if (!isValid && userLevel == 'STUDENT') throw new Error('Кажется сезон еще не начался');
+
+      let group;
+      if (userLevel !== 'ADMIN') {
+        group = await Group.findOne({ where: { id: user.groupId } });
+      }
+
+      if (!user.group && userLevel == 'STUDENT') throw new Error('У пользователя нет группы');
+
+      const token = jwt.sign(
+        { id: user.id, userLevel: user.userLevel, seasonId: season.id, groupId: group?.id || null },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: '30d',
+        },
+      );
 
       return {
         token,
         user,
+        group,
       };
     },
     createStudent: async (_, { russianName, groupId }) => {

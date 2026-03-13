@@ -4,7 +4,7 @@ import { UserLevel } from '../types';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthGuard allowedRoles={[UserLevel.Admin, UserLevel.Teacher]}>
+    <AuthGuard allowedRoles={[UserLevel.Admin, UserLevel.Teacher, UserLevel.Student]}>
       <Header />
       {children}
     </AuthGuard>

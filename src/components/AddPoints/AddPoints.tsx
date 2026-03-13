@@ -4,6 +4,9 @@ import Team from '@components/TeamRaiting/Team/Team';
 import { Group } from '@/app/types';
 import PrimaryButton from '../PrimaryButton/PrimaryButton';
 import SecondaryButton from '../SecondaryButton/SecondaryButton';
+import Section from '../Section/Section';
+import CenteredContainer from '../CenteredContainer/CenteredContainer';
+import Title from '../Title/Title';
 
 type AddPointsProps = {
   groups: Group[];
@@ -34,9 +37,9 @@ function AddPoints({ groups, onSave }: AddPointsProps) {
     onSave(changedGroups);
   }
   return (
-    <div className="centered-container">
-      <div className="section">
-        <h1 className="title">Добавить очки</h1>
+    <CenteredContainer>
+      <Section>
+        <Title>Добавить очки</Title>
         <div className={styles['save-btn']}>
           <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
         </div>
@@ -59,8 +62,8 @@ function AddPoints({ groups, onSave }: AddPointsProps) {
             </div>
           );
         })}
-      </div>
-    </div>
+      </Section>
+    </CenteredContainer>
   );
 }
 

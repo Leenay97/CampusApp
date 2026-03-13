@@ -7,6 +7,9 @@ import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { List } from '@/components/List/List';
 import { User } from '@/app/types';
+import Section from '@/components/Section/Section';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Title from '@/components/Title/Title';
 
 function TeacherGroupPage() {
   const { user } = useUser();
@@ -17,16 +20,16 @@ function TeacherGroupPage() {
   console.log(user);
 
   return (
-    <div className="centered-container">
-      <div className="section">
-        <h1 className="title">Добавить студентов</h1>
+    <CenteredContainer>
+      <Section>
+        <Title>Добавить студентов</Title>
         <div className="">
           Твоя группа <span className={styles['group-logo']}>{user?.group?.name}</span>
         </div>
         <AddStudent groupId={user?.group?.id} onAdd={refetch} />
         <List<User> items={data?.students} isLoading={loading} onDelete={() => {}} />
-      </div>
-    </div>
+      </Section>
+    </CenteredContainer>
   );
 }
 

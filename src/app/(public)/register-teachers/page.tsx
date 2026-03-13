@@ -5,11 +5,15 @@ import { queries } from '@graphql/queries/index';
 import styles from './style.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import { useState } from 'react';
-import { UserCustomSelect } from '@/components/UserCustomSelect/UserCustomSelect';
+import { CustomSelect } from '@/components/CustomSelect/CustomSelect';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import { useSearchParams } from 'next/navigation';
 import mutations from '@/graphql/mutations';
 import { User } from '@/app/types';
+import Section from '@/components/Section/Section';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Title from '@/components/Title/Title';
+import Subtitle from '@/components/Subtitle/Subtitle';
 
 function RegisterTeacherPage() {
   const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
@@ -47,41 +51,39 @@ function RegisterTeacherPage() {
   }
 
   return (
-    <div className="centered-container">
-      <div className="flex-container">
-        <div className={styles['prohibited-section']}>
-          <div className={styles['prohibited-section__content']}>
-            <h1 className="title">Ну привет, училка</h1>
-            <h2 className="subtitle">Найди себя</h2>
-            <UserCustomSelect
-              users={teachers?.teachers}
-              isLoading={teachersLoading}
-              onChange={handleAddTeacher}
-            />
-          </div>
+    <CenteredContainer>
+      <Section>
+        <div className={styles['prohibited-section__content']}>
+          <Title>Ну привет, училка</Title>
+          <Subtitle>Найди себя</Subtitle>
+          <CustomSelect
+            items={teachers?.teachers}
+            isLoading={teachersLoading}
+            onChange={handleAddTeacher}
+          />
         </div>
-        {selectedTeacher.id && (
-          <div className={styles['prohibited-section']}>
-            <div className={styles['prohibited-section__content']}>
-              <h2 className="subtitle">Логин</h2>
-              <InputField width="200px" value={login} onChange={setLogin} />
-              <h2 className="subtitle">Пароль</h2>
-              <InputField width="200px" type="password" value={password} onChange={setPassword} />
-              <h2 className="subtitle">Подтверди пароль</h2>
-              <InputField
-                width="200px"
-                type="password"
-                value={confirmPassword}
-                onChange={setConfirmPassword}
-              />
-              <PrimaryButton onClick={handleRegister} width="200px">
-                Зарегистрироваться
-              </PrimaryButton>
-            </div>
+      </Section>
+      {selectedTeacher.id && (
+        <Section>
+          <div className={styles['prohibited-section__content']}>
+            <Subtitle>Логин</Subtitle>
+            <InputField width="200px" value={login} onChange={setLogin} />
+            <Subtitle>Пароль</Subtitle>
+            <InputField width="200px" type="password" value={password} onChange={setPassword} />
+            <Subtitle>Подтверди пароль</Subtitle>
+            <InputField
+              width="200px"
+              type="password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+            />
+            <PrimaryButton onClick={handleRegister} width="200px">
+              Зарегистрироваться
+            </PrimaryButton>
           </div>
-        )}
-      </div>
-    </div>
+        </Section>
+      )}
+    </CenteredContainer>
   );
 }
 

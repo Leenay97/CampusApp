@@ -8,7 +8,7 @@ type InputFieldProps = {
   error?: string;
   placeholder?: string;
   maxLength?: number;
-  type?: 'text' | 'password' | 'date';
+  type?: string;
   onChange: (value: string) => void;
 };
 

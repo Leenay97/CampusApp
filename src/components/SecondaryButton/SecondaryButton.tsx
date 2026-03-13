@@ -3,12 +3,13 @@ import styles from './style.module.scss';
 
 type PrimaryButtonProps = {
   children: React.ReactNode;
+  disabled?: boolean;
   onClick: () => void;
 };
 
-function SecondaryButton({ children, onClick }: PrimaryButtonProps) {
+function SecondaryButton({ disabled, children, onClick }: PrimaryButtonProps) {
   return (
-    <button className={styles['secondary-button']} onClick={onClick}>
+    <button disabled={disabled} className={styles['secondary-button']} onClick={onClick}>
       {children}
     </button>
   );

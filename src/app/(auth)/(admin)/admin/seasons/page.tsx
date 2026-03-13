@@ -7,12 +7,17 @@ import { GroupsList } from '@components/GroupsList/GroupsList';
 import styles from './style.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import { AddSeason } from '@/components/AddSeason/AddSeason';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import mutations from '@/graphql/mutations';
 import { SeasonSelect } from '@/components/SeasonSelect/SeasonSelect';
 import Modal from '@/components/Modal/Modal';
 import { GroupInput, Season, Teacher } from '@/app/types';
+import Section from '@/components/Section/Section';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Title from '@/components/Title/Title';
+import Subtitle from '@/components/Subtitle/Subtitle';
+import Loader from '@/components/Loader/Loaader';
 
 function SeasonsPage() {
   const [seasonGroups, setSeasonGroups] = useState<GroupInput[]>([]);
@@ -31,11 +36,7 @@ function SeasonsPage() {
   const [createSeason] = useMutation(mutations.CREATE_SEASON);
   const [activateSeason] = useMutation(mutations.ACTIVATE_SEASON);
 
-  useEffect(() => {
-    console.log(seasonData);
-  }, [seasonData]);
-
-  const teachers = teachersData?.teachers ?? [];
+  const teachers = useMemo(() => teachersData?.teachers ?? [], [teachersData?.teachers]);
 
   const formattedTeachers = useMemo(() => {
     if (!teachers.length) return [];
@@ -92,48 +93,55 @@ function SeasonsPage() {
     }
   }
 
-  return (
-    <div className="centered-container">
-      <div className="flex-container">
-        <div className={styles['prohibited-section']}>
-          <div className={styles['prohibited-section__header']}>
-            <h2 className="subtitle">Prohibited Actions</h2>
-            <div>Введите пароль чтобы открыть секцию.</div>
-            <InputField value={password} onChange={setPassword} width="200px" />
-          </div>
-          <div
-            className={
-              password == process.env.NEXT_PUBLIC_PROHIBITED_SECTION_PASSWORD
-                ? styles['prohibited-section__content']
-                : styles['prohibited-section__content--hidden']
-            }
-          >
-            <h1 className="title">Добавить сезон</h1>
-            <AddSeason
-              year={seasonData.year}
-              number={seasonData.number}
-              startDate={seasonData.startDate}
-              endDate={seasonData.endDate}
-              onChange={handleChangeSeasonData}
-            />
-            <AddGroup onAdd={handleAddGroup} teachers={formattedTeachers} />
-            <GroupsList groups={seasonGroups} onDelete={handleDeleteGroup} />
-            <PrimaryButton onClick={handleCreateSeason}>Создать сезон</PrimaryButton>
-          </div>
-        </div>
+  if (teachersLoading || seasonsLoading)
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
 
-        <div className={styles['prohibited-section']}>
-          <h1 className="title">Активировать сезон</h1>
-          <div className={styles['flex-row']}>
-            <SeasonSelect
-              seasons={seasonsData?.seasons}
-              value={selectedSeason}
-              onChange={setSelectedSeason}
-            />
-            <PrimaryButton onClick={() => setIsModalOpen(true)}>Активировать</PrimaryButton>
-          </div>
+  return (
+    <CenteredContainer>
+      <Section>
+        <div className={styles['prohibited-section__header']}>
+          <Subtitle>Prohibited Actions</Subtitle>
+          <div>Введите пароль чтобы открыть секцию.</div>
+          <InputField value={password} onChange={setPassword} width="200px" />
         </div>
-      </div>
+        <div
+          className={
+            password == process.env.NEXT_PUBLIC_PROHIBITED_SECTION_PASSWORD
+              ? styles['prohibited-section__content']
+              : styles['prohibited-section__content--hidden']
+          }
+        >
+          <Title>Добавить сезон</Title>
+          <AddSeason
+            year={seasonData.year}
+            number={seasonData.number}
+            startDate={seasonData.startDate}
+            endDate={seasonData.endDate}
+            onChange={handleChangeSeasonData}
+          />
+          <AddGroup onAdd={handleAddGroup} teachers={formattedTeachers} />
+          <GroupsList groups={seasonGroups} onDelete={handleDeleteGroup} />
+          <PrimaryButton onClick={handleCreateSeason}>Создать сезон</PrimaryButton>
+        </div>
+      </Section>
+
+      <Section>
+        <Title>Активировать сезон</Title>
+        <div className={styles['flex-row']}>
+          <SeasonSelect
+            seasons={seasonsData?.seasons}
+            value={selectedSeason}
+            onChange={setSelectedSeason}
+          />
+          <PrimaryButton onClick={() => setIsModalOpen(true)}>Активировать</PrimaryButton>
+        </div>
+      </Section>
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -143,7 +151,7 @@ function SeasonsPage() {
         text={`Активировать ${selectedSeason.number} сезон ${selectedSeason.year}?`}
         description="Другие сезоны станут архивными. Активировать их снова уже не получится. Информацию о прошлых сезонах можно найти в разделе 'История сезонов'."
       />
-    </div>
+    </CenteredContainer>
   );
 }
 

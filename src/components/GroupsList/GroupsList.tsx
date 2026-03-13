@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import styles from './style.module.scss';
 import { GroupInput } from '@/app/types';
+import Subtitle from '../Subtitle/Subtitle';
 
 type GroupsListProps = {
   groups: GroupInput[];
@@ -17,7 +18,7 @@ export function GroupsList({ groups, onDelete }: GroupsListProps) {
 
   return (
     <div className="className">
-      <h2 className="subtitle">Список групп</h2>
+      <Subtitle>Список групп</Subtitle>
       <ul className={styles['groups-list']}>
         {sortedGroups &&
           sortedGroups.map((group) => (

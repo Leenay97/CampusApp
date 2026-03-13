@@ -34,7 +34,6 @@ export const groupResolvers = {
     createGroup: async (_, { name, userIds }) => {
       // 1. Проверка — максимум 2 учителя
 
-      console.log(userIds);
       const validUserIds = userIds ? userIds.filter((id) => id != null) : [];
 
       if (validUserIds.length < 2) {

@@ -7,6 +7,8 @@ import { mutations } from '@/graphql/mutations';
 import { queries } from '@/graphql/queries';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
+import Section from '@/components/Section/Section';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 
 export default function TeachersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,16 +41,16 @@ export default function TeachersPage() {
 
   return (
     <>
-      <div className="centered-container">
-        <div className="section">
+      <CenteredContainer>
+        <Section>
           <AddTeacher onAdd={refetchTeachers} />
           <List<User>
             items={teachersData?.teachers}
             isLoading={teachersLoading}
             onDelete={openModal}
           />
-        </div>
-      </div>
+        </Section>
+      </CenteredContainer>
       {isModalOpen && (
         <Modal
           text={'Удалить учителя?'}

@@ -52,6 +52,19 @@
         height: auto;
         object-fit: contain;
     }
+
+    &__place {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        color: white;
+        padding: 8px 10px;
+        border-radius: 5px;
+        transform: translateX(-50%);
+        margin: 0 auto;
+        height: auto;
+        object-fit: contain;
+    }
     
     &__menu {
         display: flex;

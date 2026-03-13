@@ -11,6 +11,8 @@ import { LOGIN } from './Login';
 import { CREATE_STUDENT } from './CreateStudent';
 import { REGISTER_STUDENT } from './RegisterStudent';
 import { CREATE_PLACE } from './CreatePlace';
+import { UPDATE_SCHEDULE } from './UpdateSchedule';
+import { JOIN_WORKSHOP } from './JoinWorkshop';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -26,5 +28,7 @@ export const mutations = {
   CREATE_STUDENT,
   REGISTER_STUDENT,
   CREATE_PLACE,
+  UPDATE_SCHEDULE,
+  JOIN_WORKSHOP,
 };
 export default mutations;

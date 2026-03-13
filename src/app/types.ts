@@ -25,9 +25,10 @@ export type Workshop = {
   description?: string;
   teacherId: string;
   teacher: Teacher;
-  students: Record<string, string>[];
+  students: User[];
   maxStudents: number;
-  place: string;
+  maxAge?: number;
+  place: Pick<Place, 'name' | 'id'>;
   isClosed: boolean;
 };
 
@@ -62,5 +63,10 @@ export enum UserLevel {
   Teacher = 'TEACHER',
   Student = 'STUDENT',
 }
+
+export type Schedule = {
+  time: string;
+  activity: string;
+};
 
 export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';

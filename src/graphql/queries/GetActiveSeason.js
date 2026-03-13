@@ -9,6 +9,7 @@ export const GET_ACTIVE_SEASON = gql`
         id
         name
         places
+        points
       }
     }
   }

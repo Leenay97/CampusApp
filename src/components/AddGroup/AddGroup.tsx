@@ -3,6 +3,7 @@ import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import { MultipleSelect } from '@components/MultipleSelect/MultipleSelect';
 import { GroupInput, User } from '@/app/types';
+import Subtitle from '../Subtitle/Subtitle';
 
 type AddGroupProps = {
   onAdd: (group: GroupInput) => void;
@@ -33,7 +34,7 @@ export function AddGroup({ onAdd, teachers }: AddGroupProps) {
 
   return (
     <div className={styles['add-group']}>
-      <h1 className="subtitle">Добавить группу</h1>
+      <Subtitle>Добавить группу</Subtitle>
       <div className={styles['add-group__input']}>
         <MultipleSelect<User>
           value={groupTeachers}

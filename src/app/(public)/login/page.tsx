@@ -9,6 +9,10 @@ import { useMutation } from '@apollo/client';
 import mutations from '@/graphql/mutations';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import FullscreenContainer from '@/components/FullscreenContainer/FullscreenContainer';
+import Title from '@/components/Title/Title';
+import Subtitle from '@/components/Subtitle/Subtitle';
 
 export default function LoginPage(): JSX.Element {
   const [login, setLogin] = useState<string>('');
@@ -32,27 +36,27 @@ export default function LoginPage(): JSX.Element {
   }
 
   return (
-    <div className="fullscreen-container">
-      <div className="centered-container">
+    <FullscreenContainer>
+      <CenteredContainer>
         <form className={style['section']} onSubmit={handleLogin}>
           <div className={style['section__header']}>
-            <p className="title">Hey, friend!</p>
+            <Title>Hey, friend!</Title>
             <Image className={style['section__logo']} src={Logo} alt="Логотип" />
           </div>
 
           <div className={style['section__input']}>
-            <h1 className="subtitle">Логин</h1>
+            <Subtitle>Логин</Subtitle>
             <InputField value={login} onChange={setLogin} />
           </div>
 
           <div className={style['section__input']}>
-            <h2 className="subtitle">Пароль</h2>
+            <Subtitle>Пароль</Subtitle>
             <InputField value={password} onChange={setPassword} />
           </div>
 
           <PrimaryButton type="submit">Войти</PrimaryButton>
         </form>
-      </div>
-    </div>
+      </CenteredContainer>
+    </FullscreenContainer>
   );
 }

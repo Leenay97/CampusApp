@@ -5,12 +5,16 @@ import { queries } from '@graphql/queries/index';
 import styles from './style.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import { useState } from 'react';
-import { UserCustomSelect } from '@/components/UserCustomSelect/UserCustomSelect';
+import { CustomSelect } from '@/components/CustomSelect/CustomSelect';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import { useSearchParams } from 'next/navigation';
 import mutations from '@/graphql/mutations';
 import { User } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
+import Section from '@/components/Section/Section';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Title from '@/components/Title/Title';
+import Subtitle from '@/components/Subtitle/Subtitle';
 
 function RegisterPage() {
   const [selectedStudent, setSelectedStudent] = useState<User>({} as User);
@@ -18,8 +22,6 @@ function RegisterPage() {
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-
-  const { setUser } = useUser();
 
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
@@ -57,54 +59,52 @@ function RegisterPage() {
   }
 
   return (
-    <div className="centered-container no-padding">
-      <div className="flex-container">
-        <div className="section">
-          <h1 className="title">Hey, campus student!</h1>
-          <div>
-            <h2 className="subtitle">Найди себя</h2>
-            <UserCustomSelect
-              users={unregisteredStudents}
-              isLoading={loading}
-              onChange={handleAddStudent}
-            />
-          </div>
+    <CenteredContainer noPadding>
+      <Section>
+        <Title>Hey, campus student!</Title>
+        <div>
+          <Subtitle>Найди себя</Subtitle>
+          <CustomSelect
+            items={unregisteredStudents}
+            isLoading={loading}
+            onChange={handleAddStudent}
+          />
         </div>
-        {selectedStudent.id && (
-          <div className={styles['prohibited-section']}>
-            <div className={styles['prohibited-section__content']}>
-              <div>
-                <h2 className="subtitle">Английское имя*</h2>
-                <InputField width="100%" value={name} onChange={setName} />
-              </div>
-              <div>
-                <h2 className="subtitle">Логин*</h2>
-                <InputField width="100%" value={login} onChange={setLogin} />
-              </div>
-
-              <div>
-                <h2 className="subtitle">Пароль*</h2>
-                <InputField width="100%" type="password" value={password} onChange={setPassword} />
-              </div>
-
-              <div>
-                <h2 className="subtitle">Подтверди пароль*</h2>
-                <InputField
-                  width="100%"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={setConfirmPassword}
-                />
-              </div>
-
-              <PrimaryButton width="100%" onClick={handleRegister}>
-                Зарегистрироваться
-              </PrimaryButton>
+      </Section>
+      {selectedStudent.id && (
+        <Section>
+          <div className={styles['prohibited-section__content']}>
+            <div>
+              <Subtitle>Английское имя*</Subtitle>
+              <InputField width="100%" value={name} onChange={setName} />
             </div>
+            <div>
+              <Subtitle>Логин*</Subtitle>
+              <InputField width="100%" value={login} onChange={setLogin} />
+            </div>
+
+            <div>
+              <Subtitle>Пароль*</Subtitle>
+              <InputField width="100%" type="password" value={password} onChange={setPassword} />
+            </div>
+
+            <div>
+              <Subtitle>Подтверди пароль*</Subtitle>
+              <InputField
+                width="100%"
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+              />
+            </div>
+
+            <PrimaryButton width="100%" onClick={handleRegister}>
+              Зарегистрироваться
+            </PrimaryButton>
           </div>
-        )}
-      </div>
-    </div>
+        </Section>
+      )}
+    </CenteredContainer>
   );
 }
 

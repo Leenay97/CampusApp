@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
+import Title from '../Title/Title';
 
 type ModalProps = {
   text: string;
@@ -37,9 +38,7 @@ function Modal({ text, description, onSubmit, onClose, hasCancel, onCancel, isOp
     <div className={styles['modal']} onClick={handleOverlayClick}>
       <div className={styles['modal__content']} onClick={handleContentClick}>
         <div className={styles['modal__header']}>
-          <h2 className="title" style={{ margin: '0' }}>
-            {text}
-          </h2>
+          <Title>{text}</Title>
           <div className={styles['close-button']} onClick={onClose}>
             &times;
           </div>
