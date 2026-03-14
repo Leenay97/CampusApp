@@ -59,7 +59,7 @@ function RegisterPage() {
   }
 
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer>
       <Section>
         <Title>Hey, campus student!</Title>
         <div>

@@ -30,6 +30,7 @@ export const AdminHeaderMenuOptions: MenuOption[] = [
   { name: 'Расписание', link: '/schedule' },
   { name: 'Мастерклассы', link: '/workshops' },
   { name: 'Sport Time', link: '/sporttime' },
+  { name: '[Панель администратора]', link: '/admin/panel' },
 ];
 
 export function getHeaderMenuOptions(userLevel: UserLevel) {

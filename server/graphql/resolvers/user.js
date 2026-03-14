@@ -227,12 +227,24 @@ export const userResolvers = {
       return user;
     },
 
-    transferCoins: async (_, { id, amount }) => {
-      const user = await User.findByPk(id);
-      if (!user) throw new Error('User not found');
+    transferCoins: async (_, { userId, recieverId, amount }) => {
+      const user = await User.findByPk(userId);
+      const reciever = await User.findByPk(recieverId);
+      if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
+      if (!user) throw new Error('Отправитель не найден');
+      if (!reciever) throw new Error('Получатель не найден');
 
-      user.coins += amount;
+      if (user.userLevel === 'STUDENT') {
+        if (user.coins < amount) {
+          throw new Error('Недостаточно Coins');
+        } else {
+          user.coins -= amount;
+        }
+      }
+
+      reciever.coins += amount;
       await user.save();
+      await reciever.save();
       return user;
     },
 

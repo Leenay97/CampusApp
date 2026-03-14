@@ -11,6 +11,7 @@ import { GET_TEAM_PLACES } from './GetTeamPlaces';
 import { GET_SCHEDULE } from './GetSchedule';
 import { GET_TODAY_WORKSHOPS } from './GetTodayWorkshops';
 import { GET_WORKSHOPS_BY_TEACHER } from './GetWorkshopsByTeacher';
+import { GET_TECHICAL_DATA } from './GetTechnicalData';
 
 export const queries = {
   GET_GROUPS,
@@ -26,5 +27,6 @@ export const queries = {
   GET_SCHEDULE,
   GET_TODAY_WORKSHOPS,
   GET_WORKSHOPS_BY_TEACHER,
+  GET_TECHICAL_DATA,
 };
 export default queries;

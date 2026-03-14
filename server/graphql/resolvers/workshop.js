@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { Place, Season, User, Workshop, sequelize } from '../../models/index.js';
+import { Place, Season, TechnicalData, User, Workshop, sequelize } from '../../models/index.js';
 
 const UserWorkshop = sequelize.models.UserWorkshop;
 
@@ -198,11 +198,16 @@ export const workshopResolvers = {
       const workshop = await Workshop.findByPk(workshopId);
       if (!workshop) throw new Error('Workshop not found');
 
+      const techData = await TechnicalData.findOne();
+
+      const coinsValue =
+        workshop.type === 'WORKSHOP' ? techData.workshopValue : techData.sportTimeValue;
+
       const students = await User.findAll({ where: { id: studentIds } });
 
       await Promise.all(
         students.map((student) => {
-          student.coins += 100;
+          student.coins += coinsValue;
           return student.save();
         }),
       );

@@ -5,6 +5,7 @@ import { workshopTypeDefs } from './workshop.js';
 import { seasonTypeDefs } from './season.js';
 import { placeTypeDefs } from './place.js';
 import { scheduleTypeDefs } from './schedule.js';
+import { technicalDataTypeDefs } from './technicalData.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -14,4 +15,5 @@ export const typeDefs = [
   seasonTypeDefs,
   placeTypeDefs,
   scheduleTypeDefs,
+  technicalDataTypeDefs,
 ];

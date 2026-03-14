@@ -14,6 +14,8 @@ import { CREATE_PLACE } from './CreatePlace';
 import { UPDATE_SCHEDULE } from './UpdateSchedule';
 import { JOIN_WORKSHOP } from './JoinWorkshop';
 import { CLOSE_WORKSHOP } from './CloseWorkshop';
+import { UPDATE_TECHNICAL_DATA } from './UpdateTechnicalData';
+import { TRANSFER_COINS } from './TransferCoins';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -32,5 +34,7 @@ export const mutations = {
   UPDATE_SCHEDULE,
   JOIN_WORKSHOP,
   CLOSE_WORKSHOP,
+  UPDATE_TECHNICAL_DATA,
+  TRANSFER_COINS,
 };
 export default mutations;

@@ -47,7 +47,7 @@ export const userTypeDefs = gql`
     ): AuthPayload!
     updateUser(id: ID!, name: String, russianName: String, groupId: ID): User
     deleteUser(id: ID!): User
-    transferCoins(id: ID!, amount: Int!): User
+    transferCoins(userId: ID!, recieverId: ID!, amount: Int!): User
     addWorkshop(id: ID!, workshopId: ID!): User
   }
 `;

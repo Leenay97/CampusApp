@@ -4,6 +4,7 @@ import { workshopResolvers } from './workshop.js';
 import { seasonResolvers } from './season.js';
 import { placeResolvers } from './place.js';
 import { scheduleResolvers } from './schedule.js';
+import { technicalDataResolvers } from './technicalData.js';
 
 export const resolvers = [
   userResolvers,
@@ -12,4 +13,5 @@ export const resolvers = [
   seasonResolvers,
   placeResolvers,
   scheduleResolvers,
+  technicalDataResolvers,
 ];

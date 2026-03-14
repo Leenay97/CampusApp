@@ -6,13 +6,11 @@ import CrossIcon from '../Icons/CrossIcon/CrossIcon';
 
 type CustomSelectProps<T> = {
   items: T[];
-  isLoading: boolean;
   onChange: (value: T) => void;
 };
 
 export function CustomSelect<T extends { id: string; name: string; russianName?: string }>({
   items,
-  isLoading,
   onChange,
 }: CustomSelectProps<T>) {
   const [value, setValue] = useState<string>('');
