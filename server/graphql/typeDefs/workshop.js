@@ -15,11 +15,11 @@ export const workshopTypeDefs = gql`
   }
 
   extend type Query {
-    workshops: [Workshop]
+    workshops(isSport: Boolean): [Workshop]
     workshop(id: ID!): Workshop
-    todayWorkshops: [Workshop]
+    todayWorkshops(isSport: Boolean): [Workshop]
     workshopsByUser(userId: ID!): [Workshop]
-    workshopsByTeacher(userId: ID!): [Workshop]
+    workshopsByTeacher(userId: ID!, isSport: Boolean): [Workshop]
   }
 
   extend type Mutation {
@@ -32,7 +32,7 @@ export const workshopTypeDefs = gql`
       maxAge: Int
       type: String!
     ): Workshop
-    joinWorkshop(studentId: ID!, workshopId: ID!): Workshop
+    joinWorkshop(studentId: ID!, workshopId: ID!, isSport: Boolean): Workshop
     closeWorkshop(studentIds: [ID!]!, workshopId: ID!): Workshop
   }
 `;

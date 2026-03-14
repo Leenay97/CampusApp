@@ -8,6 +8,7 @@ type MenuOption = {
 export const StudentHeaderMenuOptions: MenuOption[] = [
   { name: 'Главная', link: '/' },
   { name: 'Мастерклассы', link: '/workshops' },
+  { name: 'Sport Time', link: '/sporttime' },
   { name: 'Расписание', link: '/schedule' },
   { name: 'iPod', link: '/ipod' },
 ];
@@ -15,6 +16,7 @@ export const StudentHeaderMenuOptions: MenuOption[] = [
 export const TeacherHeaderMenuOptions: MenuOption[] = [
   { name: 'Главная', link: '/' },
   { name: 'Мастерклассы', link: '/workshops' },
+  { name: 'Sport Time', link: '/sporttime' },
   { name: 'Мой мастеркласс', link: '/teacher/my-workshop' },
   { name: 'Моя группа', link: '/teacher/my-group' },
   { name: 'Расписание', link: '/schedule' },
@@ -27,11 +29,13 @@ export const AdminHeaderMenuOptions: MenuOption[] = [
   { name: 'Главная', link: '/' },
   { name: 'Расписание', link: '/schedule' },
   { name: 'Мастерклассы', link: '/workshops' },
+  { name: 'Sport Time', link: '/sporttime' },
   { name: '[Сезоны]', link: '/admin/seasons' },
   { name: '[Учителя]', link: '/admin/teachers' },
   { name: '[Points]', link: '/admin/points' },
   { name: '[Места]', link: '/admin/places' },
   { name: '[Мастерклассы]', link: '/admin/workshops' },
+  { name: '[Sport Time]', link: '/admin/sporttime' },
   { name: '[Распорядок дня]', link: '/admin/schedule' },
 ];
 

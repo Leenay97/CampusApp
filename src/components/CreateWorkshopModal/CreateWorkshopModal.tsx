@@ -8,18 +8,19 @@ import { InputField } from '../InputField/InputField';
 import { useMutation, useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
-import { LoadingType, Place, Teacher, User } from '@/app/types';
+import { Place, User } from '@/app/types';
 import { CustomSelect } from '@components/CustomSelect/CustomSelect';
 import Title from '../Title/Title';
 import Subtitle from '../Subtitle/Subtitle';
 
 type ModalProps = {
   isOpen: boolean;
+  sportTime?: boolean;
   onClose: () => void;
   onSubmit: () => void;
 };
 
-function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
+function CreateWorkshopModal({ isOpen, sportTime, onClose, onSubmit }: ModalProps) {
   const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
   const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
   const [name, setName] = useState<string>('');
@@ -28,6 +29,7 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    /*eslint-disable react-hooks/set-state-in-effect*/
     setMounted(true);
   }, []);
 
@@ -76,7 +78,7 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
           teacherId: selectedTeacher.id,
           maxStudents: parseInt(capacity, 10),
           maxAge: parseInt(maxAge),
-          type: 'WORKSHOP',
+          type: sportTime ? 'SPORT' : 'WORKSHOP',
         },
       });
       onSubmit();
@@ -89,7 +91,7 @@ function CreateWorkshopModal({ isOpen, onClose, onSubmit }: ModalProps) {
     <div className={styles['modal']}>
       <div className={styles['modal__content']} onClick={handleContentClick}>
         <div className={styles['modal__header']}>
-          <Title>Добавить мастеркласс</Title>
+          <Title>Добавить {sportTime ? 'Sport Time' : 'мастеркласс'}</Title>
           <div className={styles['close-button']} onClick={onClose}>
             &times;
           </div>

@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_TODAY_WORKSHOPS = gql`
-  query GetTodayWorkshops {
-    todayWorkshops {
+  query GetTodayWorkshops($isSport: Boolean) {
+    todayWorkshops(isSport: $isSport) {
       id
       name
       description

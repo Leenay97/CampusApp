@@ -17,7 +17,7 @@ function Team({ team, place, changedPoints }: TeamProps) {
       <div className={styles['team__points']}>
         <span>{originalPoints}</span>
         {changedPoints !== 0 && changedPoints !== undefined && (
-          <span className={styles['team__add-points']}> + {changedPoints}</span>
+          <span className={styles['team__add-points']}> ({changedPoints})</span>
         )}
       </div>
     </div>

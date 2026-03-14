@@ -29,7 +29,7 @@ export function List<
 
   return (
     <>
-      <Subtitle>{title}</Subtitle>
+      <Subtitle noMargin>{title}</Subtitle>
       <ul className={styles['list']}>
         {items &&
           items.map((item) => (

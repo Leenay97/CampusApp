@@ -11,12 +11,12 @@ import CenteredContainer from '@/components/CenteredContainer/CenteredContainer'
 import Section from '@/components/Section/Section';
 import Loader from '@/components/Loader/Loaader';
 
-export default function WorkShopsPage(): JSX.Element {
+export default function SportPage(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showClosed, setShowClosed] = useState<boolean>(false);
 
   const { data, loading, refetch } = useQuery(queries.GET_WORKSHOPS, {
-    variables: { isSport: false },
+    variables: { isSport: true },
   });
 
   const activeWorkshops = [...(data?.workshops ?? [])].filter((w) => !w.isClosed);
@@ -49,12 +49,13 @@ export default function WorkShopsPage(): JSX.Element {
     <CenteredContainer>
       <div className={style['workshops-wrapper']}>
         <PrimaryButton onClick={handleOpenModal} width="100%">
-          Добавить мастеркласс
+          Добавить Sport Time
         </PrimaryButton>
         <CreateWorkshopModal
           isOpen={isModalOpen}
           onSubmit={handleSubmit}
           onClose={handleCloseModal}
+          sportTime
         />
         {(activeWorkshops || []).map((workshop: WorkshopType) => (
           <Workshop

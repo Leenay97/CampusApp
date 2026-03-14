@@ -5,8 +5,11 @@ const UserWorkshop = sequelize.models.UserWorkshop;
 
 export const workshopResolvers = {
   Query: {
-    workshops: async () => {
+    workshops: async (_, { isSport }) => {
       return await Workshop.findAll({
+        where: {
+          type: isSport === true ? 'SPORT' : 'WORKSHOP',
+        },
         include: [
           { model: User, as: 'teacher' },
           {
@@ -25,7 +28,7 @@ export const workshopResolvers = {
         ],
       });
     },
-    todayWorkshops: async () => {
+    todayWorkshops: async (_, { isSport }) => {
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
 
@@ -37,6 +40,7 @@ export const workshopResolvers = {
           date: {
             [Op.between]: [startOfDay, endOfDay],
           },
+          type: isSport ? 'SPORT' : 'WORKSHOP',
           isClosed: false,
         },
         include: [
@@ -107,14 +111,14 @@ export const workshopResolvers = {
         teacherId,
         maxStudents,
         seasonId: activeSeason?.id,
-        maxAge: maxAge || 100,
+        maxAge: maxAge || 0,
         type,
         date: Date.now(),
       });
       return workshop;
     },
 
-    joinWorkshop: async (_, { studentId, workshopId }) => {
+    joinWorkshop: async (_, { studentId, workshopId, isSport }) => {
       try {
         const [student, workshop] = await Promise.all([
           User.findByPk(studentId),
@@ -141,31 +145,35 @@ export const workshopResolvers = {
           throw new Error('MK не найден');
         }
 
-        // Проверяем, есть ли запись на этот мастер-класс
         const existingEntry = await UserWorkshop.findOne({
-          where: { userId: studentId, workshopId: workshopId },
+          where: { userId: studentId, workshopId },
         });
 
         if (existingEntry) {
-          // Если есть — удаляем (отменяем запись)
           await existingEntry.destroy();
         } else {
-          // Если нет — удаляем все остальные записи и добавляем новую
-          const otherEntries = await UserWorkshop.findAll({
-            where: { userId: studentId },
+          // получаем все воркшопы того же типа
+          const workshopsOfSameType = await Workshop.findAll({
+            where: { type: workshop.type },
+            attributes: ['id'],
           });
 
-          if (otherEntries.length > 0) {
-            await Promise.all(otherEntries.map((entry) => entry.destroy()));
-          }
+          const workshopIds = workshopsOfSameType.map((w) => w.id);
+
+          // удаляем записи только этого типа
+          await UserWorkshop.destroy({
+            where: {
+              userId: studentId,
+              workshopId: workshopIds,
+            },
+          });
 
           await UserWorkshop.create({
             userId: studentId,
-            workshopId: workshopId,
+            workshopId,
           });
         }
 
-        // Возвращаем обновленный мастер-класс
         const updatedWorkshop = await Workshop.findByPk(workshopId, {
           include: [
             {
@@ -182,7 +190,7 @@ export const workshopResolvers = {
           throw new Error('Вы уже записаны на этот мастеркласс');
         }
 
-        throw new Error(`${error.message}`);
+        throw new Error(error.message);
       }
     },
 

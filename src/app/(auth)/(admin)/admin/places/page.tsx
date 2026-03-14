@@ -155,7 +155,7 @@ export default function PlacesPage() {
       </Section>
       <Section>
         <AddPlaceForm onCreate={handleCreate} color={color} changeColor={setColor} />
-        <List items={places} isLoading={loading} />
+        <List title={'Все места'} items={places} isLoading={loading} />
       </Section>
     </CenteredContainer>
   );

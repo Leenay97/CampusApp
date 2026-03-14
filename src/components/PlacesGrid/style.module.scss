@@ -1,6 +1,6 @@
 .places-grid {
     display: grid;
-    grid-template-columns: 150px repeat(var(--dates-count), 80px);
+    grid-template-columns: 150px repeat(var(--dates-count), 90px);
     gap: 5px;
     width: max-content;
     margin: 0 auto;
