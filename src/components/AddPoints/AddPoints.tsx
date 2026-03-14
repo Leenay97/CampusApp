@@ -2,10 +2,8 @@ import { memo, useEffect, useState } from 'react';
 import styles from './style.module.scss';
 import Team from '@components/TeamRaiting/Team/Team';
 import { Group } from '@/app/types';
-import PrimaryButton from '../PrimaryButton/PrimaryButton';
 import SecondaryButton from '../SecondaryButton/SecondaryButton';
 import Section from '../Section/Section';
-import CenteredContainer from '../CenteredContainer/CenteredContainer';
 import Title from '../Title/Title';
 
 type AddPointsProps = {
@@ -37,33 +35,31 @@ function AddPoints({ groups, onSave }: AddPointsProps) {
     onSave(changedGroups);
   }
   return (
-    <CenteredContainer>
-      <Section>
-        <Title>Добавить очки</Title>
-        <div className={styles['save-btn']}>
-          <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
-        </div>
+    <Section>
+      <Title>Добавить очки</Title>
+      <div className={styles['save-btn']}>
+        <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
+      </div>
 
-        {changedGroups.map((team, index) => {
-          const originalTeam = Array.isArray(groups)
-            ? groups.find((g) => g.id === team.id)
-            : undefined;
-          const changedPoints = team.points - (originalTeam?.points ?? 0);
+      {changedGroups.map((team, index) => {
+        const originalTeam = Array.isArray(groups)
+          ? groups.find((g) => g.id === team.id)
+          : undefined;
+        const changedPoints = team.points - (originalTeam?.points ?? 0);
 
-          return (
-            <div key={team.id} className={styles['team']}>
-              <Team team={team} place={index + 1} changedPoints={changedPoints} />
-              <button className={styles['add-btn']} onClick={() => handleChange(team.id, -100)}>
-                -100
-              </button>
-              <button className={styles['add-btn']} onClick={() => handleChange(team.id, 100)}>
-                +100
-              </button>
-            </div>
-          );
-        })}
-      </Section>
-    </CenteredContainer>
+        return (
+          <div key={team.id} className={styles['team']}>
+            <Team team={team} place={index + 1} changedPoints={changedPoints} />
+            <button className={styles['add-btn']} onClick={() => handleChange(team.id, -100)}>
+              -100
+            </button>
+            <button className={styles['add-btn']} onClick={() => handleChange(team.id, 100)}>
+              +100
+            </button>
+          </div>
+        );
+      })}
+    </Section>
   );
 }
 

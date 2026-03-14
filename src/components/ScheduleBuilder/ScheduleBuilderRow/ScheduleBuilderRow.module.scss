@@ -1,35 +1,83 @@
 .schedule-row {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 60px 15px 1fr;
+    gap: 10px;
+    align-items: start;
     justify-content: flex-start;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     font-size: 20px;
-    gap: 5px;
     font-weight: bold;
-    box-shadow: 0 4px 10px rgba(70, 130, 187, 0.383);
-    border-radius: 8px;
-    padding: 15px;
     position: relative;
-    background-color: white;
 
     &__time {
-        color: #f46767;
+        padding: 10px 0;
+        color: #f06a6a;
+        font-size: 16px;
+        font-weight: bold;
     }
+
+    &__dot {
+        margin-top: 12px;
+        height: 15px;
+        width: 15px;
+        background-color: var(--color-dark-blue);
+        border-radius: 8px;
+        position: relative;
+
+    }
+
     &__activity {
         color: var(--color-dark-blue);
         font-size: 16px;
-        text-transform: capitalize;
+        padding: 10px 14px;
+        background: white;
+        border-radius: 10px;
+        line-height: 1.4;
     }
 
     &__buttons {
         position: absolute;
         display: flex;
         gap: 10px;
+        height: 35px;
+        align-items: center;
         right: 20px;
     }
 
+    &__add {
+        background-image: url('/img/plus.png');
+        background-size: 20px;
+    }
+
+    &__delete {
+        background-image: url('/img/delete.png');
+        background-size: 20px;
+    }
+
     button {
-        width: 30px;
-        height: 30px;
+        width: 20px;
+        height: 20px;
+        border: 0;
+        background-color: transparent;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(108%);
+        }
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        left: 76px;
+        top: 34px;
+        bottom: -28px;
+        width: 2px;
+        opacity: 0.5;
+        background: var(--color-dark-blue);
+    }
+
+    &:last-child::after {
+        display: none;
     }
 }

@@ -69,19 +69,28 @@ export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
     <div className={styles['schedule-builder']}>
       <Section>
         {editMode && <PrimaryButton onClick={handleSave}>Сохранить</PrimaryButton>}
-        {editMode ? <InputField value={name} onChange={setName} /> : <Title>{name}</Title>}
+        {editMode ? (
+          <InputField
+            value={name}
+            onChange={setName}
+            style={{ fontSize: '24px', color: '#4a90be', fontWeight: 'bold' }}
+          />
+        ) : (
+          <Title noMargin>{name}</Title>
+        )}
       </Section>
-
-      {schedules.map((schedule, index) => (
-        <ScheduleBuilderRow
-          key={index}
-          schedule={schedule}
-          onChange={(data) => handleScheduleChange(index, data)}
-          onAdd={() => handleAddRow(index)}
-          onDelete={() => handleDeleteRow(index)}
-          editMode={editMode}
-        />
-      ))}
+      <Section>
+        {schedules.map((schedule, index) => (
+          <ScheduleBuilderRow
+            key={index}
+            schedule={schedule}
+            onChange={(data) => handleScheduleChange(index, data)}
+            onAdd={() => handleAddRow(index)}
+            onDelete={() => handleDeleteRow(index)}
+            editMode={editMode}
+          />
+        ))}
+      </Section>
     </div>
   );
 }

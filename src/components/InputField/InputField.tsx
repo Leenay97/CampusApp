@@ -1,5 +1,5 @@
-import { text } from 'stream/consumers';
 import styles from './style.module.scss';
+import { CSSProperties } from 'react';
 
 type InputFieldProps = {
   width?: string;
@@ -9,6 +9,7 @@ type InputFieldProps = {
   placeholder?: string;
   maxLength?: number;
   type?: string;
+  style?: CSSProperties;
   onChange: (value: string) => void;
 };
 
@@ -20,6 +21,7 @@ export function InputField({
   placeholder,
   maxLength,
   type,
+  style,
   onChange,
 }: InputFieldProps) {
   return (
@@ -31,6 +33,7 @@ export function InputField({
         placeholder={placeholder}
         value={value}
         maxLength={maxLength}
+        style={style}
         onChange={(e) => onChange(e.target.value)}
       />
       <div className="error-text">{error}</div>

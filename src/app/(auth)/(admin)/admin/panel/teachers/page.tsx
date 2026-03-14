@@ -41,7 +41,7 @@ export default function TeachersPage() {
 
   return (
     <>
-      <CenteredContainer>
+      <CenteredContainer noPadding>
         <Section>
           <AddTeacher onAdd={refetchTeachers} />
           <List<User>

@@ -1,0 +1,12 @@
+.admin-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    border-radius: 8px;
+    &__option {
+        padding: 10px 15px;
+        border-radius: 6px;
+        background-color: var(--color-dark-blue);
+        color: white;
+    }
+}

@@ -103,32 +103,19 @@ function SeasonsPage() {
     );
 
   return (
-    <CenteredContainer>
+    <CenteredContainer noPadding>
       <Section>
-        <div className={styles['prohibited-section__header']}>
-          <Subtitle>Prohibited Actions</Subtitle>
-          <div>Введите пароль чтобы открыть секцию.</div>
-          <InputField value={password} onChange={setPassword} width="200px" />
-        </div>
-        <div
-          className={
-            password == process.env.NEXT_PUBLIC_PROHIBITED_SECTION_PASSWORD
-              ? styles['prohibited-section__content']
-              : styles['prohibited-section__content--hidden']
-          }
-        >
-          <Title>Добавить сезон</Title>
-          <AddSeason
-            year={seasonData.year}
-            number={seasonData.number}
-            startDate={seasonData.startDate}
-            endDate={seasonData.endDate}
-            onChange={handleChangeSeasonData}
-          />
-          <AddGroup onAdd={handleAddGroup} teachers={formattedTeachers} />
-          <GroupsList groups={seasonGroups} onDelete={handleDeleteGroup} />
-          <PrimaryButton onClick={handleCreateSeason}>Создать сезон</PrimaryButton>
-        </div>
+        <Title>Добавить сезон</Title>
+        <AddSeason
+          year={seasonData.year}
+          number={seasonData.number}
+          startDate={seasonData.startDate}
+          endDate={seasonData.endDate}
+          onChange={handleChangeSeasonData}
+        />
+        <AddGroup onAdd={handleAddGroup} teachers={formattedTeachers} />
+        <GroupsList groups={seasonGroups} onDelete={handleDeleteGroup} />
+        <PrimaryButton onClick={handleCreateSeason}>Создать сезон</PrimaryButton>
       </Section>
 
       <Section>

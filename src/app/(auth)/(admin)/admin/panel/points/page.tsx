@@ -39,7 +39,7 @@ function PointsPage() {
     );
 
   return (
-    <CenteredContainer>
+    <CenteredContainer noPadding>
       <AddPoints groups={data?.activeSeason.groups as Group[]} onSave={handleSaveGroups} />
     </CenteredContainer>
   );

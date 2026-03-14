@@ -125,7 +125,7 @@ export default function PlacesPage() {
     );
 
   return (
-    <CenteredContainer wide>
+    <CenteredContainer wide noPadding>
       <Section>
         <div ref={gridRef}>
           <Title>Расписание групповых мест</Title>

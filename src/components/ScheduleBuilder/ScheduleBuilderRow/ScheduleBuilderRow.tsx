@@ -21,15 +21,17 @@ export default function ScheduleBuilderRow({
     return (
       <div className={styles['schedule-row']}>
         <InputField
-          width="100px"
+          width="95px"
           type="time"
           value={schedule.time}
           onChange={(value) => onChange?.({ time: value })}
+          style={{ fontSize: '16px', color: '#f46767', fontWeight: 'bold' }}
         />
-
+        <div></div>
         <InputField
           value={schedule.activity}
           onChange={(value) => onChange?.({ activity: value })}
+          style={{ fontSize: '16px', color: '#4a90be', fontWeight: 'bold' }}
         />
 
         <div className={styles['schedule-row__buttons']}>
@@ -43,6 +45,7 @@ export default function ScheduleBuilderRow({
   return (
     <div className={styles['schedule-row']}>
       <div className={styles['schedule-row__time']}>{schedule.time}</div>
+      <div className={styles['schedule-row__dot']}></div>
       <div className={styles['schedule-row__activity']}>{schedule.activity}</div>
     </div>
   );

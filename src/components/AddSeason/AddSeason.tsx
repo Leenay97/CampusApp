@@ -1,5 +1,6 @@
 import { InputField } from '@components/InputField/InputField';
 import styles from './style.module.scss';
+import Subtitle from '../Subtitle/Subtitle';
 
 type AddSeasonProps = {
   year: string;
@@ -30,7 +31,7 @@ export function AddSeason({ year, number, startDate, endDate, onChange }: AddSea
   return (
     <div className={styles['add-season']}>
       <div className={styles['add-season__input']}>
-        <h1 className="subtitle no-margin">Год</h1>
+        <Subtitle noMargin>Год</Subtitle>
         <InputField
           value={year}
           width="80px"
@@ -38,7 +39,7 @@ export function AddSeason({ year, number, startDate, endDate, onChange }: AddSea
           maxLength={4}
           placeholder={'Год'}
         />
-        <h1 className="subtitle no-margin">Сезон</h1>
+        <Subtitle noMargin>Сезон</Subtitle>
         <InputField
           value={number}
           width="40px"
@@ -47,10 +48,14 @@ export function AddSeason({ year, number, startDate, endDate, onChange }: AddSea
           placeholder="№"
         />
       </div>
-      <h1 className="subtitle no-margin">Начало</h1>
-      <InputField value={startDate} width="150px" type="date" onChange={handleChangeStartDate} />
-      <h1 className="subtitle no-margin">Конец</h1>
-      <InputField value={endDate} width="150px" type="date" onChange={handleChangeEndDate} />
+      <div>
+        <Subtitle>Начало</Subtitle>
+        <InputField value={startDate} width="150px" type="date" onChange={handleChangeStartDate} />
+      </div>
+      <div>
+        <Subtitle>Конец</Subtitle>
+        <InputField value={endDate} width="150px" type="date" onChange={handleChangeEndDate} />
+      </div>
     </div>
   );
 }
