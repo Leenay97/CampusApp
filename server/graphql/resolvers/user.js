@@ -1,6 +1,7 @@
 import { User, Workshop, Group, Season } from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { use } from 'react';
 
 export const userResolvers = {
   Query: {
@@ -90,7 +91,12 @@ export const userResolvers = {
       if (!user.group && userLevel == 'STUDENT') throw new Error('У пользователя нет группы');
 
       const token = jwt.sign(
-        { id: user.id, userLevel: user.userLevel, seasonId: season.id, groupId: group?.id || null },
+        {
+          id: user.id,
+          userLevel: user.userLevel,
+          seasonId: season?.id || null,
+          groupId: group?.id || null,
+        },
         process.env.JWT_SECRET,
         {
           expiresIn: '30d',
@@ -113,6 +119,7 @@ export const userResolvers = {
         seasonId: group.seasonId,
         coins: 0,
         userLevel: 'STUDENT',
+        lives: 3,
       });
 
       return user;
@@ -256,6 +263,21 @@ export const userResolvers = {
       if (!workshop) throw new Error('Workshop not found');
 
       await user.addWorkshop(workshop);
+      return user;
+    },
+    fineUser: async (_, { id }) => {
+      const user = await User.findByPk(id);
+      const group = await Group.findOne({ where: { id: user.groupId } });
+
+      if (user.lives === 0) {
+        throw new Error('У студента не осталось жизней');
+      }
+      user.lives -= 1;
+      group.points -= 199;
+
+      user.save();
+      group.save();
+
       return user;
     },
   },

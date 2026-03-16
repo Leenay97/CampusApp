@@ -24,7 +24,7 @@
     }
     
     &__option {
-        padding: 10px 0;
+        padding: 15px 0;
         width: 100%;
         color: var(--text-primary);
         cursor: pointer;
@@ -38,6 +38,42 @@
             background-color: #8dd0e1;
         }
 
+    }
+
+    &__rubbers {
+        font-size: 14px;
+        margin-right: auto;
+        display: flex;
+        gap: 5px;
+    }
+
+    &__user {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 10px 20px;
+        border-bottom: 1px solid rgba(158, 174, 236, 0.394);
+    }
+
+    &__user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-left: auto;
+    }
+
+    &__user-coins {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 14px;
+        gap: 5px;
+
+        img {
+            height: 12px;
+            width: 12px;
+        }
     }
 
     &--hidden {

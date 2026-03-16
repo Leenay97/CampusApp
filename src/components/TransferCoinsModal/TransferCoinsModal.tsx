@@ -62,10 +62,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
         recieverId: selectedStudent.id,
         amount: Number(coins),
       });
-      setSelectedGroup({ id: '', name: '' });
-      setSelectedStudent({ id: '', name: '' });
       setCoins('');
-      onClose();
     } catch (err) {
       console.log(err);
     }

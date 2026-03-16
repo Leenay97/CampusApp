@@ -56,6 +56,7 @@ export type User = {
   userLevel: UserLevel;
   group?: Group;
   isActive: boolean;
+  lives: number;
 };
 
 export enum UserLevel {

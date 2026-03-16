@@ -59,6 +59,8 @@ export default function SportPage(): JSX.Element {
             maxAge={workshop.maxAge}
             handleJoin={() => handleJoin(workshop.id)}
             joined={workshop.students.some((student) => student.id === user?.id)}
+            noButtons
+            isSport
           />
         ))}
       </div>

@@ -17,13 +17,13 @@ function Workshop({
   place,
   toClose,
   isClosed,
+  isSport,
   noButtons,
   handleJoin,
 }: WorkshopType) {
   const studentCount = students?.length ?? 0;
   const isFull = studentCount >= (maxStudentAmount ?? 0);
 
-  // Если мастер-класс закрыт — отдельный блок
   if (isClosed) {
     return (
       <div className={styles['workshop--active']}>
@@ -38,9 +38,8 @@ function Workshop({
     );
   }
 
-  console.log(noButtons);
+  console.log(maxAge);
 
-  // Общий блок для остальных состояний
   return (
     <div className={joined ? styles['workshop--active'] : styles['workshop']}>
       <div className={styles['workshop__name']}>{name}</div>
@@ -50,8 +49,8 @@ function Workshop({
         <div className={styles['teacher-photo']} />
         {teacher}
       </div>
-      {maxAge && <div className={styles['workshop__place']}>Возраст: {maxAge}+</div>}
-      <WorkshopCounter number={studentCount} maxNumber={maxStudentAmount} />
+      {Number(maxAge) > 0 && <div className={styles['workshop__place']}>Возраст: {maxAge}+</div>}
+      {!isSport && <WorkshopCounter number={studentCount} maxNumber={maxStudentAmount} />}
 
       {!noButtons && (
         <>

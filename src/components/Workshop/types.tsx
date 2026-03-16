@@ -12,6 +12,7 @@ export type Workshop = {
   toClose?: boolean;
   isClosed?: boolean;
   noButtons?: boolean;
+  isSport?: boolean;
   handleJoin?: () => void;
 };
 

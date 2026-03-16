@@ -12,6 +12,7 @@ import CloseWorkshopModal from '@/components/CloseWorkshopModal/CloseWorkshopMod
 import Loader from '@/components/Loader/Loaader';
 import { CLOSE_WORKSHOP } from '@/graphql/mutations/CloseWorkshop';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
+import Subtitle from '@/components/Subtitle/Subtitle';
 
 export default function MyWorkshopPage() {
   const [activeWorkshopId, setActiveWorkshopId] = useState<string | null>(null);
@@ -49,32 +50,38 @@ export default function MyWorkshopPage() {
   return (
     <CenteredContainer>
       <Section>
-        <Title>Мои мастерклассы</Title>
+        <Title noMargin>Открытые мастерклассы</Title>
       </Section>
-      {activeWorkshops.map((workshop: WorkshopType) => (
-        <Fragment key={workshop.id}>
-          <Workshop
-            name={workshop.name}
-            description={workshop.description}
-            students={workshop.students ?? []}
-            maxStudentAmount={workshop.maxStudents}
-            place={workshop.place?.name}
-            teacher={workshop.teacher?.name}
-            maxAge={workshop.maxAge}
-            toClose
-            isClosed={workshop.isClosed}
-            handleJoin={() => setActiveWorkshopId(workshop.id)}
-          />
-
-          {activeWorkshopId === workshop.id && (
-            <CloseWorkshopModal
+      {activeWorkshops.length <= 0 && (
+        <Section>
+          <Subtitle noMargin>Мастерклассов еще нет</Subtitle>
+        </Section>
+      )}
+      {activeWorkshops.length > 0 &&
+        activeWorkshops.map((workshop: WorkshopType) => (
+          <Fragment key={workshop.id}>
+            <Workshop
+              name={workshop.name}
+              description={workshop.description}
               students={workshop.students ?? []}
-              onSubmit={handleCloseWorkshop}
-              onClose={() => setActiveWorkshopId(null)}
+              maxStudentAmount={workshop.maxStudents}
+              place={workshop.place?.name}
+              teacher={workshop.teacher?.name}
+              maxAge={workshop.maxAge}
+              toClose
+              isClosed={workshop.isClosed}
+              handleJoin={() => setActiveWorkshopId(workshop.id)}
             />
-          )}
-        </Fragment>
-      ))}
+
+            {activeWorkshopId === workshop.id && (
+              <CloseWorkshopModal
+                students={workshop.students ?? []}
+                onSubmit={handleCloseWorkshop}
+                onClose={() => setActiveWorkshopId(null)}
+              />
+            )}
+          </Fragment>
+        ))}
       <PrimaryButton onClick={() => setShowClosed((prev) => !prev)}>
         {showClosed ? 'Скрыть закрытые' : 'Показать закрытые'}
       </PrimaryButton>

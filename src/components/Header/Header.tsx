@@ -42,21 +42,15 @@ function Header() {
     setIsProfileOpen(false);
   }
 
-  // Обработчик скролла
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Определяем направление скролла
       if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        // Скролл вниз и прокрутили больше 50px - скрываем хедер
         setIsVisible(false);
       } else {
-        // Скролл вверх - показываем хедер
         setIsVisible(true);
       }
-
-      // Если открыто меню, не скрываем хедер
       if (isBurgerOpen || isProfileOpen) {
         setIsVisible(true);
       }
@@ -69,7 +63,6 @@ function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY, isBurgerOpen, isProfileOpen]);
 
-  // Проверка ширины экрана
   useEffect(() => {
     const checkWidth = () => {
       setHasMenu(window.innerWidth > 500);

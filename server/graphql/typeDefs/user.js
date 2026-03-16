@@ -10,6 +10,7 @@ export const userTypeDefs = gql`
     userLevel: String!
     workshops: [Workshop]
     isActive: Boolean
+    lives: Int
   }
 
   type AuthPayload {
@@ -49,5 +50,6 @@ export const userTypeDefs = gql`
     deleteUser(id: ID!): User
     transferCoins(userId: ID!, recieverId: ID!, amount: Int!): User
     addWorkshop(id: ID!, workshopId: ID!): User
+    fineUser(id: ID!): User
   }
 `;

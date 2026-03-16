@@ -6,6 +6,8 @@ import { Season } from './Season.js';
 import { Place } from './Place.js';
 import { Schedule } from './Schedule.js';
 import { TechnicalData } from './TechnicalData.js';
+import { IpodGroup } from './IpodGroup.js';
+import { IpodMatch } from './IpodMatch.js';
 
 Season.hasMany(Group, { foreignKey: 'seasonId', as: 'groups' });
 Group.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
@@ -32,6 +34,19 @@ Workshop.belongsToMany(User, {
   through: 'UserWorkshop',
   as: 'students',
   foreignKey: 'workshopId',
+});
+
+IpodGroup.hasMany(User);
+User.belongsTo(IpodGroup);
+
+IpodMatch.belongsToMany(IpodGroup, {
+  through: 'Ipod',
+  foreignKey: 'ipodGroup',
+});
+
+IpodGroup.belongsToMany(IpodMatch, {
+  through: 'Ipod',
+  foreignKey: 'ipodMatch',
 });
 
 Group.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
