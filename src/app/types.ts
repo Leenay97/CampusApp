@@ -40,6 +40,22 @@ export type Place = {
   color: string;
 };
 
+export type RegisterStudentResponse = {
+  data?: {
+    registerStudent: {
+      token: string;
+      user: {
+        id: string;
+        name: string;
+        login: string;
+        userLevel: string;
+        isActive: boolean;
+      };
+    };
+  };
+  errors?: any[];
+};
+
 export type Season = {
   id: string;
   number: string;

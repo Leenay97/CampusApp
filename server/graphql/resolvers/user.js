@@ -171,35 +171,34 @@ export const userResolvers = {
       };
     },
 
-    registerStudent: async (_, { token, id, name, login, password, confirmPassword }) => {
+    registerStudent: async (_, { token, name, login, password, confirmPassword }) => {
       if (!login || !password) throw new Error('Введите пароль и логин');
-
       if (password !== confirmPassword) throw new Error('Пароли не совпадают');
-
-      const group = await Group.findByPk(token);
-
-      if (!group) throw new Error('Группа не существует');
-
       if (!name) throw new Error('Введите английское имя');
 
-      const student = await User.findByPk(id);
-
-      if (!student) throw new Error('Студента не существует');
-      if (student.isActive) throw new Error('Студент уже зарегистрирован');
+      const group = await Group.findByPk(token);
+      if (!group) throw new Error('Группа не существует');
 
       const existingLogin = await User.findOne({ where: { login } });
       if (existingLogin) throw new Error('Логин уже занят');
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      student.hashedPassword = hashedPassword;
-      student.login = login;
-      student.name = name;
-      student.isActive = true;
 
-      await student.save();
+      const student = await User.create({
+        login,
+        name,
+        hashedPassword,
+        userLevel: 'STUDENT',
+        isActive: true,
+        groupId: group.id,
+      });
 
       const tokenForLogin = jwt.sign(
-        { id: student.id, userLevel: student.userLevel },
+        {
+          id: student.id,
+          userLevel: student.userLevel,
+          name: student.name,
+        },
         process.env.JWT_SECRET,
         { expiresIn: '30d' },
       );

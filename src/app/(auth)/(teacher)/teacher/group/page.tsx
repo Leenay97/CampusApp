@@ -9,7 +9,6 @@ import { List } from '@/components/List/List';
 import { User } from '@/app/types';
 import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
-import Title from '@/components/Title/Title';
 
 function TeacherGroupPage() {
   const { user } = useUser();
@@ -22,11 +21,9 @@ function TeacherGroupPage() {
   return (
     <CenteredContainer>
       <Section>
-        <Title>Добавить студентов</Title>
         <div className="">
           Твоя группа <span className={styles['group-logo']}>{user?.group?.name}</span>
         </div>
-        <AddStudent groupId={user?.group?.id} onAdd={refetch} />
         <List<User> items={data?.students} isLoading={loading} onDelete={() => {}} />
       </Section>
     </CenteredContainer>

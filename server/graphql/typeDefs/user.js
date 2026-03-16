@@ -40,7 +40,6 @@ export const userTypeDefs = gql`
     ): AuthPayload!
     registerStudent(
       token: String!
-      id: ID!
       name: String!
       login: String!
       password: String!
