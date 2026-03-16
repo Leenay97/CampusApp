@@ -118,7 +118,7 @@ function CreateWorkshopModal({ isOpen, sportTime, onClose, onSubmit }: ModalProp
             <InputField value={capacity} onChange={setCapacity} />
           </div>
           <div>
-            <Subtitle>Максимальный возраст</Subtitle>
+            <Subtitle>Минимальный возраст</Subtitle>
             <div className={styles['modal__age']}>
               <InputField maxLength={2} width="40px" value={maxAge} onChange={setMaxAge} />+
             </div>
