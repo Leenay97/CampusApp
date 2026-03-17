@@ -1,4 +1,4 @@
-.modal {
+.fine-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -39,6 +39,17 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
+    }
+
+    &__student-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        span {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
     }
 
     .close-button {

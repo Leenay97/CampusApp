@@ -5,7 +5,7 @@ import TransferCoinsModal from '../TransferCoinsModal/TransferCoinsModal';
 import Coin from '@/assets/img/coin.png';
 import Image from 'next/image';
 import QRModal from '../QRModal/QRModal';
-import QRScannerModal from '../QRScannerModal/QRScannerModal';
+import FineStudentModal from '../FineStudentModal/FineStudentModal';
 
 type ProfileMenuProps = {
   isOpen: boolean;
@@ -15,7 +15,7 @@ type ProfileMenuProps = {
 function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
   const [transferModal, setTransferModal] = useState(false);
   const [myqr, setMyqr] = useState(false);
-  const [qrScanner, setQrScanner] = useState(false);
+  const [fineModal, setFineModal] = useState(false);
   const { user, setUser } = useUser();
 
   function handleLogout() {
@@ -25,13 +25,18 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
     window.location.href = '/login';
   }
 
-  function handleOpenModal() {
+  function handleOpenTrabsferModal() {
     setTransferModal(true);
     onClose();
   }
 
   function handleOpenQR() {
     setMyqr(true);
+    onClose();
+  }
+
+  function handleOpenFineModal() {
+    setFineModal(true);
     onClose();
   }
 
@@ -55,7 +60,6 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
               )}
             </>
             <div className={styles['profile-menu__user-info']}>
-              {' '}
               <div className={styles['profile-menu__user-name']}>{user?.name}</div>
               <div className={styles['profile-menu__user-coins']}>
                 <Image src={Coin} alt="coins" /> {user?.coins ?? 0}
@@ -63,11 +67,11 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
             </div>
           </div>
           {(role === 'TEACHER' || role === 'ADMIN') && (
-            <div className={styles['profile-menu__option']} onClick={() => setQrScanner(true)}>
+            <div className={styles['profile-menu__option']} onClick={handleOpenFineModal}>
               Оштрафовать
             </div>
           )}
-          <div className={styles['profile-menu__option']} onClick={handleOpenModal}>
+          <div className={styles['profile-menu__option']} onClick={handleOpenTrabsferModal}>
             Перевести coins
           </div>
           <div className={styles['profile-menu__option']} onClick={handleOpenQR}>
@@ -82,14 +86,7 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
         <TransferCoinsModal onClose={() => setTransferModal(false)}></TransferCoinsModal>
       )}
       {myqr && <QRModal onClose={() => setMyqr(false)}></QRModal>}
-      {qrScanner && (
-        <QRScannerModal
-          isOpen={qrScanner}
-          type="FINE"
-          onClose={() => setQrScanner(false)}
-          onScanSuccess={(data) => console.log(data)}
-        ></QRScannerModal>
-      )}
+      {fineModal && <FineStudentModal onClose={() => setFineModal(false)}></FineStudentModal>}
     </>
   );
 }

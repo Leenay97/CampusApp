@@ -53,7 +53,6 @@ export type RegisterStudentResponse = {
       };
     };
   };
-  errors?: any[];
 };
 
 export type Season = {
@@ -84,6 +83,11 @@ export enum UserLevel {
 export type Schedule = {
   time: string;
   activity: string;
+};
+
+export type ScannerError = Error & {
+  name: string;
+  message: string;
 };
 
 export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';
