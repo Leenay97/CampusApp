@@ -209,13 +209,14 @@ export const userResolvers = {
       };
     },
 
-    updateUser: async (_, { id, name, russianName, groupId }) => {
+    updateUser: async (_, { id, name, russianName, groupId, houseId }) => {
       const user = await User.findByPk(id);
       if (!user) throw new Error('User not found');
 
       user.name = name !== undefined ? name : user.name;
       user.russianName = russianName !== undefined ? russianName : user.russianName;
       user.groupId = groupId !== undefined ? groupId : user.groupId;
+      user.houseId = houseId !== undefined ? houseId : user.houseId;
 
       await user.save();
       return user;

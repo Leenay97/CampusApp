@@ -1,0 +1,18 @@
+.user-badge {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: var(--text-primary);
+    color: white;
+    border-radius: 5px;
+
+    &__name {
+        font-weight: bold;
+    }
+
+    &__group {
+        opacity: 0.8;
+    }
+}

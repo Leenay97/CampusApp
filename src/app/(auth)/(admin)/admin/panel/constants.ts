@@ -12,4 +12,5 @@ export const AdminPanelOptions: MenuOption[] = [
   { name: 'Sport Time', link: '/admin/panel/sporttime' },
   { name: 'Распорядок дня', link: '/admin/panel/schedule' },
   { name: 'Тех. данные', link: '/admin/panel/technical-data' },
+  { name: 'Управление домиками', link: '/houses' },
 ];

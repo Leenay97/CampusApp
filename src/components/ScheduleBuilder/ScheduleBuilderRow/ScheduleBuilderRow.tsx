@@ -1,6 +1,7 @@
 import { Schedule } from '@/app/types';
 import styles from './ScheduleBuilderRow.module.scss';
 import { InputField } from '@/components/InputField/InputField';
+import ActionButton from '@/components/ActionButton/ActionButton';
 
 type Props = {
   schedule: Schedule;
@@ -17,7 +18,7 @@ export default function ScheduleBuilderRow({
   onAdd,
   onDelete,
 }: Props) {
-  if (editMode) {
+  if (editMode && onAdd && onDelete) {
     return (
       <div className={styles['schedule-row']}>
         <InputField
@@ -35,8 +36,8 @@ export default function ScheduleBuilderRow({
         />
 
         <div className={styles['schedule-row__buttons']}>
-          <button className={styles['schedule-row__add']} onClick={onAdd}></button>
-          <button className={styles['schedule-row__delete']} onClick={onDelete} />
+          <ActionButton onClick={onAdd} type="ADD" />
+          <ActionButton onClick={onDelete} type="DELETE" />
         </div>
       </div>
     );

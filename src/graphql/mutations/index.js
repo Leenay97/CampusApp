@@ -17,6 +17,9 @@ import { CLOSE_WORKSHOP } from './CloseWorkshop';
 import { UPDATE_TECHNICAL_DATA } from './UpdateTechnicalData';
 import { TRANSFER_COINS } from './TransferCoins';
 import { FINE_USER } from './FineUser';
+import { CREATE_HOUSE } from './CreateHouse';
+import { UPDATE_USER } from './UpdateUser';
+import { UPDATE_HOUSE } from './UpdateHouse';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -38,5 +41,8 @@ export const mutations = {
   UPDATE_TECHNICAL_DATA,
   TRANSFER_COINS,
   FINE_USER,
+  CREATE_HOUSE,
+  UPDATE_USER,
+  UPDATE_HOUSE,
 };
 export default mutations;

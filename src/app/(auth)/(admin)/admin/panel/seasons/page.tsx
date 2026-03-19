@@ -1,11 +1,10 @@
 'use client';
 
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { queries } from '@graphql/queries/index';
 import { AddGroup } from '@components/AddGroup/AddGroup';
 import { GroupsList } from '@components/GroupsList/GroupsList';
 import styles from './style.module.scss';
-import { InputField } from '@/components/InputField/InputField';
 import { AddSeason } from '@/components/AddSeason/AddSeason';
 import { useMemo, useState } from 'react';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
@@ -16,8 +15,8 @@ import { GroupInput, Season, Teacher } from '@/app/types';
 import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import Title from '@/components/Title/Title';
-import Subtitle from '@/components/Subtitle/Subtitle';
 import Loader from '@/components/Loader/Loaader';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 
 function SeasonsPage() {
   const [seasonGroups, setSeasonGroups] = useState<GroupInput[]>([]);
@@ -27,14 +26,17 @@ function SeasonsPage() {
     startDate: '',
     endDate: '',
   });
-  const [password, setPassword] = useState<string>('');
   const [selectedSeason, setSelectedSeason] = useState<Partial<Season>>({ id: '' });
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { loading: teachersLoading, data: teachersData } = useQuery(queries.GET_TEACHERS);
-  const { loading: seasonsLoading, data: seasonsData } = useQuery(queries.GET_SEASONS);
-  const [createSeason] = useMutation(mutations.CREATE_SEASON);
-  const [activateSeason] = useMutation(mutations.ACTIVATE_SEASON);
+  const {
+    loading: seasonsLoading,
+    data: seasonsData,
+    refetch: refetchSeasons,
+  } = useQuery(queries.GET_SEASONS);
+  const [createSeason] = useGlobalLoadingMutation(mutations.CREATE_SEASON);
+  const [activateSeason] = useGlobalLoadingMutation(mutations.ACTIVATE_SEASON);
 
   const teachers = useMemo(() => teachersData?.teachers ?? [], [teachersData?.teachers]);
 
@@ -68,14 +70,13 @@ function SeasonsPage() {
   async function handleCreateSeason() {
     try {
       await createSeason({
-        variables: {
-          year: seasonData.year,
-          number: seasonData.number,
-          startDate: seasonData.startDate,
-          endDate: seasonData.endDate,
-          groupTeachers: seasonGroups,
-        },
+        year: seasonData.year,
+        number: seasonData.number,
+        startDate: seasonData.startDate,
+        endDate: seasonData.endDate,
+        groupTeachers: seasonGroups,
       });
+      refetchSeasons();
     } catch (err) {
       console.error(err);
     }
@@ -84,10 +85,9 @@ function SeasonsPage() {
   async function handleActivateSeason() {
     try {
       await activateSeason({
-        variables: {
-          id: selectedSeason.id,
-        },
+        id: selectedSeason.id,
       });
+      setIsModalOpen(false);
     } catch (err) {
       console.error(err);
     }

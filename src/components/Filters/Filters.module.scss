@@ -1,0 +1,18 @@
+.filters {
+    display: flex;
+    gap: 5px;
+
+    &__item {
+        padding: 3px 10px;
+        border: 2px solid var(--text-primary);
+        color: var(--text-primary);
+        border-radius: 3px;
+    }
+
+    &__item--active {
+        padding: 3px 10px;
+        background-color: var(--text-primary);
+        color: white;
+        border-radius: 3px;
+    }
+}

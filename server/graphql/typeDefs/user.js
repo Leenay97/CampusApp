@@ -11,6 +11,7 @@ export const userTypeDefs = gql`
     workshops: [Workshop]
     isActive: Boolean
     lives: Int
+    houseId: ID
   }
 
   type AuthPayload {
@@ -45,7 +46,7 @@ export const userTypeDefs = gql`
       password: String!
       confirmPassword: String!
     ): AuthPayload!
-    updateUser(id: ID!, name: String, russianName: String, groupId: ID): User
+    updateUser(id: ID!, name: String, russianName: String, groupId: ID, houseId: ID): User
     deleteUser(id: ID!): User
     transferCoins(userId: ID!, recieverId: ID!, amount: Int!): User
     addWorkshop(id: ID!, workshopId: ID!): User

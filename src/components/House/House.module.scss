@@ -1,0 +1,49 @@
+.house {
+    border-radius: 4px;
+    padding: 6px 10px;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 3px solid var(--text-primary);
+    color: var(--text-primary);
+    font-weight: bold;
+    position: relative;
+    background-color: transparent;
+
+    &::before, &::after {
+        position: absolute;
+        content: '';
+        height: 5px;
+        width: 55px;
+        background-color: var(--text-primary);
+        border-radius: 3px;
+        z-index: 1;
+    }
+
+    &::before {
+        transform: rotateZ(30deg);
+        right: -15px;
+        top: -10px;
+    }
+
+    &::after {
+        transform: rotateZ(-30deg);
+        left: -15px;
+        top: -10px;
+    }
+
+    &:nth-child(2n) {
+        border-color: var(--color-orange);
+        color: var(--color-orange);
+        &::before, &::after {
+            background-color: var(--color-orange);
+        }
+
+    }
+
+    span {
+        z-index: 100;
+    }
+}

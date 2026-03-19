@@ -6,6 +6,7 @@ import { seasonTypeDefs } from './season.js';
 import { placeTypeDefs } from './place.js';
 import { scheduleTypeDefs } from './schedule.js';
 import { technicalDataTypeDefs } from './technicalData.js';
+import { houseTypeDefs } from './house.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -16,4 +17,5 @@ export const typeDefs = [
   placeTypeDefs,
   scheduleTypeDefs,
   technicalDataTypeDefs,
+  houseTypeDefs,
 ];

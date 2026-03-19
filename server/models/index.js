@@ -8,6 +8,7 @@ import { Schedule } from './Schedule.js';
 import { TechnicalData } from './TechnicalData.js';
 import { IpodGroup } from './IpodGroup.js';
 import { IpodMatch } from './IpodMatch.js';
+import { House } from './House.js';
 
 Season.hasMany(Group, { foreignKey: 'seasonId', as: 'groups' });
 Group.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
@@ -55,4 +56,7 @@ Place.hasOne(Group, { foreignKey: 'placeId', as: 'group' });
 Workshop.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
 Place.hasOne(Workshop, { foreignKey: 'placeId', as: 'workshop' });
 
-export { sequelize, User, Group, Workshop, Season, Place, Schedule, TechnicalData };
+House.hasMany(User, { foreignKey: 'houseId', as: 'users' });
+User.belongsTo(House, { foreignKey: 'houseId', as: 'house' });
+
+export { sequelize, User, Group, Workshop, Season, Place, Schedule, TechnicalData, House };
