@@ -40,7 +40,7 @@ export const userResolvers = {
     // Новый: по groupId
     usersByGroup: async (_, { groupId }) => {
       return await User.findAll({
-        where: { groupId },
+        where: { groupId, userLevel: 'STUDENT' },
         include: [
           { model: Group, as: 'group' },
           { model: Workshop, as: 'attendingWorkshops' },

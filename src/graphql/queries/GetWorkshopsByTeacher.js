@@ -6,6 +6,7 @@ export const GET_WORKSHOPS_BY_TEACHER = gql`
       id
       name
       description
+      date
       teacher {
         name
       }

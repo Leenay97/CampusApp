@@ -16,6 +16,7 @@ import { CREATE_HOUSE } from '@/graphql/mutations/CreateHouse';
 import { useQuery } from '@apollo/client';
 import { GET_HOUSES } from '@/graphql/queries/GetHouses';
 import Filters from '@/components/Filters/Filters';
+import { useUser } from '@/contexts/UserContext';
 
 type SortOption = 'по номеру' | 'по оценке';
 
@@ -25,6 +26,7 @@ export default function HousesPage() {
   const [createHouse] = useGlobalLoadingMutation(CREATE_HOUSE);
   const { data, loading, refetch } = useQuery(GET_HOUSES);
   const [sortBy, setSortBy] = useState<SortOption>('по номеру');
+  const { user } = useUser();
 
   async function handleCreate() {
     try {
@@ -99,17 +101,21 @@ export default function HousesPage() {
             </TransformWrapper>
           </div>
         )}
-        <Subtitle noMargin>Добавить домик</Subtitle>
-        <div className={styles['houses__add']}>
-          <Subtitle>№</Subtitle>
-          <InputField
-            value={creationNumber}
-            onChange={handleChangeNumber}
-            width="40px"
-            maxLength={2}
-          />
-          <PrimaryButton onClick={handleCreate}>Добавить</PrimaryButton>
-        </div>
+        {user?.userLevel === 'ADMIN' && (
+          <>
+            <Subtitle noMargin>Добавить домик</Subtitle>
+            <div className={styles['houses__add']}>
+              <Subtitle>№</Subtitle>
+              <InputField
+                value={creationNumber}
+                onChange={handleChangeNumber}
+                width="40px"
+                maxLength={2}
+              />
+              <PrimaryButton onClick={handleCreate}>Добавить</PrimaryButton>
+            </div>
+          </>
+        )}
       </Section>
 
       <Section>

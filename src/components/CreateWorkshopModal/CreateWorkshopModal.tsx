@@ -1,5 +1,5 @@
 'use client';
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './style.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
@@ -16,11 +16,26 @@ import Subtitle from '../Subtitle/Subtitle';
 type ModalProps = {
   isOpen: boolean;
   sportTime?: boolean;
+  allDates: {
+    label: string;
+    value: string;
+    timestamp: number;
+  }[];
+  selectedDate: string;
+  onDateChange: (e: ChangeEvent<HTMLSelectElement, Element>) => void;
   onClose: () => void;
   onSubmit: () => void;
 };
 
-function CreateWorkshopModal({ isOpen, sportTime, onClose, onSubmit }: ModalProps) {
+function CreateWorkshopModal({
+  isOpen,
+  sportTime,
+  allDates,
+  selectedDate,
+  onDateChange,
+  onClose,
+  onSubmit,
+}: ModalProps) {
   const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
   const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
   const [name, setName] = useState<string>('');
@@ -79,6 +94,7 @@ function CreateWorkshopModal({ isOpen, sportTime, onClose, onSubmit }: ModalProp
           maxStudents: parseInt(capacity, 10),
           maxAge: parseInt(maxAge),
           type: sportTime ? 'SPORT' : 'WORKSHOP',
+          date: selectedDate,
         },
       });
       onSubmit();
@@ -97,6 +113,30 @@ function CreateWorkshopModal({ isOpen, sportTime, onClose, onSubmit }: ModalProp
           </div>
         </div>
         <div className={styles['modal__body']}>
+          {allDates.length > 0 && (
+            <div>
+              <Subtitle>Дата</Subtitle>
+              <select
+                value={selectedDate}
+                onChange={onDateChange}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd',
+                  backgroundColor: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                {allDates.map((date) => (
+                  <option key={date.value} value={date.value}>
+                    {date.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <Subtitle>Название</Subtitle>
             <InputField value={name} onChange={setName} />

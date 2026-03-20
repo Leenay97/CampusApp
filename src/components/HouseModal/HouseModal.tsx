@@ -125,12 +125,12 @@ function HouseModal({ id, number, onClose }: ModalProps) {
                 onChange={handleChangeGroup}
                 initValue={selectedGroup.name}
               />
-              {studentsData?.students?.length > 0 ? (
+              {studentsData?.usersByGroup?.length > 0 ? (
                 <>
                   <Subtitle>Студент</Subtitle>
                   <CustomSelect
                     key={`student-select-${selectedStudent.id}`}
-                    items={studentsData?.students || []}
+                    items={studentsData?.usersByGroup || []}
                     onChange={setSelectedStudent}
                     initValue={selectedStudent.name}
                   />

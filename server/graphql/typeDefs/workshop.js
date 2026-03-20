@@ -11,6 +11,7 @@ export const workshopTypeDefs = gql`
     students: [User]
     maxStudents: Int
     maxAge: Int
+    date: String
     isClosed: Boolean
   }
 
@@ -31,6 +32,7 @@ export const workshopTypeDefs = gql`
       maxStudents: Int
       maxAge: Int
       type: String!
+      date: String!
     ): Workshop
     joinWorkshop(studentId: ID!, workshopId: ID!, isSport: Boolean): Workshop
     closeWorkshop(studentIds: [ID!]!, workshopId: ID!): Workshop

@@ -1,4 +1,4 @@
-.house-modal {
+.student-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -32,13 +32,6 @@
         padding-right: 30px;
     }
 
-    &__row {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        align-items: flex-end;
-        align-items: center;
-    }
     &__body {
         min-height: 50px;
         display: flex;
@@ -50,12 +43,6 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-    }
-
-    &__students {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
     }
 
     .close-button {

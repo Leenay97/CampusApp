@@ -5,19 +5,19 @@ import { InputField } from '@/components/InputField/InputField';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Logo from '@/assets/img/logo.png';
 import Image from 'next/image';
-import { useMutation } from '@apollo/client';
-import mutations from '@/graphql/mutations';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import FullscreenContainer from '@/components/FullscreenContainer/FullscreenContainer';
 import Title from '@/components/Title/Title';
 import Subtitle from '@/components/Subtitle/Subtitle';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import { LOGIN } from '@/graphql/mutations/Login';
 
 export default function LoginPage(): JSX.Element {
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [loginUser] = useMutation(mutations.LOGIN);
+  const [loginUser] = useGlobalLoadingMutation(LOGIN);
   const router = useRouter();
   const { setUser } = useUser();
 
@@ -25,9 +25,8 @@ export default function LoginPage(): JSX.Element {
     e.preventDefault();
 
     try {
-      const { data } = await loginUser({ variables: { login, password } });
+      const data = await loginUser({ login: login, password: password });
       localStorage.setItem('token', data.login.token);
-      console.log(data);
       setUser(data.login.user);
       router.push('/');
     } catch (error) {

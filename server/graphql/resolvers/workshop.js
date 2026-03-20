@@ -94,13 +94,14 @@ export const workshopResolvers = {
   Mutation: {
     createWorkshop: async (
       _,
-      { name, description, placeId, teacherId, maxStudents, maxAge, type },
+      { name, description, placeId, teacherId, maxStudents, maxAge, type, date },
     ) => {
       if (!name) throw new Error('Нет названия');
       if (!teacherId) throw new Error('Не выбран учитель');
       if (!placeId) throw new Error('Не выбрано место');
       if (!maxStudents) throw new Error('Не выбрано кол-во студентов');
       if (!type) throw new Error('Ошибка типа');
+      if (!date) throw new Error('Нет даты');
 
       const activeSeason = await Season.findOne({ where: { isActive: true } });
 
@@ -113,7 +114,7 @@ export const workshopResolvers = {
         seasonId: activeSeason?.id,
         maxAge: maxAge || 0,
         type,
-        date: Date.now(),
+        date,
       });
       return workshop;
     },

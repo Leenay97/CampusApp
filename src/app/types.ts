@@ -30,6 +30,7 @@ export type Workshop = {
   maxAge?: number;
   place: Pick<Place, 'name' | 'id'>;
   isClosed: boolean;
+  date: Date;
 };
 
 export type Place = {
@@ -41,16 +42,14 @@ export type Place = {
 };
 
 export type RegisterStudentResponse = {
-  data?: {
-    registerStudent: {
-      token: string;
-      user: {
-        id: string;
-        name: string;
-        login: string;
-        userLevel: string;
-        isActive: boolean;
-      };
+  registerStudent: {
+    token: string;
+    user: {
+      id: string;
+      name: string;
+      login: string;
+      userLevel: string;
+      isActive: boolean;
     };
   };
 };

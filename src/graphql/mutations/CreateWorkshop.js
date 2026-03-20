@@ -9,6 +9,7 @@ export const CREATE_WORKSHOP = gql`
     $maxStudents: Int
     $maxAge: Int
     $type: String!
+    $date: String!
   ) {
     createWorkshop(
       name: $name
@@ -18,6 +19,7 @@ export const CREATE_WORKSHOP = gql`
       maxStudents: $maxStudents
       maxAge: $maxAge
       type: $type
+      date: $date
     ) {
       id
       name

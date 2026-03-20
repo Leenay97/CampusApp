@@ -71,6 +71,7 @@ export default function MyWorkshopPage() {
               toClose
               isClosed={workshop.isClosed}
               handleJoin={() => setActiveWorkshopId(workshop.id)}
+              date={workshop?.date}
             />
 
             {activeWorkshopId === workshop.id && (

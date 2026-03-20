@@ -10,7 +10,7 @@ export const StudentHeaderMenuOptions: MenuOption[] = [
   { name: 'Мастерклассы', link: '/workshops' },
   { name: 'Sport Time', link: '/sporttime' },
   { name: 'Расписание', link: '/schedule' },
-  { name: 'iPod', link: '/ipod' },
+  // { name: 'iPod', link: '/ipod' },
 ];
 
 export const TeacherHeaderMenuOptions: MenuOption[] = [
@@ -18,10 +18,10 @@ export const TeacherHeaderMenuOptions: MenuOption[] = [
   { name: 'Мастерклассы', link: '/workshops' },
   { name: 'Sport Time', link: '/sporttime' },
   { name: 'Мой мастеркласс', link: '/teacher/my-workshop' },
-  { name: 'Моя группа', link: '/teacher/my-group' },
+  { name: 'Моя группа', link: '/teacher/group' },
   { name: 'Расписание', link: '/schedule' },
-  { name: 'iPod', link: '/ipod' },
-  { name: '[Редактировать группу]', link: '/teacher/group' },
+  // { name: 'iPod', link: '/ipod' },
+  { name: 'Домики', link: '/houses' },
   { name: '[QR группы]', link: '/teacher/group/qr' },
 ];
 
@@ -30,6 +30,7 @@ export const AdminHeaderMenuOptions: MenuOption[] = [
   { name: 'Расписание', link: '/schedule' },
   { name: 'Мастерклассы', link: '/workshops' },
   { name: 'Sport Time', link: '/sporttime' },
+  { name: 'Домики', link: '/houses' },
   { name: '[Панель администратора]', link: '/admin/panel' },
 ];
 

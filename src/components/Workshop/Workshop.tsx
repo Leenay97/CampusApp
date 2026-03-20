@@ -19,10 +19,12 @@ function Workshop({
   isClosed,
   isSport,
   noButtons,
+  date,
   handleJoin,
 }: WorkshopType) {
   const studentCount = students?.length ?? 0;
   const isFull = studentCount >= (maxStudentAmount ?? 0);
+  console.log(date);
 
   if (isClosed) {
     return (
