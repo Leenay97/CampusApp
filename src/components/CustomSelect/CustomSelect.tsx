@@ -7,12 +7,16 @@ import CrossIcon from '../Icons/CrossIcon/CrossIcon';
 type CustomSelectProps<T> = {
   items: T[];
   initValue?: string;
+  width?: string;
+  hasCleanButton: boolean;
   onChange: (value: T) => void;
 };
 
 export function CustomSelect<T extends { id: string; name: string; russianName?: string }>({
   items,
   initValue,
+  width,
+  hasCleanButton,
   onChange,
 }: CustomSelectProps<T>) {
   const [value, setValue] = useState<string>(initValue ?? '');
@@ -55,8 +59,13 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
     setShowItems(false);
   };
 
+  function handleClean() {
+    onChange({ id: '', name: '' });
+    setValue('');
+  }
+
   return (
-    <div ref={selectRef} className={styles['custom-select']}>
+    <div ref={selectRef} className={styles['custom-select']} style={{ width }}>
       <div className={styles['custom-select__input']} onClick={() => setShowItems(true)}>
         <span>{value}</span>
         <ChevronIcon isOpen={showItems} />
@@ -90,6 +99,12 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
             </li>
           ))}
         </ul>
+      )}
+      {hasCleanButton && (
+        <CrossIcon
+          style={{ position: 'absolute', top: 6, right: -20, cursor: 'pointer' }}
+          onClick={handleClean}
+        />
       )}
     </div>
   );

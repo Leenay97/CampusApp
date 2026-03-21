@@ -1,7 +1,6 @@
-import { User, Workshop, Group, Season } from '../../models/index.js';
+import { User, Workshop, Group, Season, House } from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { use } from 'react';
 
 export const userResolvers = {
   Query: {
@@ -37,7 +36,6 @@ export const userResolvers = {
       });
     },
 
-    // Новый: по groupId
     usersByGroup: async (_, { groupId }) => {
       return await User.findAll({
         where: { groupId, userLevel: 'STUDENT' },
@@ -48,9 +46,7 @@ export const userResolvers = {
       });
     },
 
-    // Новый: по workshopId
     usersByWorkshop: async (_, { workshopId }) => {
-      // Сначала находим воркшоп, затем пользователя
       const workshop = await Workshop.findByPk(workshopId);
       if (!workshop) return [];
       return await User.findAll({
@@ -58,6 +54,18 @@ export const userResolvers = {
         include: [
           { model: Group, as: 'group' },
           { model: Workshop, as: 'attendingWorkshops' },
+        ],
+      });
+    },
+
+    seasonStudents: async () => {
+      const activeSeason = await Season.findOne({ where: { isActive: true } });
+      return await User.findAll({
+        where: { userLevel: 'STUDENT', seasonId: activeSeason.id },
+        include: [
+          { model: Group, as: 'group' },
+          { model: Workshop, as: 'attendingWorkshops' },
+          { model: House, as: 'house' },
         ],
       });
     },
@@ -186,7 +194,10 @@ export const userResolvers = {
 
       const student = await User.create({
         login,
+        seasonId: group.seasonId,
         name,
+        lives: 3,
+        coins: 0,
         hashedPassword,
         userLevel: 'STUDENT',
         isActive: true,
@@ -269,11 +280,10 @@ export const userResolvers = {
       const user = await User.findByPk(id);
       const group = await Group.findOne({ where: { id: user.groupId } });
 
-      if (user.lives === 0) {
+      if (!user.lives || user.lives === 0) {
         throw new Error('У студента не осталось жизней');
       }
       user.lives -= 1;
-      group.points -= 199;
 
       user.save();
       group.save();

@@ -1,5 +1,5 @@
 'use client';
-import { memo, useEffect, useState } from 'react';
+import { memo, use, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './HouseModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
@@ -106,7 +106,10 @@ function HouseModal({ id, number, onClose }: ModalProps) {
           )}
           <div className={styles['house-modal__row']}>
             <Subtitle noMargin>Студенты</Subtitle>
-            <ActionButton type="ADD" onClick={handleToggleEditForm} />
+            {user?.userLevel === 'ADMIN' ||
+              (user?.userLevel === 'TEACHER' && (
+                <ActionButton type="ADD" onClick={handleToggleEditForm} />
+              ))}
           </div>
           {!addStudentForm && houseData?.house?.users.length > 0 && (
             <div className={styles['house-modal__students']}>

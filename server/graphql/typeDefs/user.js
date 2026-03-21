@@ -11,6 +11,7 @@ export const userTypeDefs = gql`
     workshops: [Workshop]
     isActive: Boolean
     lives: Int
+    house: House
     houseId: ID
   }
 
@@ -26,6 +27,7 @@ export const userTypeDefs = gql`
     user(id: ID!): User
     usersByGroup(groupId: ID!): [User]
     usersByWorkshop(workshopId: ID!): [User]
+    seasonStudents: [User!]
   }
 
   extend type Mutation {

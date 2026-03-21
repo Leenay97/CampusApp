@@ -62,6 +62,11 @@ export type Season = {
   isArchived: boolean;
 };
 
+export type House = {
+  number: string;
+  id: string;
+};
+
 export type User = {
   id: string;
   name: string;
@@ -71,6 +76,7 @@ export type User = {
   group?: Group;
   isActive: boolean;
   lives: number;
+  house?: House;
 };
 
 export enum UserLevel {

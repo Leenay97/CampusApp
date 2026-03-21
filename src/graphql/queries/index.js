@@ -14,6 +14,7 @@ import { GET_WORKSHOPS_BY_TEACHER } from './GetWorkshopsByTeacher';
 import { GET_TECHICAL_DATA } from './GetTechnicalData';
 import { GET_HOUSES } from './GetHouses';
 import { GET_HOUSE } from './GetHouse';
+import { GET_SEASON_STUDENTS } from './GetSeasonStudents';
 
 export const queries = {
   GET_GROUPS,
@@ -32,5 +33,6 @@ export const queries = {
   GET_TECHICAL_DATA,
   GET_HOUSES,
   GET_HOUSE,
+  GET_SEASON_STUDENTS,
 };
 export default queries;
