@@ -22,15 +22,15 @@ function TeacherGroupPage() {
   });
   console.log(user);
 
-  const handleStudentClick = (student: User) => {
+  function handleStudentClick(student: User) {
     setSelectedStudent(student);
     setShowEditModal(true);
-  };
+  }
 
-  const handleCloseModal = () => {
+  function handleCloseModal() {
     setShowEditModal(false);
     setSelectedStudent(null);
-  };
+  }
 
   if (loading)
     return (

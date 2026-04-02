@@ -11,4 +11,5 @@ export const User = sequelize.define('User', {
   hashedPassword: { type: DataTypes.STRING, allowNull: true },
   isActive: { type: DataTypes.BOOLEAN, defaultValue: false },
   lives: { type: DataTypes.INTEGER, allowNull: true },
+  englishLevel: { type: DataTypes.STRING, allowNull: true },
 });

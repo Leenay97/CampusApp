@@ -14,6 +14,11 @@ export const GET_USER = gql`
       coins
       userLevel
       lives
+      class {
+        id
+        name
+      }
+      englishLevel
     }
   }
 `;

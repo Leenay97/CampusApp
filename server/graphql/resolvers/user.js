@@ -1,4 +1,4 @@
-import { User, Workshop, Group, Season, House } from '../../models/index.js';
+import { User, Workshop, Group, Season, House, Class } from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -66,6 +66,7 @@ export const userResolvers = {
           { model: Group, as: 'group' },
           { model: Workshop, as: 'attendingWorkshops' },
           { model: House, as: 'house' },
+          { model: Class, as: 'class' },
         ],
       });
     },
@@ -220,7 +221,10 @@ export const userResolvers = {
       };
     },
 
-    updateUser: async (_, { id, name, russianName, groupId, houseId }) => {
+    updateUser: async (
+      _,
+      { id, name, russianName, groupId, houseId, englishLevel, classId, coins },
+    ) => {
       const user = await User.findByPk(id);
       if (!user) throw new Error('User not found');
 
@@ -228,6 +232,10 @@ export const userResolvers = {
       user.russianName = russianName !== undefined ? russianName : user.russianName;
       user.groupId = groupId !== undefined ? groupId : user.groupId;
       user.houseId = houseId !== undefined ? houseId : user.houseId;
+      user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
+      user.classId = classId !== undefined ? classId : user.classId;
+      user.coins = coins !== undefined ? coins : user.coins;
+      user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
 
       await user.save();
       return user;

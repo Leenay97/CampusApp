@@ -1,0 +1,9 @@
+.posts {
+    &__text {
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+}

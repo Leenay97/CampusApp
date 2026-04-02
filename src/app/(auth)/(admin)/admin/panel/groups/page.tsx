@@ -4,7 +4,7 @@ import { AddTeacher } from '@/components/AddTeacher/AddTeacher';
 import { useQuery } from '@apollo/client';
 import { queries } from '@graphql/queries/index';
 import Modal from '@components/Modal/Modal';
-import styles from './style.module.scss';
+import styles from './GroupsPage.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import { useState } from 'react';
 import { AuthGuard } from '@/auth/AuthGuard';
@@ -33,11 +33,11 @@ function GroupsPage() {
     refetch: refetchTeachers,
   } = useQuery(queries.GET_TEACHERS);
 
-  const handleRefetch = () => {
+  function handleRefetch() {
     refetchTeachers();
-  };
+  }
 
-  const modalSubmit = async () => {
+  async function modalSubmit() {
     if (!selectedIdToDelete) return;
     try {
       await deleteUser({ id: selectedIdToDelete });
@@ -47,7 +47,7 @@ function GroupsPage() {
     } catch {
       setIsModalOpen(false);
     }
-  };
+  }
 
   async function handleDeleteUser(user: User | null) {
     if (!user) return;

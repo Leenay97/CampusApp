@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { queries } from '@graphql/queries/index';
 import { AddGroup } from '@components/AddGroup/AddGroup';
 import { GroupsList } from '@components/GroupsList/GroupsList';
-import styles from './style.module.scss';
+import styles from './SeasonsPage.module.scss';
 import { AddSeason } from '@/components/AddSeason/AddSeason';
 import { useMemo, useState } from 'react';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';

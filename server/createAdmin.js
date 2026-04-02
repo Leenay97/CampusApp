@@ -4,12 +4,10 @@ import bcrypt from 'bcrypt';
 
 async function createAdminUser() {
   try {
-    // Хешируем пароль
     const saltRounds = 10;
-    const plainPassword = '1'; // Замените на нужный пароль
+    const plainPassword = '1';
     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
 
-    // Создаем админа
     const admin = await User.create({
       name: 'Admin',
       coins: 0,

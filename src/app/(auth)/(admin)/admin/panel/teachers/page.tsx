@@ -5,10 +5,11 @@ import Modal from '@/components/Modal/Modal';
 import { List } from '@/components/List/List';
 import { mutations } from '@/graphql/mutations';
 import { queries } from '@/graphql/queries';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useState } from 'react';
 import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 
 export default function TeachersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,25 +20,25 @@ export default function TeachersPage() {
     refetch: refetchTeachers,
   } = useQuery(queries.GET_TEACHERS);
 
-  const [deleteTeacher] = useMutation(mutations.DELETE_USER);
+  const [deleteTeacher] = useGlobalLoadingMutation(mutations.DELETE_USER);
 
   function openModal(user: User | null) {
     setTeacherToDelete(user);
     setIsModalOpen(true);
   }
 
-  const handleDeleteTeacher = async () => {
+  async function handleDeleteTeacher() {
     if (!teacherToDelete) return;
 
     try {
-      await deleteTeacher({ variables: { id: teacherToDelete.id } });
+      await deleteTeacher({ id: teacherToDelete.id });
       setTeacherToDelete(null);
       setIsModalOpen(false);
       refetchTeachers();
     } catch (err) {
       console.error('Error deleting teacher:', err);
     }
-  };
+  }
 
   return (
     <>

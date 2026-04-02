@@ -20,22 +20,5 @@ export const placeResolvers = {
       if (!isTeamPlace && color) throw new Error('У негруппового места не может быть выбран цвет');
       return await Place.create({ name, isTeamPlace, color });
     },
-
-    //   addPoints: async (_, { id, amount }) => {
-    //     const group = await Group.findByPk(id);
-    //     if (!group) throw new Error('Group not found');
-
-    //     group.points += amount;
-    //     await group.save();
-    //     return group;
-    //   },
-
-    //   deleteGroup: async (_, { id }) => {
-    //     const group = await Group.findByPk(id);
-    //     if (!group) throw new Error('Group not found');
-
-    //     await group.destroy();
-    //     return group;
-    //   },
   },
 };

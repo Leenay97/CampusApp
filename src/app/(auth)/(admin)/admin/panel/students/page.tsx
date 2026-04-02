@@ -18,7 +18,7 @@ export default function StudentsPage() {
   const [name, setName] = useState('');
   const [group, setGroup] = useState({ id: '', name: '' });
   const { data: groupsData, loading: groupsLoading } = useQuery(GET_ACTIVE_SEASON);
-  const { data: studentsData, loading: studentsLoading } = useQuery(GET_SEASON_STUDENTS);
+  const { data: studentsData, loading: studentsLoading, refetch } = useQuery(GET_SEASON_STUDENTS);
 
   const filteredStudents: User[] = useMemo(() => {
     if (!studentsData?.seasonStudents) return [];
@@ -53,7 +53,7 @@ export default function StudentsPage() {
             hasCleanButton
           />
         </div>
-        <StudentsTable students={filteredStudents} />
+        <StudentsTable students={filteredStudents} refetch={refetch} />
       </Section>
     </CenteredContainer>
   );

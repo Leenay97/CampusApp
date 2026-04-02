@@ -7,19 +7,21 @@
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
+    font-size: 14px;
   }
 
   &__header {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    background-color: #f5f5f5;
+    grid-template-columns: repeat(6, 1fr) 50px;
+    background-color: var(--text-primary);
+    color: white;
     border-bottom: 2px solid #e0e0e0;
     font-weight: 600;
   }
 
   &__row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr) 50px;
     border-bottom: 1px solid #e0e0e0;
     transition: background-color 0.2s;
 
@@ -37,6 +39,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: center;
   }
 
   .sortable {
@@ -45,7 +48,7 @@
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: #e8e8e8;
+      background-color: #e8e8e837;
     }
 
     &:active {

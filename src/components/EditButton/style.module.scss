@@ -1,0 +1,29 @@
+@import '@app/globals.css';
+
+
+.edit-button {
+  border: 2px solid var(--primary-button-color);
+  color: white;
+  border: none;
+  font-size: 14px;
+  border-radius: 5px;
+  height: 35px;
+  width: 35px;
+  cursor: pointer;
+  margin: auto 10px;
+  background-color: white;
+
+  &:disabled {
+    background-color: var(--primary-button-disabled);
+
+    &:hover {
+      background-color: var(--primary-button-disabled);
+      color: white;
+    }
+  }
+
+  &:hover {
+    background-color: var(--primary-button-disabled);
+    color: white;
+  }
+}

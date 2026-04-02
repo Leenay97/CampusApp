@@ -20,6 +20,8 @@ import { FINE_USER } from './FineUser';
 import { CREATE_HOUSE } from './CreateHouse';
 import { UPDATE_USER } from './UpdateUser';
 import { UPDATE_HOUSE } from './UpdateHouse';
+import { CREATE_POST } from './CreatePost';
+import { CREATE_CLASS } from './CreateClass';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -44,5 +46,7 @@ export const mutations = {
   CREATE_HOUSE,
   UPDATE_USER,
   UPDATE_HOUSE,
+  CREATE_POST,
+  CREATE_CLASS,
 };
 export default mutations;

@@ -6,6 +6,8 @@ import { placeResolvers } from './place.js';
 import { scheduleResolvers } from './schedule.js';
 import { technicalDataResolvers } from './technicalData.js';
 import { houseResolvers } from './house.js';
+import { postResolvers } from './post.js';
+import { classResolvers } from './class.js';
 
 export const resolvers = [
   userResolvers,
@@ -16,4 +18,6 @@ export const resolvers = [
   scheduleResolvers,
   technicalDataResolvers,
   houseResolvers,
+  postResolvers,
+  classResolvers,
 ];

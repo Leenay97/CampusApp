@@ -54,6 +54,12 @@ export type RegisterStudentResponse = {
   };
 };
 
+export type Post = {
+  id: string;
+  text: string;
+  title: string;
+};
+
 export type Season = {
   id: string;
   number: string;
@@ -77,7 +83,11 @@ export type User = {
   isActive: boolean;
   lives: number;
   house?: House;
+  class: Class;
+  englishLevel: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 };
+
+export type EnglishLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
 export enum UserLevel {
   Admin = 'ADMIN',
@@ -93,6 +103,13 @@ export type Schedule = {
 export type ScannerError = Error & {
   name: string;
   message: string;
+};
+
+export type Class = {
+  id: string;
+  name: string;
+  place: Place;
+  level: number;
 };
 
 export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';

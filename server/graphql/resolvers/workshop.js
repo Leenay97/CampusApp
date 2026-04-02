@@ -74,21 +74,6 @@ export const workshopResolvers = {
         ],
       });
     },
-    // workshop: async (_, { id }) => {
-    //   return await Workshop.findByPk(id, {
-    //     include: [{ model: Workshop, as: 'workshops' }],
-    //   });
-    // },
-
-    // workshopsByUser: async (_, { userId }) => {
-    //   // Сначала находим пользователя, затем воркшоп
-    //   const user = await User.findByPk(userId);
-    //   if (!user) return [];
-    //   return await Workshop.findAll({
-    //     where: { id: user.workshopId },
-    //     include: [{ model: Workshop, as: 'workshops' }],
-    //   });
-    // },
   },
 
   Mutation: {

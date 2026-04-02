@@ -8,7 +8,7 @@ type CustomSelectProps<T> = {
   items: T[];
   initValue?: string;
   width?: string;
-  hasCleanButton: boolean;
+  hasCleanButton?: boolean;
   onChange: (value: T) => void;
 };
 

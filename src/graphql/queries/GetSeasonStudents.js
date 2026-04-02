@@ -10,6 +10,7 @@ export const GET_SEASON_STUDENTS = gql`
       coins
       lives
       house {
+        id
         number
       }
       group {
@@ -20,6 +21,11 @@ export const GET_SEASON_STUDENTS = gql`
         id
         name
       }
+      class {
+        id
+        name
+      }
+      englishLevel
     }
   }
 `;

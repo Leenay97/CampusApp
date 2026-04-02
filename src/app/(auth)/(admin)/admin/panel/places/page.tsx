@@ -15,7 +15,7 @@ import { buildPlacesPayload } from './helpers';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
 import html2canvas from 'html2canvas';
-import styles from './style.module.scss';
+import styles from './PlacesPage.module.scss';
 import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import Title from '@/components/Title/Title';

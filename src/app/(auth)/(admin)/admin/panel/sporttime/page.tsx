@@ -1,7 +1,7 @@
 'use client';
 import { JSX, useState, useMemo, useEffect } from 'react';
 import Workshop from '@components/Workshop/Workshop';
-import style from './style.module.scss';
+import style from './SportTimePage.module.scss';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import CreateWorkshopModal from '@/components/CreateWorkshopModal/CreateWorkshopModal';
 import { useQuery } from '@apollo/client';
@@ -22,23 +22,20 @@ export default function SportTimePage(): JSX.Element {
     variables: { isSport: true },
   });
 
-  // Функция для форматирования даты в YYYY-MM-DD с учетом локального часового пояса
-  const formatLocalDate = (date: Date): string => {
+  function formatLocalDate(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
-  };
+  }
 
-  // Функция для сравнения дат без учета времени
-  const isDateTodayOrFuture = (date: Date): boolean => {
+  function isDateTodayOrFuture(date: Date): boolean {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     date.setHours(0, 0, 0, 0);
     return date >= today;
-  };
+  }
 
-  // Массив всех дат в сезоне (только сегодня и будущие)
   const allDates = useMemo(() => {
     if (!seasonData?.activeSeason?.startDate || !seasonData?.activeSeason?.endDate) {
       return [];
@@ -59,7 +56,6 @@ export default function SportTimePage(): JSX.Element {
       const currentDate = new Date(start);
 
       while (currentDate <= end) {
-        // Проверяем, является ли дата сегодняшней или будущей
         if (isDateTodayOrFuture(new Date(currentDate))) {
           const dateString = formatLocalDate(currentDate);
           dates.push({
@@ -78,19 +74,17 @@ export default function SportTimePage(): JSX.Element {
     }
   }, [seasonData?.activeSeason?.startDate, seasonData?.activeSeason?.endDate]);
 
-  // Устанавливаем сегодняшнюю дату по умолчанию, если она входит в диапазон
   useEffect(() => {
     if (allDates.length > 0 && !selectedDate) {
       const today = new Date();
       const todayString = formatLocalDate(today);
 
-      // Проверяем, есть ли сегодняшняя дата в списке доступных дат
       const todayExists = allDates.some((date) => date.value === todayString);
 
       if (todayExists) {
+        /*eslint-disable react-hooks/set-state-in-effect*/
         setSelectedDate(todayString);
       } else {
-        // Если сегодняшней даты нет, выбираем первую доступную дату (первую будущую)
         setSelectedDate(allDates[0].value);
       }
     }

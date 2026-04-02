@@ -11,7 +11,6 @@ export const groupResolvers = {
       });
     },
 
-    // Новый: по groupId
     groupByUserId: async (_, { userId }) => {
       return await Group.findOne({
         where: { userId },
@@ -22,7 +21,6 @@ export const groupResolvers = {
       });
     },
 
-    // Новый: по workshopId
     groupByUserId: async (_, { userId }) => {
       return await Group.findOne({
         where: { userId },
@@ -32,12 +30,10 @@ export const groupResolvers = {
   },
   Mutation: {
     createGroup: async (_, { name, userIds }) => {
-      // 1. Проверка — максимум 2 учителя
-
       const validUserIds = userIds ? userIds.filter((id) => id != null) : [];
 
       if (validUserIds.length < 2) {
-        throw new Error('At least two teachers must be selected');
+        throw new Error('Минимум 2 учителя');
       }
 
       const existingGroup = await Group.findOne({
@@ -46,10 +42,10 @@ export const groupResolvers = {
         },
       });
 
-      if (existingGroup) throw new Error('Group exists');
+      if (existingGroup) throw new Error('Группа уже существует');
 
       if (userIds && userIds.length > 3) {
-        throw new Error('Maximum 3 teachers per group');
+        throw new Error('Максисум 3 учителя');
       }
 
       const users = await User.findAll({
@@ -59,30 +55,28 @@ export const groupResolvers = {
       });
 
       if (users.length !== userIds.length) {
-        throw new Error('Some users not found');
+        throw new Error('Учителя не найдены');
       }
 
       const usersWithGroup = users.filter((user) => user.groupId !== null);
       if (usersWithGroup.length > 0) {
         const userNames = usersWithGroup.map((u) => u.name || u.id).join(', ');
-        throw new Error(`Users already have a group: ${userNames}`);
+        throw new Error(`У учителя уже есть группа: ${userNames}`);
       }
 
       const group = await Group.create({ name, points: 0 });
 
-      // 3. Привязываем учителей к группе
       if (userIds && userIds.length > 0) {
         await User.update(
           { groupId: group.id },
           {
             where: {
-              id: userIds, // Sequelize автоматически обработает массив как IN условие
+              id: userIds,
             },
           },
         );
       }
 
-      // 4. Возвращаем группу с пользователями
       return await Group.findByPk(group.id, {
         include: [{ model: User, as: 'users' }],
       });
@@ -90,7 +84,7 @@ export const groupResolvers = {
 
     updateGroup: async (_, { id, amount, places }) => {
       const group = await Group.findByPk(id);
-      if (!group) throw new Error('Group not found');
+      if (!group) throw new Error('Группа не найдена');
 
       group.points += amount;
       group.places = places;
@@ -100,7 +94,7 @@ export const groupResolvers = {
 
     deleteGroup: async (_, { id }) => {
       const group = await Group.findByPk(id);
-      if (!group) throw new Error('Group not found');
+      if (!group) throw new Error('Группа не найдена');
 
       await group.destroy();
       return group;

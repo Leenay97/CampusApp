@@ -7,6 +7,8 @@ import { placeTypeDefs } from './place.js';
 import { scheduleTypeDefs } from './schedule.js';
 import { technicalDataTypeDefs } from './technicalData.js';
 import { houseTypeDefs } from './house.js';
+import { postTypeDefs } from './post.js';
+import { classTypeDefs } from './class.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -18,4 +20,6 @@ export const typeDefs = [
   scheduleTypeDefs,
   technicalDataTypeDefs,
   houseTypeDefs,
+  postTypeDefs,
+  classTypeDefs,
 ];
