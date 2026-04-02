@@ -7,6 +7,7 @@ export const GET_TECHICAL_DATA = gql`
       sportTimeValue
       workshopStart
       sportTimeStart
+      isRatingShown
     }
   }
 `;

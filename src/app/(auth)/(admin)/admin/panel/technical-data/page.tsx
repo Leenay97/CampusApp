@@ -1,5 +1,6 @@
 'use client';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import Checkbox from '@/components/Checkbox/Checkbox';
 import { InputField } from '@/components/InputField/InputField';
 import Loader from '@/components/Loader/Loaader';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
@@ -20,6 +21,7 @@ export default function TechnicalData() {
   const [sportValue, setSportValue] = useState<string>('');
   const [workshopStart, setWorkshopStart] = useState<string>('');
   const [sportTimeStart, setSportTimeStart] = useState<string>('');
+  const [showRating, setShowRating] = useState<boolean>(true);
 
   const technicalData = useMemo(() => data?.technicalData, [data?.technicalData]);
 
@@ -30,6 +32,7 @@ export default function TechnicalData() {
       setSportValue(technicalData?.sportTimeValue?.toString() || '');
       setWorkshopStart(technicalData?.workshopStart || '');
       setSportTimeStart(technicalData?.sportTimeStart || '');
+      setShowRating(technicalData?.isRatingShown || '');
     }
   }, [
     data,
@@ -37,6 +40,7 @@ export default function TechnicalData() {
     technicalData?.sportTimeValue,
     technicalData?.workshopStart,
     technicalData?.workshopValue,
+    technicalData?.isRatingShown,
   ]);
 
   async function handleSave() {
@@ -46,6 +50,7 @@ export default function TechnicalData() {
         sportTimeValue: Number(sportValue),
         workshopStart: workshopStart.length ? workshopStart : null,
         sportTimeStart: sportTimeStart.length ? sportTimeStart : null,
+        isRatingShown: showRating,
       });
       refetch();
     } catch (err) {
@@ -90,6 +95,13 @@ export default function TechnicalData() {
             type="time"
             value={sportTimeStart}
             onChange={setSportTimeStart}
+          />
+        </div>
+        <div className="">
+          <Checkbox
+            checked={showRating}
+            onChange={() => setShowRating((prev) => !prev)}
+            label="Показывать рейтинг"
           />
         </div>
         <PrimaryButton onClick={handleSave}>Сохранить</PrimaryButton>
