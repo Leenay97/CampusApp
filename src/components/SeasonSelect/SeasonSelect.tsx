@@ -12,7 +12,6 @@ export function SeasonSelect({ seasons, value, onChange }: CustomSelectProps) {
   const [showSeasons, setShowSeasons] = useState<boolean>(false);
 
   const handleSeasonSelect = (season: Season) => {
-    console.log(season);
     if (season?.isArchived) return;
     onChange(season);
     setShowSeasons(false);

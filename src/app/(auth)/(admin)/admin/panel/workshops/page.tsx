@@ -114,8 +114,6 @@ export default function WorkShopsPage(): JSX.Element {
     setSelectedDate(e.target.value);
   }
 
-  console.log(data);
-
   if (loading || seasonLoading)
     return (
       <CenteredContainer>

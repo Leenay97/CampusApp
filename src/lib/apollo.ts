@@ -1,5 +1,6 @@
-import { ApolloClient, InMemoryCache, HttpLink, from } from '@apollo/client';
+import { ApolloClient, InMemoryCache, from } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
+import { createUploadLink } from 'apollo-upload-client';
 
 let globalErrorHandler: ((message: string) => void) | null = null;
 
@@ -19,12 +20,12 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const httpLink = new HttpLink({
+const uploadLink = createUploadLink({
   uri: 'http://localhost:5000/graphql',
   credentials: 'same-origin',
 });
 
 export const client = new ApolloClient({
-  link: from([errorLink, httpLink]),
+  link: from([errorLink, uploadLink]),
   cache: new InMemoryCache(),
 });

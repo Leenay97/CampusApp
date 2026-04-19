@@ -19,9 +19,7 @@ export function AddStudent({ onAdd, groupId }: AddTeacherProps) {
     if (!studentName) return;
 
     try {
-      console.log(groupId);
-      const result = await createStudent({ variables: { russianName: studentName, groupId } });
-      console.log('Студент создан:', result.data.createStudent);
+      await createStudent({ variables: { russianName: studentName, groupId } });
       setStudentName('');
       onAdd?.();
     } catch (err) {

@@ -31,7 +31,7 @@ export default function MyWorkshopPage() {
       refetch();
       setActiveWorkshopId(null);
     } catch {
-      console.log('Error');
+      console.error('Error');
     }
   }
 

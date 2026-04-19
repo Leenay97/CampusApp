@@ -27,7 +27,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
-  // ✅ Получаем userId напрямую при рендере, без useState и useEffect
   const getUserId = (): string | null => {
     if (typeof window === 'undefined') return null;
 
@@ -42,8 +41,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
       return null;
     }
   };
-
-  const userId = getUserId(); // ✅ Вычисляется при каждом рендере
+  const userId = getUserId();
 
   // Запрос данных пользователя (оставляем как есть)
   const { data, loading } = useQuery(queries.GET_USER, {
@@ -51,7 +49,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
     skip: !userId,
   });
 
-  // Эффект только для проверки авторизации и установки пользователя
   useEffect(() => {
     const checkAuth = () => {
       if (!userId) {

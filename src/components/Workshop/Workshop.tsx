@@ -24,7 +24,6 @@ function Workshop({
 }: WorkshopType) {
   const studentCount = students?.length ?? 0;
   const isFull = studentCount >= (maxStudentAmount ?? 0);
-  console.log(date);
 
   if (isClosed) {
     return (
@@ -39,8 +38,6 @@ function Workshop({
       </div>
     );
   }
-
-  console.log(maxAge);
 
   return (
     <div className={joined ? styles['workshop--active'] : styles['workshop']}>

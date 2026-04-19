@@ -77,6 +77,7 @@ export type User = {
   id: string;
   name: string;
   russianName?: string;
+  photoUrl?: string;
   coins: number;
   userLevel: UserLevel;
   group?: Group;

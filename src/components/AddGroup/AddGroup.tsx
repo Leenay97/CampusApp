@@ -19,7 +19,6 @@ export function AddGroup({ onAdd, teachers }: AddGroupProps) {
     try {
       const groupName = groupTeachers.map((teacher) => teacher.name).join('-');
       const teacherIds = groupTeachers.map((teacher) => teacher.id);
-      console.log(teacherIds);
       const newGroup: GroupInput = { name: groupName, teacherIds: teacherIds };
       setGroupTeachers([]);
       onAdd(newGroup);

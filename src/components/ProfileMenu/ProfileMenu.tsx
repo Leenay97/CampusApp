@@ -6,6 +6,7 @@ import Coin from '@/assets/img/coin.png';
 import Image from 'next/image';
 import QRModal from '../QRModal/QRModal';
 import FineStudentModal from '../FineStudentModal/FineStudentModal';
+import { ChangeAvatarModal } from '../ChangeAvatarModal/ChangeAvatarModal';
 
 type ProfileMenuProps = {
   isOpen: boolean;
@@ -16,6 +17,7 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
   const [transferModal, setTransferModal] = useState(false);
   const [myqr, setMyqr] = useState(false);
   const [fineModal, setFineModal] = useState(false);
+  const [avatarModal, setAvatarModal] = useState(false);
   const { user, setUser } = useUser();
 
   function handleLogout() {
@@ -37,6 +39,11 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
 
   function handleOpenFineModal() {
     setFineModal(true);
+    onClose();
+  }
+
+  function handleOpenAvatarModal() {
+    setAvatarModal(true);
     onClose();
   }
 
@@ -77,6 +84,9 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
           <div className={styles['profile-menu__option']} onClick={handleOpenQR}>
             Мой QR
           </div>
+          <div className={styles['profile-menu__option']} onClick={handleOpenAvatarModal}>
+            Сменить аватар
+          </div>
           <div className={styles['profile-menu__option']} onClick={handleLogout}>
             Выйти
           </div>
@@ -87,6 +97,14 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
       )}
       {myqr && <QRModal onClose={() => setMyqr(false)}></QRModal>}
       {fineModal && <FineStudentModal onClose={() => setFineModal(false)}></FineStudentModal>}
+      {avatarModal && (
+        <ChangeAvatarModal
+          onSuccess={() => setAvatarModal(false)}
+          onClose={() => setAvatarModal(false)}
+          userId={user?.id}
+          photoUrl={user?.photoUrl}
+        ></ChangeAvatarModal>
+      )}
     </>
   );
 }

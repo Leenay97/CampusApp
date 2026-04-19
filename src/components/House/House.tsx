@@ -23,7 +23,6 @@ export default function House({ id, number, grade, refetchHouses }: HouseProps) 
   }
 
   const gradeData = grade > 0 ? grades[grade] : null;
-  console.log(gradeData);
 
   return (
     <div className={styles['house']} onClick={handleOpenModal}>

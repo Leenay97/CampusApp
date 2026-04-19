@@ -1,6 +1,8 @@
 import { User, Workshop, Group, Season, House, Class } from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import path from 'path';
+import fs from 'fs';
 
 export const userResolvers = {
   Query: {
@@ -42,6 +44,8 @@ export const userResolvers = {
         include: [
           { model: Group, as: 'group' },
           { model: Workshop, as: 'attendingWorkshops' },
+          { model: House, as: 'house' },
+          { model: Class, as: 'class' },
         ],
       });
     },
@@ -297,6 +301,107 @@ export const userResolvers = {
       group.save();
 
       return user;
+    },
+    uploadAvatar: async (_, { file, userId }) => {
+      try {
+        console.log('Starting upload for userId:', userId);
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+          throw new Error('User not found');
+        }
+
+        // Получаем данные файла из правильного места
+        let uploadData;
+
+        // Если есть file.file (как в вашем логе)
+        if (file.file && file.file.createReadStream) {
+          uploadData = file.file;
+        }
+        // Если есть promise
+        else if (file.promise && typeof file.promise.then === 'function') {
+          uploadData = await file.promise;
+        }
+        // Если file сам содержит createReadStream
+        else if (file.createReadStream) {
+          uploadData = file;
+        } else {
+          console.error('Unknown file structure:', file);
+          throw new Error('Invalid file upload object');
+        }
+
+        const { createReadStream, mimetype, filename } = uploadData;
+
+        console.log('Mimetype:', mimetype);
+        console.log('Filename:', filename);
+
+        // Валидация
+        const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedMimes.includes(mimetype)) {
+          throw new Error('Only JPEG, PNG, WEBP images are allowed');
+        }
+
+        // Определяем расширение из mimetype
+        let ext = '';
+        if (mimetype === 'image/jpeg') ext = '.jpg';
+        if (mimetype === 'image/png') ext = '.png';
+        if (mimetype === 'image/webp') ext = '.webp';
+
+        // Генерируем уникальное имя
+        const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}${ext}`;
+        console.log('Generated filename:', uniqueName);
+
+        // Путь к папке
+        const uploadDir = path.join(process.cwd(), 'uploads', 'avatars');
+        console.log('Upload directory:', uploadDir);
+
+        // Создаем директорию если её нет
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+          console.log('Created directory:', uploadDir);
+        }
+
+        const filePath = path.join(uploadDir, uniqueName);
+        console.log('Full file path:', filePath);
+
+        // Сохраняем файл
+        const stream = createReadStream();
+        const outStream = fs.createWriteStream(filePath);
+
+        await new Promise((resolve, reject) => {
+          stream.pipe(outStream);
+          stream.on('error', (err) => {
+            console.error('Stream error:', err);
+            reject(err);
+          });
+          outStream.on('finish', () => {
+            console.log('File saved successfully');
+            resolve();
+          });
+        });
+
+        // Удаляем старый аватар
+        if (user.photoUrl) {
+          const oldAvatarPath = path.join(process.cwd(), user.photoUrl);
+          console.log('Old avatar path:', oldAvatarPath);
+          if (fs.existsSync(oldAvatarPath)) {
+            fs.unlinkSync(oldAvatarPath);
+            console.log('Deleted old avatar');
+          }
+        }
+
+        // Обновляем пользователя
+        const photoUrl = `/uploads/avatars/${uniqueName}`;
+        user.photoUrl = photoUrl;
+        await user.save();
+
+        console.log('User updated with photoUrl:', photoUrl);
+
+        return user;
+      } catch (error) {
+        console.error('Upload error details:', error);
+        throw new Error(`Upload failed: ${error.message}`);
+      }
     },
   },
 };

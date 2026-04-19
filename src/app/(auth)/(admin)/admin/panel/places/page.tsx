@@ -91,7 +91,7 @@ export default function PlacesPage() {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -111,7 +111,7 @@ export default function PlacesPage() {
       await createPlace({ name, isTeamPlace: isTeam, color });
       refetch();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

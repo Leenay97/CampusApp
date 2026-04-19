@@ -23,8 +23,6 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
   const [filterValue, setFilterValue] = useState<string>('');
   const [showItems, setShowItems] = useState<boolean>(false);
 
-  console.log(initValue);
-
   const selectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

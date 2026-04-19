@@ -18,8 +18,7 @@ export function AddTeacher({ onAdd }: AddTeacherProps) {
     if (!teacherName) return;
 
     try {
-      const result = await createTeacher({ variables: { name: teacherName } });
-      console.log('Учитель создан:', result.data.createTeacher);
+      await createTeacher({ variables: { name: teacherName } });
       setTeacherName('');
       onAdd?.();
     } catch (err) {

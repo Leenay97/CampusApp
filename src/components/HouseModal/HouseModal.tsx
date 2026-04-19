@@ -74,7 +74,7 @@ function HouseModal({ id, number, onClose }: ModalProps) {
       setAddStudentForm(false);
       refetch();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 
@@ -83,7 +83,7 @@ function HouseModal({ id, number, onClose }: ModalProps) {
       await updateHouse({ id, grade: value });
       setGrade(value);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 

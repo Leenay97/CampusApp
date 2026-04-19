@@ -16,6 +16,15 @@ export const GET_STUDENTS_BY_GROUP_ID = gql`
         id
         name
       }
+      house {
+        id
+        number
+      }
+      class {
+        id
+        name
+      }
+      englishLevel
     }
   }
 `;

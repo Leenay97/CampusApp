@@ -22,7 +22,7 @@ export default function WorkShopsPage(): JSX.Element {
       await joinWorkshop({ studentId: user?.id, workshopId: workshopId });
       refetch();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

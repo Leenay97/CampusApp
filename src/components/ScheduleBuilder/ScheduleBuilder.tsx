@@ -61,7 +61,7 @@ export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
     try {
       updateSchedule({ variables: { dayName: name, schedule: schedulesJSON } });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 

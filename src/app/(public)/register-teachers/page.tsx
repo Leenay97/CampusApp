@@ -27,7 +27,6 @@ function RegisterTeacherPage() {
 
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
-  console.log(token);
 
   const { loading: teachersLoading, data: teachers } = useQuery(GET_TEACHERS);
   const [registerTeacher] = useGlobalLoadingMutation(REGISTER_TEACHER);
@@ -49,7 +48,7 @@ function RegisterTeacherPage() {
       setUser(result.registerTeacher.user);
       router.push('/');
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 

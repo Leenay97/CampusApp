@@ -31,16 +31,13 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [app, setApp] = useState<AppValueContextType | null>(null);
 
-  // Refs
   const tokenProcessed = useRef(false);
   const userDataProcessed = useRef(false);
   const placeIdRef = useRef<string | null>(null);
   const todayRef = useRef<number>(Date.now());
 
-  // Lazy query для получения места
   const [getPlace, { data: placeData }] = useLazyQuery(queries.GET_PLACE);
 
-  // Получение userId из токена (синхронно)
   const getUserId = (): string | null => {
     if (typeof window === 'undefined') return null;
     const token = localStorage.getItem('token');
@@ -57,13 +54,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const userId = getUserId();
 
-  // Запрос данных пользователя
   const { data: userData } = useQuery(queries.GET_USER, {
     variables: { id: userId },
     skip: !userId,
   });
 
-  // ИНИЦИАЛИЗАЦИЯ APP: синхронно во время рендера!
   if (!tokenProcessed.current && typeof window !== 'undefined' && !app) {
     const token = localStorage.getItem('token');
     if (token) {
@@ -74,7 +69,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           seasonId: decoded.seasonId,
           today: todayRef.current,
         });
-        console.log('AppContext initialized with seasonId:', decoded.seasonId);
 
         tokenProcessed.current = true;
       } catch (error) {
@@ -84,7 +78,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // ОБРАБОТКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ: синхронно во время рендера!
   if (userData && !userDataProcessed.current && app) {
     try {
       if (userData?.user?.group?.places) {
@@ -98,7 +91,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
         if (todayPlaceData?.placeId) {
           placeIdRef.current = todayPlaceData.placeId;
-          // Запускаем запрос места (это не setState, это вызов функции)
           getPlace({ variables: { id: todayPlaceData.placeId } });
         }
       }
@@ -110,13 +102,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // ОБРАБОТКА ДАННЫХ МЕСТА: синхронно во время рендера!
   if (placeData?.place && app && !app.todayPlace) {
     setApp({
       ...app,
       todayPlace: placeData.place,
     });
-    console.log('AppContext updated with full place:', placeData.place.name);
   }
 
   return <AppContext.Provider value={{ app, setApp }}>{children}</AppContext.Provider>;

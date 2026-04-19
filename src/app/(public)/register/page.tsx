@@ -38,8 +38,6 @@ function RegisterPage() {
         confirmPassword,
       })) as RegisterStudentResponse;
 
-      console.log(result);
-
       if (result?.registerStudent?.token) {
         localStorage.setItem('token', result.registerStudent.token);
         setUser(result.registerStudent.user);

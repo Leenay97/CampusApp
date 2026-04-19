@@ -20,7 +20,17 @@ export function HeaderProfile({ user, isExpanded, onClick }: HeaderProfileProps)
           </div>
         </div>
       )}
-      <div className={styles['profile__img']}></div>
+      <div className={styles['profile__img']}>
+        {user?.photoUrl && (
+          <Image
+            src={`http://localhost:5000${user?.photoUrl}` || ''}
+            alt="Avatar"
+            width={40}
+            height={40}
+            unoptimized
+          />
+        )}
+      </div>
     </div>
   );
 }

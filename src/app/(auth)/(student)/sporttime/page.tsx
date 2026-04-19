@@ -24,7 +24,7 @@ export default function SportPage(): JSX.Element {
       await joinWorkshop({ studentId: user?.id, workshopId: workshopId, isSport: true });
       refetch();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

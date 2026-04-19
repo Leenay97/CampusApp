@@ -54,7 +54,7 @@ export default function TechnicalData() {
       });
       refetch();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 

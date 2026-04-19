@@ -42,7 +42,6 @@ function Team({ team, place, changedPoints, hidden }: TeamProps) {
     }
     return emojiSets[index];
   };
-  console.log(hidden);
 
   if (hidden && !changedPoints) {
     const emojis = getEmojisByTeamId(String((place ?? 1) - 1));

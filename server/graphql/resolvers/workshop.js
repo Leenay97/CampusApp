@@ -104,7 +104,7 @@ export const workshopResolvers = {
       return workshop;
     },
 
-    joinWorkshop: async (_, { studentId, workshopId, isSport }) => {
+    joinWorkshop: async (_, { studentId, workshopId }) => {
       try {
         const [student, workshop] = await Promise.all([
           User.findByPk(studentId),

@@ -20,7 +20,6 @@ export function AddSeason({ year, number, startDate, endDate, onChange }: AddSea
   }
 
   function handleChangeStartDate(value: string) {
-    console.log(value);
     onChange(year, number, value, endDate);
   }
 

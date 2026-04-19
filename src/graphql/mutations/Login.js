@@ -13,6 +13,7 @@ export const LOGIN = gql`
           name
         }
         userLevel
+        photoUrl
         workshops {
           id
         }

@@ -41,8 +41,6 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
   const { data: classesData } = useQuery(GET_CLASSES);
   const { data: housesData } = useQuery(GET_HOUSES);
 
-  console.log(student);
-
   const transformedHouses =
     housesData?.houses?.map((house: House) => ({
       id: house.id,
@@ -108,7 +106,7 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
       onClose();
       onSubmit();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
   const englishLevelOptions: EnglishLevelOption[] = [

@@ -35,10 +35,6 @@ function TeamRaiting() {
     );
   }
 
-  console.log('technicalData:', technicalData);
-  console.log('isRatingShown:', technicalData?.isRatingShown);
-  console.log('!isRatingShown:', !technicalData?.isRatingShown);
-
   return (
     <Section>
       <div className={styles['raiting']}>

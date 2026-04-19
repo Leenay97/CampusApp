@@ -17,6 +17,7 @@ import { useQuery } from '@apollo/client';
 import { GET_HOUSES } from '@/graphql/queries/GetHouses';
 import Filters from '@/components/Filters/Filters';
 import { useUser } from '@/contexts/UserContext';
+import Loader from '@/components/Loader/Loaader';
 
 type SortOption = 'по номеру' | 'по оценке';
 
@@ -60,6 +61,15 @@ export default function HousesPage() {
   }, [data?.houses, sortBy]);
 
   const filterOptions: SortOption[] = ['по номеру', 'по оценке'];
+
+  if (loading)
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
 
   return (
     <CenteredContainer>

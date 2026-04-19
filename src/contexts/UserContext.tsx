@@ -14,14 +14,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window === 'undefined') return null;
     const storedToken = localStorage.getItem('token');
-    console.log('Token:', storedToken);
     const storedUser = localStorage.getItem('user');
     if (storedToken && storedUser) {
       return { ...JSON.parse(storedUser), token: storedToken };
     }
     return null;
   });
-  console.log(user);
 
   const logout = () => {
     localStorage.removeItem('token');

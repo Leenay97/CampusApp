@@ -20,7 +20,6 @@ function TeacherGroupPage() {
     variables: { groupId: user?.group?.id },
     skip: !user?.group?.id,
   });
-  console.log(user);
 
   function handleStudentClick(student: User) {
     setSelectedStudent(student);

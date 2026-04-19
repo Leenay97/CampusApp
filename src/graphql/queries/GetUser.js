@@ -10,6 +10,7 @@ export const GET_USER = gql`
         name
         places
       }
+      photoUrl
       russianName
       coins
       userLevel

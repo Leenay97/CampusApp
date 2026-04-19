@@ -22,6 +22,7 @@ import { UPDATE_USER } from './UpdateUser';
 import { UPDATE_HOUSE } from './UpdateHouse';
 import { CREATE_POST } from './CreatePost';
 import { CREATE_CLASS } from './CreateClass';
+import { UPLOAD_AVATAR } from './UploadAvatar';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -48,5 +49,6 @@ export const mutations = {
   UPDATE_HOUSE,
   CREATE_POST,
   CREATE_CLASS,
+  UPLOAD_AVATAR,
 };
 export default mutations;
