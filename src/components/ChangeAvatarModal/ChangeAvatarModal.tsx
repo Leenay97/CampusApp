@@ -12,6 +12,7 @@ import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { GET_USER } from '@/graphql/queries/GetUser';
 import { useUser } from '@/contexts/UserContext';
 import { UPLOAD_AVATAR } from '@/graphql/mutations/UploadAvatar';
+import EditIcon from '@/modules/icons/EditIcon';
 
 type CroppedAreaPixelsType = {
   x: number;
@@ -26,6 +27,10 @@ interface Props {
   onSuccess?: (url: string) => void;
   onClose: () => void;
 }
+
+type DataType = {
+  uploadAvatar: { photoUrl: string };
+};
 
 export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Props) {
   const [uploadAvatar, { loading }] = useGlobalLoadingMutation(UPLOAD_AVATAR);
@@ -46,9 +51,12 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
     };
   }, [image]);
 
-  const onCropComplete = useCallback((_, croppedPixels: CroppedAreaPixelsType) => {
-    setCroppedAreaPixels(croppedPixels);
-  }, []);
+  const onCropComplete = useCallback(
+    (_: CroppedAreaPixelsType, croppedPixels: CroppedAreaPixelsType) => {
+      setCroppedAreaPixels(croppedPixels);
+    },
+    [],
+  );
 
   if (typeof window === 'undefined') return null;
 
@@ -138,10 +146,10 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
         });
       }
 
-      const data = await uploadAvatar({
+      const data = (await uploadAvatar({
         file: fileToUpload,
         userId: userId,
-      });
+      })) as DataType;
 
       const updatedUser = await getUser({ variables: { id: userId } });
 
@@ -196,6 +204,7 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
                   disabled={loading}
                   hidden
                 />
+                <EditIcon className={styles.icon} />
               </label>
             </>
           ) : (
@@ -217,23 +226,20 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
 
         {!image && (
           <div className={styles.modal__footer}>
-            <PrimaryButton onClick={onClose} disabled={loading}>
+            <SecondaryButton onClick={onClose} disabled={loading}>
               Отмена
-            </PrimaryButton>
-            <SecondaryButton onClick={handleSaveAvatar} disabled={loading || !originalFile}>
-              {loading ? 'Загрузка...' : 'Загрузить'}
             </SecondaryButton>
           </div>
         )}
 
         {image && (
           <div className={styles.modal__footer}>
-            <PrimaryButton onClick={handleCancelCrop} disabled={loading}>
+            <SecondaryButton onClick={handleCancelCrop} disabled={loading}>
               Отмена
-            </PrimaryButton>
-            <SecondaryButton onClick={handleSaveAvatar} disabled={loading}>
-              {loading ? 'Загрузка...' : 'Сохранить'}
             </SecondaryButton>
+            <PrimaryButton onClick={handleSaveAvatar} disabled={loading}>
+              {loading ? 'Загрузка...' : 'Сохранить'}
+            </PrimaryButton>
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import styles from './style.module.scss';
+import styles from './GroupsList.module.scss';
 import { GroupInput } from '@/app/types';
 import Subtitle from '../Subtitle/Subtitle';
 

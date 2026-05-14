@@ -18,26 +18,11 @@ import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 type ModalProps = {
   isOpen: boolean;
   sportTime?: boolean;
-  allDates: {
-    label: string;
-    value: string;
-    timestamp: number;
-  }[];
-  selectedDate: string;
-  onDateChange: (e: ChangeEvent<HTMLSelectElement, Element>) => void;
   onClose: () => void;
   onSubmit: () => void;
 };
 
-function CreateClassModal({
-  isOpen,
-  sportTime,
-  allDates,
-  selectedDate,
-  onDateChange,
-  onClose,
-  onSubmit,
-}: ModalProps) {
+function CreateClassModal({ isOpen, sportTime, onClose, onSubmit }: ModalProps) {
   const [selectedTeachers, setSelectedTeachers] = useState<User[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
   const [name, setName] = useState<string>('');
@@ -119,7 +104,7 @@ function CreateClassModal({
           </div>
           <div>
             <Subtitle>Место</Subtitle>
-            <CustomSelect items={places} isLoading={placesLoading} onChange={handleChangePlace} />
+            <CustomSelect items={places} onChange={handleChangePlace} />
           </div>
         </div>
         <div className={styles['modal__footer']}>

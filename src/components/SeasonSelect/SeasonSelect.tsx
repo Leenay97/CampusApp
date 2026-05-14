@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import styles from './style.module.scss';
+import styles from './SeasonSelect.module.scss';
 import { Season } from '@/app/types';
 
 type CustomSelectProps = {

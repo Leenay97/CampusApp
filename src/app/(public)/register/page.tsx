@@ -1,8 +1,8 @@
 'use client';
 
-import styles from './style.module.scss';
+import styles from './RegisterPage.module.scss';
 import { InputField } from '@/components/InputField/InputField';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import { useSearchParams } from 'next/navigation';
 import Section from '@/components/Section/Section';
@@ -15,7 +15,8 @@ import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { REGISTER_STUDENT } from '@/graphql/mutations/RegisterStudent';
 
-function RegisterPage() {
+// Компонент, который использует useSearchParams
+function RegisterForm() {
   const [name, setName] = useState<string>('');
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -87,6 +88,14 @@ function RegisterPage() {
         </div>
       </Section>
     </CenteredContainer>
+  );
+}
+
+function RegisterPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }
 

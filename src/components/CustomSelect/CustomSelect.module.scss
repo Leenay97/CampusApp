@@ -5,23 +5,24 @@
     flex-direction: column;
     align-items: flex-start;
     position: relative;
-    margin-bottom: 10px;
+    width: 240px;
+    font-size: 14px;
     
     &__input {
         display: flex;
         align-items: center;
         gap: 5px;
-        height: 35px;
+        height: var(--input-button-height);
         padding: 8px;
         border: 1px solid #ccc;
         border-radius: 4px;
-        width: 200px;
-    }
+        width: 100%;
+        cursor: pointer;
 
-    &__field {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        span {
+            text-wrap: nowrap;
+            overflow: hidden;
+        }
     }
 
     &__list {
@@ -30,8 +31,9 @@
         background-color: white;
         flex-direction: column;
         list-style: none;
+        gap: 5px;
         max-height: 150px;
-        width: 200px;
+        min-width: 200px;
         overflow-y: scroll;
         z-index: 10;
         position: absolute;
@@ -41,19 +43,17 @@
     }
 
     &__option {
-        padding: 5px 10px;
+        padding: 10px 10px;
         font-size: 14px;
         cursor: pointer;
+        position: relative;
 
-        &--archived {
-            padding: 5px 10px;
-            font-size: 14px;
-            background-color: #a8a8a87f;
+        input {
+            padding-right: 30px;
         }
 
         &:hover {
             background-color: #f0f0f0;
         }   
     }
-
 }

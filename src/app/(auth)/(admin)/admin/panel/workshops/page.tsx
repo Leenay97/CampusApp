@@ -1,7 +1,7 @@
 'use client';
 import { JSX, useState, useMemo, useEffect } from 'react';
 import Workshop from '@components/Workshop/Workshop';
-import style from './style.module.scss';
+import style from './WorkshopsPage.module.scss';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import CreateWorkshopModal from '@/components/CreateWorkshopModal/CreateWorkshopModal';
 import { useQuery } from '@apollo/client';

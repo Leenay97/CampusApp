@@ -1,5 +1,5 @@
 import { Place } from '@/app/types';
-import styles from './style.module.scss';
+import styles from './PlacesDropdown.module.scss';
 
 type Props = {
   places: (Place | undefined)[];

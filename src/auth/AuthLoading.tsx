@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Logo from '@/assets/img/logo.png';
-import styles from './style.module.scss';
+import styles from './AuthLoading.module.scss';
 import { JSX } from 'react';
 import FullscreenContainer from '@/components/FullscreenContainer/FullscreenContainer';
 

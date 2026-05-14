@@ -1,7 +1,7 @@
 'use client';
 import { JSX } from 'react';
 import Workshop from '@components/Workshop/Workshop';
-import style from './style.module.scss';
+import styles from './WorkShopsPage.module.scss';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { User, Workshop as WorkshopType } from '@/app/types';
@@ -44,7 +44,7 @@ export default function WorkShopsPage(): JSX.Element {
 
   return (
     <CenteredContainer>
-      <div className={style['workshops-wrapper']}>
+      <div className={styles['workshops-wrapper']}>
         {(workshopsToShow || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}

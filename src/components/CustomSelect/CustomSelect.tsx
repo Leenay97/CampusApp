@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import styles from './style.module.scss';
+import styles from './CustomSelect.module.scss';
 import ChevronIcon from '@components/Icons/ChevronIcon/ChevronIcon';
 import SearchIcon from '@components/Icons/SearchIcon/SearchIcon';
 import CrossIcon from '../Icons/CrossIcon/CrossIcon';
@@ -57,10 +57,11 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
     setShowItems(false);
   };
 
-  function handleClean() {
-    onChange({ id: '', name: '' });
+  const handleClean = () => {
+    const emptyItem = items.find((item) => item.id === '') ?? ({ id: '', name: '' } as T);
+    onChange(emptyItem);
     setValue('');
-  }
+  };
 
   return (
     <div ref={selectRef} className={styles['custom-select']} style={{ width }}>

@@ -44,14 +44,9 @@ export type Place = {
 export type RegisterStudentResponse = {
   registerStudent: {
     token: string;
-    user: {
-      id: string;
-      name: string;
-      login: string;
-      userLevel: string;
-      isActive: boolean;
-    };
+    user: User;
   };
+  errors: string;
 };
 
 export type Post = {

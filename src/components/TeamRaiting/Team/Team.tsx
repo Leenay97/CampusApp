@@ -1,11 +1,11 @@
 import { memo } from 'react';
-import styles from './style.module.scss';
+import styles from './Team.module.scss';
 
 type TeamProps = {
   team: Team;
   place?: number;
   changedPoints?: number;
-  hidden: boolean;
+  hidden?: boolean;
 };
 
 function Team({ team, place, changedPoints, hidden }: TeamProps) {

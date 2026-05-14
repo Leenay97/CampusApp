@@ -1,7 +1,7 @@
 'use client';
 import { memo } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './style.module.scss';
+import styles from './Modal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import Title from '../Title/Title';

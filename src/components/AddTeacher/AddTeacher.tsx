@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { InputField } from '@components/InputField/InputField';
-import styles from './style.module.scss';
+import styles from './AddTeacher.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import { useMutation } from '@apollo/client';
 import { mutations } from '@graphql/mutations';

@@ -1,6 +1,6 @@
 import { JSX, memo } from 'react';
 import { getHeaderMenuOptions } from './constants';
-import styles from './style.module.scss';
+import styles from './BurgerMenu.module.scss';
 import Link from 'next/link';
 import { UserLevel } from '@/app/types';
 

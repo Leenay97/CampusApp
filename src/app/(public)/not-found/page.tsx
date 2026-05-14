@@ -1,6 +1,6 @@
 'use client';
 
-import styles from './style.module.scss';
+import styles from './NotFoundPage.module.scss';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';

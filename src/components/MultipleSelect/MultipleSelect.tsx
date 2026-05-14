@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import styles from './style.module.scss';
+import styles from './MultipleSelect.module.scss';
 
 type MultipleSelectProps<T> = {
   items: T[];

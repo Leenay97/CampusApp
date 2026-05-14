@@ -7,8 +7,11 @@
   background-color: transparent;
   font-size: 14px;
   border-radius: 5px;
-  padding: 8px 15px;
-  height: 35px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--input-button-height);
   cursor: pointer;
 
   &:disabled {

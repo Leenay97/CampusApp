@@ -85,9 +85,16 @@
         display: block;
         left: 50%;
         transform: translateX(40px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         
         &:hover {
             background: #e0e0e0;
         }
+    }
+
+    .icon {
+        color: white
     }
 }

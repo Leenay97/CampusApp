@@ -1,7 +1,7 @@
 'use client';
 import { JSX } from 'react';
 import Workshop from '@components/Workshop/Workshop';
-import style from './style.module.scss';
+import style from './SportPage.module.scss';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { User, Workshop as WorkshopType } from '@/app/types';

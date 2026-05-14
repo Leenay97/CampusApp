@@ -1,5 +1,5 @@
 'use client';
-import styles from './style.module.scss';
+import styles from './PrimaryButton.module.scss';
 
 type PrimaryButtonProps = {
   children: React.ReactNode;

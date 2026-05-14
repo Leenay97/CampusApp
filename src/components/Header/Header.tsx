@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useMemo, useState } from 'react';
-import styles from './style.module.scss';
+import styles from './Header.module.scss';
 import { Burger } from '../Burger/Burger';
 import BurgerMenu from '../BurgerMenu/BurgerMenu';
 import Logo from '@/assets/img/logo.png';

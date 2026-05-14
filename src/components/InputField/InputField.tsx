@@ -1,4 +1,4 @@
-import styles from './style.module.scss';
+import styles from './InputField.module.scss';
 import { CSSProperties } from 'react';
 
 type InputFieldProps = {

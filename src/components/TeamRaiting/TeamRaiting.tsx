@@ -1,6 +1,6 @@
 'use client';
 import { memo, useMemo } from 'react';
-import styles from './style.module.scss';
+import styles from './TeamRaiting.module.scss';
 import Team from './Team/Team';
 import { useQuery } from '@apollo/client';
 import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';

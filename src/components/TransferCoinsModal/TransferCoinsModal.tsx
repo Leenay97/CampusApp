@@ -1,7 +1,7 @@
 'use client';
 import { memo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './style.module.scss';
+import styles from './TransferCoinsModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import Title from '../Title/Title';

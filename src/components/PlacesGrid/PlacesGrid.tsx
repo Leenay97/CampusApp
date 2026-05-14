@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Group, Place } from '@/app/types';
 import PlacesCell from './PlacesCell/PlacesCell';
 import PlacesDropdown from './PlacesDropdown/PlacesDropdown';
-import styles from './style.module.scss';
+import styles from './PlacesGrid.module.scss';
 import SecondaryButton from '../SecondaryButton/SecondaryButton';
 
 type Props = {

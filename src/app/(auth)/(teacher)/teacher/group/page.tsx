@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser } from '@/contexts/UserContext';
-import styles from './style.module.scss';
+import styles from './TeacherGroupPage.module.scss';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { User } from '@/app/types';

@@ -45,6 +45,11 @@ function HouseModal({ id, number, onClose }: ModalProps) {
   });
   const { user } = useUser();
 
+  useEffect(() => {
+    /*eslint-disable-next-line react-hooks/set-state-in-effect*/
+    setGrade(houseData?.house?.grade);
+  }, [houseData?.house?.grade]);
+
   if (typeof window === 'undefined') return null;
 
   const modalRoot = document.getElementById('modal-root');
@@ -86,10 +91,6 @@ function HouseModal({ id, number, onClose }: ModalProps) {
       console.error(err);
     }
   }
-
-  useEffect(() => {
-    setGrade(houseData?.house?.grade);
-  }, [houseData?.house?.grade]);
 
   return createPortal(
     <div className={styles['house-modal']} onClick={handleOverlayClick}>

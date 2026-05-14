@@ -1,16 +1,16 @@
 @import '@app/globals.css';
 
 
-.primary-button {
+.edit-button {
   border: 2px solid var(--primary-button-color);
-  background-color: var(--primary-button-color);
-  color: white;
   border: none;
   font-size: 14px;
   border-radius: 5px;
-  padding: 10px 15px;
-  height: 35px;
+  height: var(--input-button-height);
+  width: var(--input-button-height);
   cursor: pointer;
+  margin: auto 10px;
+  background-color: white;
 
   &:disabled {
     background-color: var(--primary-button-disabled);

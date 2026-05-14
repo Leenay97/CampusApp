@@ -1,5 +1,5 @@
 import { InputField } from '@components/InputField/InputField';
-import styles from './style.module.scss';
+import styles from './AddSeason.module.scss';
 import Subtitle from '../Subtitle/Subtitle';
 
 type AddSeasonProps = {

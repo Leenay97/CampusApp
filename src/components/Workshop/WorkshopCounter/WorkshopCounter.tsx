@@ -1,5 +1,5 @@
 import { WorkshopCounterProps } from '@components/Workshop/types';
-import styles from './style.module.scss';
+import styles from './WorkshopCounter.module.scss';
 import { memo } from 'react';
 
 function WorkShopCounter({ number, maxNumber }: WorkshopCounterProps) {

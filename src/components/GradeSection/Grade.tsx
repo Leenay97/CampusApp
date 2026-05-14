@@ -4,7 +4,7 @@ type GradeProps = {
   selectedGrade: number;
   gradeKey?: string;
   value: string[];
-  small: boolean;
+  small?: boolean;
   onClick?: (value: number) => void;
 };
 

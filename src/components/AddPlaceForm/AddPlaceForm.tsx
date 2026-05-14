@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Checkbox from '../Checkbox/Checkbox';
-import styles from './style.module.scss';
+import styles from './AddPlaceForm.module.scss';
 import { InputField } from '../InputField/InputField';
 import PrimaryButton from '../PrimaryButton/PrimaryButton';
 import ColorPicker from '../ColorPicker/ColorPicker';

@@ -1,7 +1,7 @@
 import Loader from '../Loader/Loaader';
 import Section from '../Section/Section';
 import Subtitle from '../Subtitle/Subtitle';
-import styles from './style.module.scss';
+import styles from './List.module.scss';
 
 type ListProps<T> = {
   items: T[];

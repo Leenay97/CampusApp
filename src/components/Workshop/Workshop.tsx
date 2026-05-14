@@ -1,6 +1,6 @@
 'use client';
 import { Workshop as WorkshopType } from './types';
-import styles from './style.module.scss';
+import styles from './Workshop.module.scss';
 import { memo } from 'react';
 import WorkshopCounter from './WorkshopCounter/WorkshopCounter';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';

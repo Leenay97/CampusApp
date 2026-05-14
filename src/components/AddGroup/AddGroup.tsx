@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styles from './style.module.scss';
+import styles from './AddGroup.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import { MultipleSelect } from '@components/MultipleSelect/MultipleSelect';
 import { GroupInput, User } from '@/app/types';

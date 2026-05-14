@@ -1,6 +1,6 @@
 'use client';
 import { JSX, useState } from 'react';
-import style from './style.module.scss';
+import style from './LoginPage.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Logo from '@/assets/img/logo.png';
@@ -13,6 +13,14 @@ import Title from '@/components/Title/Title';
 import Subtitle from '@/components/Subtitle/Subtitle';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { LOGIN } from '@/graphql/mutations/Login';
+import { User } from '@/app/types';
+
+type DataType = {
+  login: {
+    token: string;
+    user: User;
+  };
+};
 
 export default function LoginPage(): JSX.Element {
   const [login, setLogin] = useState<string>('');
@@ -25,8 +33,8 @@ export default function LoginPage(): JSX.Element {
     e.preventDefault();
 
     try {
-      const data = await loginUser({ login: login, password: password });
-      localStorage.setItem('token', data.login.token);
+      const data: DataType = (await loginUser({ login: login, password: password })) as DataType;
+      localStorage.setItem('token', data.login.token as string);
       setUser(data.login.user);
       router.push('/');
     } catch (error) {

@@ -1,7 +1,7 @@
 'use client';
 import { memo, useState, useEffect, ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './style.module.scss';
+import styles from './CreateWorkshopModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import { InputField } from '../InputField/InputField';
@@ -48,9 +48,9 @@ function CreateWorkshopModal({
     setMounted(true);
   }, []);
 
-  const { loading: teachersLoading, data: teachersData } = useQuery(queries.GET_TEACHERS);
+  const { data: teachersData } = useQuery(queries.GET_TEACHERS);
 
-  const { loading: placesLoading, data: placesData } = useQuery(queries.GET_PLACES);
+  const { data: placesData } = useQuery(queries.GET_PLACES);
 
   const [createWorkshop] = useMutation(mutations.CREATE_WORKSHOP);
 
@@ -143,15 +143,11 @@ function CreateWorkshopModal({
           </div>
           <div>
             <Subtitle>Учитель</Subtitle>
-            <CustomSelect
-              items={teachers}
-              isLoading={teachersLoading}
-              onChange={handleChangeTeacher}
-            />
+            <CustomSelect items={teachers} onChange={handleChangeTeacher} />
           </div>
           <div>
             <Subtitle>Место</Subtitle>
-            <CustomSelect items={places} isLoading={placesLoading} onChange={handleChangePlace} />
+            <CustomSelect items={places} onChange={handleChangePlace} />
           </div>
           <div>
             <Subtitle>Количество человек</Subtitle>

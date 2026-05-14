@@ -1,7 +1,7 @@
 'use client';
 import { memo, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './style.module.scss';
+import styles from './ModalLoading.module.scss';
 import { LoadingType } from '@/app/types';
 import Loader from '../Loader/Loaader';
 import Subtitle from '../Subtitle/Subtitle';

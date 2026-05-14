@@ -1,7 +1,7 @@
 'use client';
-import { memo, useState, useEffect, ChangeEvent } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './style.module.scss';
+import styles from './CreatePostModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import { InputField } from '../InputField/InputField';

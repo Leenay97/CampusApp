@@ -1,7 +1,7 @@
 'use client';
-import { memo, useEffect, useLayoutEffect, useState } from 'react';
+import { memo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './style.module.scss';
+import styles from './ModalError.module.scss';
 
 type ModalProps = {
   text: string;

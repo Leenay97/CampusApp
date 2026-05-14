@@ -1,8 +1,8 @@
 'use client';
 
-import styles from './style.module.scss';
+import styles from './RegisterTeacherPage.module.scss';
 import { InputField } from '@/components/InputField/InputField';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,7 +17,15 @@ import { useQuery } from '@apollo/client';
 import { GET_TEACHERS } from '@/graphql/queries/GetTeachers';
 import { useUser } from '@/contexts/UserContext';
 
-function RegisterTeacherPage() {
+type ResultType = {
+  registerTeacher: {
+    token: string;
+    user: User;
+  };
+};
+
+// Компонент, который использует useSearchParams
+function RegisterTeacherForm() {
   const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -28,7 +36,7 @@ function RegisterTeacherPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
 
-  const { loading: teachersLoading, data: teachers } = useQuery(GET_TEACHERS);
+  const { data: teachers } = useQuery(GET_TEACHERS);
   const [registerTeacher] = useGlobalLoadingMutation(REGISTER_TEACHER);
 
   function handleAddTeacher(value: User) {
@@ -37,13 +45,13 @@ function RegisterTeacherPage() {
 
   async function handleRegister() {
     try {
-      const result = await registerTeacher({
+      const result = (await registerTeacher({
         id: selectedTeacher?.id,
         token,
         login,
         password,
         confirmPassword,
-      });
+      })) as ResultType;
       localStorage.setItem('token', result?.registerTeacher?.token);
       setUser(result.registerTeacher.user);
       router.push('/');
@@ -58,11 +66,7 @@ function RegisterTeacherPage() {
         <div className={styles['prohibited-section__content']}>
           <Title>Ну привет, училка</Title>
           <Subtitle>Найди себя</Subtitle>
-          <CustomSelect
-            items={teachers?.teachers}
-            isLoading={teachersLoading}
-            onChange={handleAddTeacher}
-          />
+          <CustomSelect items={teachers?.teachers} onChange={handleAddTeacher} />
         </div>
       </Section>
       {selectedTeacher.id && (
@@ -86,6 +90,15 @@ function RegisterTeacherPage() {
         </Section>
       )}
     </CenteredContainer>
+  );
+}
+
+// Основной компонент страницы с Suspense
+function RegisterTeacherPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterTeacherForm />
+    </Suspense>
   );
 }
 

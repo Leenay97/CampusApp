@@ -1,7 +1,7 @@
 'use client';
 import { memo } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './style.module.scss';
+import styles from './QRModal.module.scss';
 import { useUser } from '@/contexts/UserContext';
 import { QRCodeCanvas } from 'qrcode.react';
 import Subtitle from '../Subtitle/Subtitle';

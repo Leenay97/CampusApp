@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react';
-import styles from './style.module.scss';
+import styles from './AddPoints.module.scss';
 import Team from '@components/TeamRaiting/Team/Team';
 import { Group } from '@/app/types';
 import SecondaryButton from '../SecondaryButton/SecondaryButton';

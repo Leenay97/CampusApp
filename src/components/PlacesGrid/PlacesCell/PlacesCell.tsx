@@ -1,5 +1,5 @@
 import { Place } from '@/app/types';
-import styles from './style.module.scss';
+import styles from './PlacesCell.module.scss';
 
 type Props = {
   place?: Place;

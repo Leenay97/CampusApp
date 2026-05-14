@@ -5,7 +5,7 @@
 
     &__input {
       display: flex;
-      height: 35px;
+      height: var(--input-button-height);
       flex-direction: row;
       align-items: center;
       gap: 12px;

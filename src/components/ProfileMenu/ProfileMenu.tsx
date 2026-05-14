@@ -1,5 +1,5 @@
 import { JSX, memo, useMemo, useState } from 'react';
-import styles from './style.module.scss';
+import styles from './ProfileMenu.module.scss';
 import { useUser } from '@/contexts/UserContext';
 import TransferCoinsModal from '../TransferCoinsModal/TransferCoinsModal';
 import Coin from '@/assets/img/coin.png';

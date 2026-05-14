@@ -9,6 +9,11 @@ import { GET_CLASSES } from '@/graphql/queries/GetClasses';
 import { useQuery } from '@apollo/client';
 import { useState } from 'react';
 
+type ClassItem = {
+  id: string;
+  name: string;
+};
+
 export default function ClassesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { loading, data, refetch } = useQuery(GET_CLASSES);
@@ -35,7 +40,7 @@ export default function ClassesPage() {
         )}
         {data?.classes && data.classes.length > 0 ? (
           <ul>
-            {data.classes.map((classItem) => (
+            {data.classes.map((classItem: ClassItem) => (
               <li key={classItem.id}>{classItem.name}</li>
             ))}
           </ul>

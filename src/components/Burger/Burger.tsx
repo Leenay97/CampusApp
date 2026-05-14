@@ -1,4 +1,4 @@
-import styles from './style.module.scss';
+import styles from './Burger.module.scss';
 
 interface BurgerProps {
   isOpen: boolean;
