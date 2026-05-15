@@ -191,7 +191,7 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
             <>
               {photoUrl && (
                 <img
-                  src={`http://localhost:5000${photoUrl}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${photoUrl}`}
                   className={styles.image}
                   alt="Avatar"
                 />

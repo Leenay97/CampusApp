@@ -20,9 +20,10 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
+console.log(process.env.NEXT_PUBLIC_API_URL);
+
 const uploadLink = createUploadLink({
-  // uri: 'http://localhost:5000/graphql',
-  uri: 'api/graphql',
+  uri: process.env.NEXT_PUBLIC_API_URL + '/graphql',
   credentials: 'same-origin',
 });
 

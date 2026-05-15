@@ -8,6 +8,10 @@
   user-select: none;
 }
 
+*:focus-visible {
+  outline: none;
+}
+
 :root {
   --color-purple: #9c72d4;
 

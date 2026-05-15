@@ -47,18 +47,21 @@ export default function LoginPage(): JSX.Element {
       <CenteredContainer>
         <form className={style['section']} onSubmit={handleLogin}>
           <div className={style['section__header']}>
-            <Title>Hey, friend!</Title>
+            <Title noMargin>Welcome!</Title>
             <Image className={style['section__logo']} src={Logo} alt="Логотип" />
           </div>
 
           <div className={style['section__input']}>
-            <Subtitle>Логин</Subtitle>
-            <InputField value={login} onChange={setLogin} />
+            <InputField value={login} onChange={setLogin} placeholder="Логин" />
           </div>
 
           <div className={style['section__input']}>
-            <Subtitle>Пароль</Subtitle>
-            <InputField value={password} onChange={setPassword} />
+            <InputField
+              value={password}
+              onChange={setPassword}
+              placeholder="Пароль"
+              type="password"
+            />
           </div>
 
           <PrimaryButton type="submit">Войти</PrimaryButton>

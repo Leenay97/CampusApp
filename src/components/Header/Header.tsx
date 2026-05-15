@@ -12,7 +12,6 @@ import { useUser } from '@/contexts/UserContext';
 import { useApp } from '@/contexts/AppContext';
 
 function Header() {
-  const [hasMenu, setHasMenu] = useState(false);
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -65,7 +64,6 @@ function Header() {
 
   useEffect(() => {
     const checkWidth = () => {
-      setHasMenu(window.innerWidth > 500);
       setIsBurgerOpen(false);
       setIsProfileOpen(false);
     };
@@ -93,7 +91,7 @@ function Header() {
         )}
         <Burger isOpen={isBurgerOpen} onClick={handleBurgerClick} />
         <BurgerMenu userLevel={userLevel} isOpen={isBurgerOpen} onClose={handleBurgerClose} />
-        <HeaderProfile user={user} isExpanded={hasMenu} onClick={handleProfileClick} />
+        <HeaderProfile user={user} onClick={handleProfileClick} />
         <ProfileMenu isOpen={isProfileOpen} onClose={handleProfileClose} />
       </div>
     </div>
