@@ -7,6 +7,7 @@ import { AppProvider } from '@/contexts/AppContext';
 import ModalLoading from '@/components/ModalLoading/ModalLoading';
 import { useLoading } from '@/contexts/LoadingContext';
 import { LoadingProvider } from '@/contexts/LoadingContext';
+import { chiron } from './fonts';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -32,7 +33,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" className={chiron.className}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="preload" href="/bg-colored.png" as="image" />
