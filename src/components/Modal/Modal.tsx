@@ -5,13 +5,12 @@ import styles from './Modal.module.scss';
 
 type ModalProps = {
   onClose: () => void;
-  isOpen: boolean;
-  children: ReactNode[];
+  isOpen?: boolean;
+  children: ReactNode;
+  className?: string;
 };
 
-function Modal({ onClose, children, isOpen }: ModalProps) {
-  if (!isOpen) return null;
-
+function Modal({ onClose, children, className }: ModalProps) {
   if (typeof window === 'undefined') return null;
 
   const modalRoot = document.getElementById('modal-root');
@@ -29,7 +28,7 @@ function Modal({ onClose, children, isOpen }: ModalProps) {
 
   return createPortal(
     <div className={styles['modal']} onClick={handleOverlayClick}>
-      <div className={styles['modal__content']} onClick={handleContentClick}>
+      <div className={`${styles['modal__content']} ${className}`} onClick={handleContentClick}>
         {children}
       </div>
     </div>,

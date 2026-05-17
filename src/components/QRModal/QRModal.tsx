@@ -1,10 +1,10 @@
 'use client';
 import { memo } from 'react';
-import { createPortal } from 'react-dom';
-import styles from './QRModal.module.scss';
 import { useUser } from '@/contexts/UserContext';
 import { QRCodeCanvas } from 'qrcode.react';
-import Subtitle from '../Subtitle/Subtitle';
+import Modal from '../Modal/Modal';
+import ModalHeader from '../Modal/ModalHeader';
+import ModalBody from '../Modal/ModalBody';
 
 type ModalProps = {
   onClose: () => void;
@@ -13,37 +13,16 @@ type ModalProps = {
 function QRModal({ onClose }: ModalProps) {
   const { user } = useUser();
 
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) return null;
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   const qrValue = String(user?.id);
 
-  return createPortal(
-    <div className={styles['modal']} onClick={handleOverlayClick}>
-      <div className={styles['modal__content']} onClick={handleContentClick}>
-        <div className={styles['modal__header']}>
-          <Subtitle>Мой QR</Subtitle>
-          <div className={styles['close-button']} onClick={onClose}>
-            &times;
-          </div>
-        </div>
-        <div className={styles['modal__body']}>
-          {' '}
-          <QRCodeCanvas value={qrValue} size={200} />
-        </div>
-      </div>
-    </div>,
-    modalRoot,
+  return (
+    <Modal onClose={onClose}>
+      <ModalHeader title="Мой QR" onClose={onClose} />
+      <ModalBody>
+        {' '}
+        <QRCodeCanvas value={qrValue} size={200} />
+      </ModalBody>
+    </Modal>
   );
 }
 

@@ -130,15 +130,16 @@ export default function SportTimePage(): JSX.Element {
           Добавить Sport Time
         </PrimaryButton>
 
-        <CreateWorkshopModal
-          isOpen={isModalOpen}
-          onSubmit={handleSubmit}
-          onClose={handleCloseModal}
-          allDates={allDates}
-          selectedDate={selectedDate}
-          onDateChange={handleDateChange}
-          sportTime
-        />
+        {isModalOpen && (
+          <CreateWorkshopModal
+            onSubmit={handleSubmit}
+            onClose={handleCloseModal}
+            allDates={allDates}
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+            sportTime
+          />
+        )}
         {(activeWorkshops || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}

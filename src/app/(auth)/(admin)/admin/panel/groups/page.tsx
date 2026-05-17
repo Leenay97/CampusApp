@@ -16,6 +16,11 @@ import Subtitle from '@/components/Subtitle/Subtitle';
 import Loader from '@/components/Loader/Loaader';
 import { DELETE_USER } from '@/graphql/mutations/DeleteUser';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import ModalHeader from '@/components/Modal/ModalHeader';
+import ModalBody from '@/components/Modal/ModalBody';
+import ModalFooter from '@/components/Modal/ModalFooter';
+import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
+import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 
 function GroupsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -94,15 +99,14 @@ function GroupsPage() {
           </div>
         </Section>
         {isModalOpen && (
-          <Modal
-            text={modalText.text}
-            description={modalText.description}
-            onSubmit={modalSubmit}
-            onClose={() => setIsModalOpen(false)}
-            hasCancel
-            onCancel={() => setIsModalOpen(false)}
-            isOpen={isModalOpen}
-          />
+          <Modal onClose={() => setIsModalOpen(false)}>
+            <ModalHeader title={modalText.text} onClose={() => setIsModalOpen(false)} />
+            <ModalBody>{modalText.description}</ModalBody>
+            <ModalFooter>
+              <SecondaryButton onClick={() => setIsModalOpen(false)}>Отмена</SecondaryButton>
+              <PrimaryButton onClick={modalSubmit}>Удалить</PrimaryButton>
+            </ModalFooter>
+          </Modal>
         )}
       </CenteredContainer>
     </AuthGuard>

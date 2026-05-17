@@ -1,7 +1,6 @@
 'use client';
 
 import AddSeasonModal from '@/components/AddSeasonModal/AddSeasonModal';
-import { InputField } from '@/components/InputField/InputField';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Section from '@/components/Section/Section';
 import Title from '@/components/Title/Title';
@@ -17,10 +16,18 @@ import { useState } from 'react';
 function SeasonManagementPage() {
   //   const [seasonData, setSeasonData] = useState<SeasonDataType | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+
+  function handleOpenModal() {
+    setIsCreateModalOpen(true);
+  }
+
+  // function handleCloseModal() {
+  //   setIsCreateModalOpen(false);
+  // }
   return (
     <Section>
       <Title>Season Management</Title>
-      <PrimaryButton onClick={setIsCreateModalOpen}>Добавить сезон</PrimaryButton>
+      <PrimaryButton onClick={handleOpenModal}>Добавить сезон</PrimaryButton>
       {isCreateModalOpen && <AddSeasonModal onClose={() => setIsCreateModalOpen(false)} />}
       {/* <InputField value={seasonData} onChange={setSeasonData} /> */}
     </Section>

@@ -1,10 +1,8 @@
 'use client';
-import { memo, use, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { memo, useEffect, useState } from 'react';
 import styles from './HouseModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
-import Title from '../Title/Title';
 import Subtitle from '../Subtitle/Subtitle';
 import ActionButton from '@components/ActionButton/ActionButton';
 import { CustomSelect } from '../CustomSelect/CustomSelect';
@@ -19,6 +17,10 @@ import { User } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import GradeSection from '../GradeSection/GradeSection';
 import { UPDATE_HOUSE } from '@/graphql/mutations/UpdateHouse';
+import Modal from '../Modal/Modal';
+import ModalHeader from '../Modal/ModalHeader';
+import ModalBody from '../Modal/ModalBody';
+import ModalFooter from '../Modal/ModalFooter';
 
 type ModalProps = {
   id: string;
@@ -32,13 +34,9 @@ function HouseModal({ id, number, onClose }: ModalProps) {
   const [grade, setGrade] = useState(0);
   const [updateUser] = useGlobalLoadingMutation(UPDATE_USER);
   const [updateHouse] = useGlobalLoadingMutation(UPDATE_HOUSE);
-  const {
-    data: houseData,
-    loading: houseLoading,
-    refetch,
-  } = useQuery(GET_HOUSE, { variables: { id } });
+  const { data: houseData, refetch } = useQuery(GET_HOUSE, { variables: { id } });
   const [addStudentForm, setAddStudentForm] = useState<boolean>(false);
-  const { data: groupsData, loading: groupsLoading } = useQuery(GET_ACTIVE_SEASON);
+  const { data: groupsData } = useQuery(GET_ACTIVE_SEASON);
   const { data: studentsData } = useQuery(GET_STUDENTS_BY_GROUP_ID, {
     variables: { groupId: selectedGroup.id },
     skip: !selectedGroup.id,
@@ -50,23 +48,9 @@ function HouseModal({ id, number, onClose }: ModalProps) {
     setGrade(houseData?.house?.grade);
   }, [houseData?.house?.grade]);
 
-  if (typeof window === 'undefined') return null;
-
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) return null;
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
   function handleToggleEditForm() {
     setAddStudentForm((prev) => !prev);
   }
-
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   function handleChangeGroup({ id, name }: { id: string; name: string }) {
     setSelectedGroup({ id, name });
@@ -92,35 +76,29 @@ function HouseModal({ id, number, onClose }: ModalProps) {
     }
   }
 
-  return createPortal(
-    <div className={styles['house-modal']} onClick={handleOverlayClick}>
-      <div className={styles['house-modal__content']} onClick={handleContentClick}>
-        <div className={styles['house-modal__header']}>
-          <Title noMargin>Домик #{number}</Title>
-          <div className={styles['close-button']} onClick={onClose}>
-            &times;
-          </div>
+  return (
+    <Modal onClose={onClose} className={styles['house-modal__content']}>
+      <ModalHeader onClose={onClose} title={`Домик #${number}`} />
+      <ModalBody>
+        {user?.userLevel === 'ADMIN' && (
+          <GradeSection onChange={handleGrade} selectedGrade={grade} />
+        )}
+        <div className={styles['house-modal__row']}>
+          <Subtitle noMargin>Студенты</Subtitle>
+          {(user?.userLevel === 'ADMIN' || user?.userLevel === 'TEACHER') && (
+            <ActionButton type="ADD" onClick={handleToggleEditForm} />
+          )}
         </div>
-        <div className={styles['house-modal__body']}>
-          {user?.userLevel === 'ADMIN' && (
-            <GradeSection onChange={handleGrade} selectedGrade={grade} />
-          )}
-          <div className={styles['house-modal__row']}>
-            <Subtitle noMargin>Студенты</Subtitle>
-            {user?.userLevel === 'ADMIN' ||
-              (user?.userLevel === 'TEACHER' && (
-                <ActionButton type="ADD" onClick={handleToggleEditForm} />
-              ))}
+        {!addStudentForm && houseData?.house?.users.length > 0 && (
+          <div className={styles['house-modal__students']}>
+            {houseData.house.users.map((user: User) => (
+              <UserBadge key={user.id} name={user.name} group={user?.group?.name || ''} />
+            ))}
           </div>
-          {!addStudentForm && houseData?.house?.users.length > 0 && (
-            <div className={styles['house-modal__students']}>
-              {houseData.house.users.map((user: User) => (
-                <UserBadge key={user.id} name={user.name} group={user?.group?.name || ''} />
-              ))}
-            </div>
-          )}
-          {houseData?.house?.users.length === 0 && <Subtitle>Пусто</Subtitle>}
-          {addStudentForm && (
+        )}
+        {houseData?.house?.users.length === 0 && <Subtitle>Пусто</Subtitle>}
+        {addStudentForm && (
+          <>
             <div>
               <Subtitle>Группа</Subtitle>
               <CustomSelect
@@ -129,31 +107,30 @@ function HouseModal({ id, number, onClose }: ModalProps) {
                 onChange={handleChangeGroup}
                 initValue={selectedGroup.name}
               />
-              {studentsData?.usersByGroup?.length > 0 ? (
-                <>
-                  <Subtitle>Студент</Subtitle>
-                  <CustomSelect
-                    key={`student-select-${selectedStudent.id}`}
-                    items={studentsData?.usersByGroup || []}
-                    onChange={setSelectedStudent}
-                    initValue={selectedStudent.name}
-                  />
-                </>
-              ) : (
-                <Subtitle>Студентов нет</Subtitle>
-              )}
             </div>
-          )}
-        </div>
-        <div className={styles['house-modal__footer']}>
-          <SecondaryButton onClick={addStudentForm ? handleToggleEditForm : onClose}>
-            {addStudentForm ? 'Отмена' : 'Выйти'}
-          </SecondaryButton>
-          {addStudentForm && <PrimaryButton onClick={handleAddStudent}>Добавить</PrimaryButton>}
-        </div>
-      </div>
-    </div>,
-    modalRoot,
+            {studentsData?.usersByGroup?.length > 0 ? (
+              <div>
+                <Subtitle>Студент</Subtitle>
+                <CustomSelect
+                  key={`student-select-${selectedStudent.id}`}
+                  items={studentsData?.usersByGroup || []}
+                  onChange={setSelectedStudent}
+                  initValue={selectedStudent.name}
+                />
+              </div>
+            ) : (
+              <Subtitle>Студентов нет</Subtitle>
+            )}
+          </>
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <SecondaryButton onClick={addStudentForm ? handleToggleEditForm : onClose}>
+          {addStudentForm ? 'Отмена' : 'Выйти'}
+        </SecondaryButton>
+        {addStudentForm && <PrimaryButton onClick={handleAddStudent}>Добавить</PrimaryButton>}
+      </ModalFooter>
+    </Modal>
   );
 }
 

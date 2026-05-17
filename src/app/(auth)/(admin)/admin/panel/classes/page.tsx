@@ -32,11 +32,7 @@ export default function ClassesPage() {
         <Title>Classes</Title>
         <PrimaryButton onClick={() => setIsModalOpen(true)}>Добавить класс</PrimaryButton>
         {isModalOpen && (
-          <CreateClassModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={refetch}
-          />
+          <CreateClassModal onClose={() => setIsModalOpen(false)} onSubmit={refetch} />
         )}
         {data?.classes && data.classes.length > 0 ? (
           <ul>

@@ -14,7 +14,7 @@ export const houseTypeDefs = gql`
   }
 
   extend type Mutation {
-    createHouse(id: ID!): House
+    createHouse(number: String!): House
     updateHouse(id: ID!, grade: Int): House
     deleteHouse(id: ID!): House
   }

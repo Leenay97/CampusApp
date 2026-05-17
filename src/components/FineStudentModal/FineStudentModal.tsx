@@ -1,11 +1,9 @@
 'use client';
 
 import { memo, useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import styles from './FineStudentModal.module.scss';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
-import Title from '../Title/Title';
 import Subtitle from '../Subtitle/Subtitle';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { FINE_USER } from '@/graphql/mutations/FineUser';
@@ -15,6 +13,10 @@ import { useLazyQuery } from '@apollo/client';
 import { GetUserResponse, GetUserVariables } from '@/graphql/types';
 import PrimaryButton from '../PrimaryButton/PrimaryButton';
 import Loader from '../Loader/Loaader';
+import Modal from '../Modal/Modal';
+import ModalHeader from '../Modal/ModalHeader';
+import ModalBody from '../Modal/ModalBody';
+import ModalFooter from '../Modal/ModalFooter';
 
 type FineStudentModalProps = {
   onClose: () => void;
@@ -41,21 +43,7 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
     }
   }, [userData, scanCompleted]);
 
-  if (typeof window === 'undefined') return null;
-
   const title = 'Оштрафовать';
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) return null;
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   const handleClose = () => {
     resetState();
@@ -118,73 +106,65 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
   const showStudentInfo = student && scanCompleted;
   const showLoading = userLoading || loading;
 
-  return createPortal(
-    <div className={styles['fine-modal']} onClick={handleOverlayClick}>
-      <div className={styles['fine-modal__content']} onClick={handleContentClick}>
-        <div className={styles['fine-modal__header']}>
-          <Title noMargin>{title}</Title>
-          <div className={styles['close-button']} onClick={handleClose}>
-            &times;
+  return (
+    <Modal onClose={onClose}>
+      <ModalHeader title={title} onClose={onClose} />
+
+      {showLoading && <Loader />}
+
+      {showScanner && !showLoading && (
+        <ModalBody>
+          <Subtitle>Наведите камеру на QR-код</Subtitle>
+
+          <div className={styles['scanner']}>
+            <Scanner
+              key="qr-scanner"
+              onScan={handleScan}
+              onError={handleError}
+              formats={['qr_code']}
+              constraints={{ facingMode: 'environment' }}
+              allowMultiple={false}
+              scanDelay={500}
+            />
           </div>
-        </div>
 
-        {showLoading && <Loader />}
-
-        {showScanner && !showLoading && (
-          <div className={styles['fine-modal__body']}>
-            <Subtitle>Наведите камеру на QR-код</Subtitle>
-
-            <div className={styles['fine-modal__container']}>
-              <Scanner
-                key="qr-scanner"
-                onScan={handleScan}
-                onError={handleError}
-                formats={['qr_code']}
-                constraints={{ facingMode: 'environment' }}
-                allowMultiple={false}
-                scanDelay={500}
-              />
+          {error && (
+            <div>
+              <p>{error}</p>
             </div>
+          )}
+        </ModalBody>
+      )}
 
-            {error && (
-              <div className={styles['fine-modal__error']}>
-                <p>{error}</p>
-              </div>
-            )}
+      {showStudentInfo && !showLoading && (
+        <div className={styles['fine-modal__student-info']}>
+          <div className={styles['fine-modal__info-item']}>
+            Имя: <span>{student.name}</span>
           </div>
-        )}
-
-        {showStudentInfo && !showLoading && (
-          <div className={styles['fine-modal__student-info']}>
-            <div className={styles['fine-modal__info-item']}>
-              Имя: <span>{student.name}</span>
-            </div>
-            <div className={styles['fine-modal__info-item']}>
-              Группа: <span>{groupName}</span>
-            </div>
-            {error && (
-              <div className={styles['fine-modal__error']}>
-                <p>{error}</p>
-              </div>
-            )}
+          <div className={styles['fine-modal__info-item']}>
+            Группа: <span>{groupName}</span>
           </div>
-        )}
-
-        <div className={styles['fine-modal__footer']}>
-          {showStudentInfo ? (
-            <>
-              <SecondaryButton onClick={handleReset}>Сканировать</SecondaryButton>
-              <PrimaryButton onClick={handleFine} disabled={loading}>
-                {title}
-              </PrimaryButton>
-            </>
-          ) : (
-            <SecondaryButton onClick={handleClose}>Закрыть</SecondaryButton>
+          {error && (
+            <div className={styles['fine-modal__error']}>
+              <p>{error}</p>
+            </div>
           )}
         </div>
-      </div>
-    </div>,
-    modalRoot,
+      )}
+
+      <ModalFooter>
+        {showStudentInfo ? (
+          <>
+            <SecondaryButton onClick={handleReset}>Сканировать</SecondaryButton>
+            <PrimaryButton onClick={handleFine} disabled={loading}>
+              {title}
+            </PrimaryButton>
+          </>
+        ) : (
+          <SecondaryButton onClick={handleClose}>Закрыть</SecondaryButton>
+        )}
+      </ModalFooter>
+    </Modal>
   );
 }
 

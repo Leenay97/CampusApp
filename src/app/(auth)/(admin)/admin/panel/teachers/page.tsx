@@ -10,6 +10,11 @@ import { useState } from 'react';
 import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import ModalHeader from '@/components/Modal/ModalHeader';
+import ModalBody from '@/components/Modal/ModalBody';
+import ModalFooter from '@/components/Modal/ModalFooter';
+import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
+import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 
 export default function TeachersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,15 +58,14 @@ export default function TeachersPage() {
         </Section>
       </CenteredContainer>
       {isModalOpen && (
-        <Modal
-          text={'Удалить учителя?'}
-          description={`Вы уверены, что хотите удалить учителя ${teacherToDelete?.name}?`}
-          onSubmit={handleDeleteTeacher}
-          onClose={() => setIsModalOpen(false)}
-          hasCancel
-          onCancel={() => setIsModalOpen(false)}
-          isOpen={isModalOpen}
-        />
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <ModalHeader title="Удалить учителя?" onClose={() => setIsModalOpen(false)} />
+          <ModalBody>{`Вы уверены, что хотите удалить учителя ${teacherToDelete?.name}?`}</ModalBody>
+          <ModalFooter>
+            <SecondaryButton onClick={() => setIsModalOpen(false)}>Отмена</SecondaryButton>
+            <PrimaryButton onClick={handleDeleteTeacher}>Удалить</PrimaryButton>
+          </ModalFooter>
+        </Modal>
       )}
     </>
   );

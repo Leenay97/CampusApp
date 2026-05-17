@@ -1,7 +1,5 @@
 'use client';
-import { memo, useState, useEffect, ChangeEvent } from 'react';
-import { createPortal } from 'react-dom';
-import styles from './CreateClassModal.module.scss';
+import { memo, useState } from 'react';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import { InputField } from '../InputField/InputField';
@@ -9,44 +7,35 @@ import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { Place, User } from '@/app/types';
 import { CustomSelect } from '@components/CustomSelect/CustomSelect';
-import Title from '../Title/Title';
 import Subtitle from '../Subtitle/Subtitle';
 import { MultipleSelect } from '../MultipleSelect/MultipleSelect';
 import { CREATE_CLASS } from '@/graphql/mutations/CreateClass';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import Modal from '../Modal/Modal';
+import ModalHeader from '../Modal/ModalHeader';
+import ModalBody from '../Modal/ModalBody';
+import ModalFooter from '../Modal/ModalFooter';
 
 type ModalProps = {
-  isOpen: boolean;
   sportTime?: boolean;
   onClose: () => void;
   onSubmit: () => void;
 };
 
-function CreateClassModal({ isOpen, sportTime, onClose, onSubmit }: ModalProps) {
+function CreateClassModal({ onClose, onSubmit }: ModalProps) {
   const [selectedTeachers, setSelectedTeachers] = useState<User[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
   const [name, setName] = useState<string>('');
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    /*eslint-disable react-hooks/set-state-in-effect*/
-    setMounted(true);
-  }, []);
+  const { data: teachersData } = useQuery(queries.GET_TEACHERS);
 
-  const { loading: teachersLoading, data: teachersData } = useQuery(queries.GET_TEACHERS);
-
-  const { loading: placesLoading, data: placesData } = useQuery(queries.GET_PLACES);
+  const { data: placesData } = useQuery(queries.GET_PLACES);
 
   const [createClass] = useGlobalLoadingMutation(CREATE_CLASS);
 
   const teachers = teachersData?.teachers ?? [];
 
   const places = placesData?.places ?? [];
-
-  if (!isOpen || !mounted) return null;
-
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) return null;
 
   function handleChangeTeacher(teachers: User[]) {
     setSelectedTeachers(teachers);
@@ -55,10 +44,6 @@ function CreateClassModal({ isOpen, sportTime, onClose, onSubmit }: ModalProps) 
   function handleChangePlace(place: Place) {
     setSelectedPlace(place);
   }
-
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   function handleClose() {
     onClose();
@@ -80,40 +65,32 @@ function CreateClassModal({ isOpen, sportTime, onClose, onSubmit }: ModalProps) 
     }
   }
 
-  return createPortal(
-    <div className={styles['modal']}>
-      <div className={styles['modal__content']} onClick={handleContentClick}>
-        <div className={styles['modal__header']}>
-          <Title>Добавить {sportTime ? 'Sport Time' : 'мастеркласс'}</Title>
-          <div className={styles['close-button']} onClick={onClose}>
-            &times;
-          </div>
+  return (
+    <Modal onClose={onClose}>
+      <ModalHeader title="Создать класс" onClose={onClose} />
+      <ModalBody>
+        <div>
+          <Subtitle>Название</Subtitle>
+          <InputField value={name} onChange={setName} />
         </div>
-        <div className={styles['modal__body']}>
-          <div>
-            <Subtitle>Название</Subtitle>
-            <InputField value={name} onChange={setName} />
-          </div>
-          <div>
-            <Subtitle>Учитель</Subtitle>
-            <MultipleSelect
-              value={selectedTeachers}
-              items={teachers}
-              onChange={handleChangeTeacher}
-            />
-          </div>
-          <div>
-            <Subtitle>Место</Subtitle>
-            <CustomSelect items={places} onChange={handleChangePlace} />
-          </div>
+        <div>
+          <Subtitle>Учитель</Subtitle>
+          <MultipleSelect
+            value={selectedTeachers}
+            items={teachers}
+            onChange={handleChangeTeacher}
+          />
         </div>
-        <div className={styles['modal__footer']}>
-          <SecondaryButton onClick={handleClose}>Отмена</SecondaryButton>
-          <PrimaryButton onClick={handleSubmit}>Добавить</PrimaryButton>
+        <div>
+          <Subtitle>Место</Subtitle>
+          <CustomSelect items={places} onChange={handleChangePlace} />
         </div>
-      </div>
-    </div>,
-    modalRoot,
+      </ModalBody>
+      <ModalFooter>
+        <SecondaryButton onClick={handleClose}>Отмена</SecondaryButton>
+        <PrimaryButton onClick={handleSubmit}>Добавить</PrimaryButton>
+      </ModalFooter>
+    </Modal>
   );
 }
 

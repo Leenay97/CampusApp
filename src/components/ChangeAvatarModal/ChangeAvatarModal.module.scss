@@ -1,16 +1,4 @@
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-
-    &__content {
+.modal-content {
         background: white;
         padding: 20px;
         border-radius: 12px;
@@ -22,38 +10,6 @@
         margin: 20px;
         max-width: 500px;
         width: 100%;
-    }
-
-    &__header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-    }
-
-    &__body {
-        min-height: 50px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        position: relative;
-    }
-
-    &__footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-
-    .close-button {
-        font-size: 28px;
-        cursor: pointer;
-        color: #999;
-        line-height: 1;
-        
-        &:hover {
-            color: #333;
-        }
     }
 
     .image {
@@ -76,7 +32,7 @@
     .uploadButton {
         width: 40px;
         position: absolute;
-        bottom: 0;
+        bottom: 70px;
         height: 40px;
         border-radius: 50%;
         background: var(--text-primary);
@@ -97,4 +53,3 @@
     .icon {
         color: white
     }
-}

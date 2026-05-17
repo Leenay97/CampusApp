@@ -9,11 +9,9 @@ type ModalHeaderProps = {
 };
 
 function ModalHeader({ title, onClose }: ModalHeaderProps) {
-  if (typeof window === 'undefined') return null;
-
   return (
     <div className={styles['modal__header']}>
-      <Title>{title}</Title>
+      <Title noMargin>{title}</Title>
       <div className={styles['close-button']} onClick={onClose}>
         &times;
       </div>

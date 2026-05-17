@@ -17,6 +17,10 @@ import CenteredContainer from '@/components/CenteredContainer/CenteredContainer'
 import Title from '@/components/Title/Title';
 import Loader from '@/components/Loader/Loaader';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
+import ModalFooter from '@/components/Modal/ModalFooter';
+import ModalBody from '@/components/Modal/ModalBody';
+import ModalHeader from '@/components/Modal/ModalHeader';
 
 function SeasonsPage() {
   const [seasonGroups, setSeasonGroups] = useState<GroupInput[]>([]);
@@ -129,15 +133,23 @@ function SeasonsPage() {
           <PrimaryButton onClick={() => setIsModalOpen(true)}>Активировать</PrimaryButton>
         </div>
       </Section>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleActivateSeason}
-        hasCancel
-        onCancel={() => setIsModalOpen(false)}
-        text={`Активировать ${selectedSeason.number} сезон ${selectedSeason.year}?`}
-        description="Другие сезоны станут архивными. Активировать их снова уже не получится. Информацию о прошлых сезонах можно найти в разделе 'История сезонов'."
-      />
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <ModalHeader
+            title={`Активировать ${selectedSeason.number} сезон ${selectedSeason.year}?`}
+            onClose={() => setIsModalOpen(false)}
+          />
+          <ModalBody>
+            {
+              "Другие сезоны станут архивными. Активировать их снова уже не получится. Информацию о прошлых сезонах можно найти в разделе 'История сезонов'."
+            }
+          </ModalBody>
+          <ModalFooter>
+            <SecondaryButton onClick={() => setIsModalOpen(false)}>Отмена</SecondaryButton>
+            <PrimaryButton onClick={handleActivateSeason}>Удалить</PrimaryButton>
+          </ModalFooter>
+        </Modal>
+      )}
     </CenteredContainer>
   );
 }

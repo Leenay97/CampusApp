@@ -1,10 +1,8 @@
 'use client';
 
 import { useLazyQuery } from '@apollo/client';
-import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useState } from 'react';
 import Cropper from 'react-easy-crop';
-import Title from '../Title/Title';
 import styles from './ChangeAvatarModal.module.scss';
 import PrimaryButton from '../PrimaryButton/PrimaryButton';
 import SecondaryButton from '../SecondaryButton/SecondaryButton';
@@ -13,6 +11,10 @@ import { GET_USER } from '@/graphql/queries/GetUser';
 import { useUser } from '@/contexts/UserContext';
 import { UPLOAD_AVATAR } from '@/graphql/mutations/UploadAvatar';
 import EditIcon from '@/modules/icons/EditIcon';
+import Modal from '../Modal/Modal';
+import ModalHeader from '../Modal/ModalHeader';
+import ModalBody from '../Modal/ModalBody';
+import ModalFooter from '../Modal/ModalFooter';
 
 type CroppedAreaPixelsType = {
   x: number;
@@ -57,11 +59,6 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
     },
     [],
   );
-
-  if (typeof window === 'undefined') return null;
-
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) return null;
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -170,80 +167,65 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
     setOriginalFile(null);
   };
 
-  const handleOverlayClick = (event: React.MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
-
-  return createPortal(
-    <div className={styles.modal} onClick={handleOverlayClick}>
-      <div className={styles.modal__content} onClick={(event) => event.stopPropagation()}>
-        <div className={styles.modal__header}>
-          <Title>Сменить аватар</Title>
-          <div className={styles['close-button']} onClick={onClose}>
-            &times;
-          </div>
-        </div>
-
-        <div className={styles.modal__body}>
-          {!image ? (
-            <>
-              {photoUrl && (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${photoUrl}`}
-                  className={styles.image}
-                  alt="Avatar"
-                />
-              )}
-              <label className={styles.uploadButton}>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handleFileSelect}
-                  disabled={loading}
-                  hidden
-                />
-                <EditIcon className={styles.icon} />
-              </label>
-            </>
-          ) : (
-            <div className={styles.cropArea}>
-              <Cropper
-                image={image}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                cropShape="round"
-                showGrid={false}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
+  return (
+    <Modal onClose={onClose} className={styles['modal__content']}>
+      <ModalHeader title="Сменить аватар" onClose={onClose} />
+      <ModalBody>
+        {!image ? (
+          <>
+            {photoUrl && (
+              <img
+                src={`${process.env.NEXT_PUBLIC_API_URL}${photoUrl}`}
+                className={styles.image}
+                alt="Avatar"
               />
-            </div>
-          )}
-        </div>
-
-        {!image && (
-          <div className={styles.modal__footer}>
-            <SecondaryButton onClick={onClose} disabled={loading}>
-              Отмена
-            </SecondaryButton>
+            )}
+            <label className={styles.uploadButton}>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileSelect}
+                disabled={loading}
+                hidden
+              />
+              <EditIcon className={styles.icon} />
+            </label>
+          </>
+        ) : (
+          <div className={styles.cropArea}>
+            <Cropper
+              image={image}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              cropShape="round"
+              showGrid={false}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+            />
           </div>
         )}
+      </ModalBody>
 
-        {image && (
-          <div className={styles.modal__footer}>
-            <SecondaryButton onClick={handleCancelCrop} disabled={loading}>
-              Отмена
-            </SecondaryButton>
-            <PrimaryButton onClick={handleSaveAvatar} disabled={loading}>
-              {loading ? 'Загрузка...' : 'Сохранить'}
-            </PrimaryButton>
-          </div>
-        )}
-      </div>
-    </div>,
-    modalRoot,
+      {!image && (
+        <ModalFooter>
+          <SecondaryButton onClick={onClose} disabled={loading}>
+            Отмена
+          </SecondaryButton>
+        </ModalFooter>
+      )}
+
+      {image && (
+        <ModalFooter>
+          <SecondaryButton onClick={handleCancelCrop} disabled={loading}>
+            Отмена
+          </SecondaryButton>
+          <PrimaryButton onClick={handleSaveAvatar} disabled={loading}>
+            {loading ? 'Загрузка...' : 'Сохранить'}
+          </PrimaryButton>
+        </ModalFooter>
+      )}
+    </Modal>
   );
 }

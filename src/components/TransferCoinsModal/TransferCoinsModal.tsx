@@ -1,10 +1,8 @@
 'use client';
 import { memo, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import styles from './TransferCoinsModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
-import Title from '../Title/Title';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { CustomSelect } from '../CustomSelect/CustomSelect';
 import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
@@ -18,6 +16,10 @@ import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import { GetUserResponse, GetUserVariables } from '@/graphql/types';
 import { GET_USER } from '@/graphql/queries/GetUser';
 import Loader from '../Loader/Loaader';
+import Modal from '../Modal/Modal';
+import ModalHeader from '../Modal/ModalHeader';
+import ModalBody from '../Modal/ModalBody';
+import ModalFooter from '../Modal/ModalFooter';
 
 type ModalProps = {
   onClose: () => void;
@@ -63,23 +65,11 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     if (!showScanner) {
       setScanCompleted(false);
       setError('');
+      setSelectedStudent({ id: '', name: '' });
+      setSelectedGroup({ id: '', name: '' });
+      setCoins('');
     }
   }, [showScanner]);
-
-  if (typeof window === 'undefined') return null;
-
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) return null;
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   function handleChangeGroup({ id, name }: { id: string; name: string }) {
     setSelectedGroup({ id, name });
@@ -146,40 +136,45 @@ function TransferCoinsModal({ onClose }: ModalProps) {
 
   const showLoader = userLoading || groupsLoading || loading;
 
-  return createPortal(
-    <div className={styles['modal']} onClick={handleOverlayClick}>
-      <div className={styles['modal__content']} onClick={handleContentClick}>
-        <div className={styles['modal__header']}>
-          <Title>Перевести Coins</Title>
-          <div className={styles['close-button']} onClick={onClose}>
-            &times;
+  // Если открыт сканер — показываем только его
+  if (showScanner) {
+    return (
+      <Modal onClose={onClose}>
+        <ModalHeader title="Перевести Coins" onClose={onClose} />
+        <ModalBody>
+          <PrimaryButton onClick={toggleScanner}>Закрыть сканер</PrimaryButton>
+          <div className={styles['scanner']}>
+            <Scanner
+              key="scanner"
+              onScan={handleScan}
+              onError={handleError}
+              formats={['qr_code']}
+              constraints={{ facingMode: 'environment' }}
+              allowMultiple={false}
+              scanDelay={500}
+            />
           </div>
-        </div>
+          {error && <div className={styles['error']}>{error}</div>}
+        </ModalBody>
+        <ModalFooter>
+          <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
+        </ModalFooter>
+      </Modal>
+    );
+  }
 
+  // Если сканер закрыт — показываем форму
+  return (
+    <Modal onClose={onClose}>
+      <ModalHeader title="Перевести Coins" onClose={onClose} />
+
+      <ModalBody>
         {showLoader && <Loader />}
 
         {!showLoader && (
           <>
-            <PrimaryButton onClick={toggleScanner}>
-              {showScanner ? 'Закрыть сканер' : 'Перевести по QR'}
-            </PrimaryButton>
-
-            {showScanner && (
-              <div className={styles['scanner-container']}>
-                <Scanner
-                  key={`scanner-${showScanner}`}
-                  onScan={handleScan}
-                  onError={handleError}
-                  formats={['qr_code']}
-                  constraints={{ facingMode: 'environment' }}
-                  allowMultiple={false}
-                  scanDelay={500}
-                />
-                {error && <div className={styles['error']}>{error}</div>}
-              </div>
-            )}
-
-            <div className={styles['modal__body']}>
+            <PrimaryButton onClick={toggleScanner}>Перевести по QR</PrimaryButton>
+            <div>
               <Subtitle>Группа</Subtitle>
               <CustomSelect
                 key={`group-select-${selectedGroup.id}`}
@@ -187,43 +182,44 @@ function TransferCoinsModal({ onClose }: ModalProps) {
                 onChange={handleChangeGroup}
                 initValue={selectedGroup.name}
               />
-
-              {studentsData?.usersByGroup?.length > 0 && (
-                <>
-                  <Subtitle>Студент</Subtitle>
-                  <CustomSelect
-                    key={`student-select-${selectedStudent.id}`}
-                    items={studentsData?.usersByGroup || []}
-                    onChange={setSelectedStudent}
-                    initValue={selectedStudent.name}
-                  />
-                </>
-              )}
-
-              {selectedGroup.id && selectedStudent.id && (
-                <>
-                  <Subtitle>Сумма</Subtitle>
-                  <InputField
-                    value={coins}
-                    onChange={setCoins}
-                    type="number"
-                    placeholder="Введите сумму"
-                  />
-                </>
-              )}
             </div>
 
-            <div className={styles['modal__footer']}>
-              <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
-              <PrimaryButton onClick={transfer} disabled={!selectedStudent.id || !coins}>
-                Перевести
-              </PrimaryButton>
-            </div>
+            {studentsData?.usersByGroup?.length > 0 && (
+              <div>
+                <Subtitle>Студент</Subtitle>
+                <CustomSelect
+                  key={`student-select-${selectedStudent.id}`}
+                  items={studentsData?.usersByGroup || []}
+                  onChange={setSelectedStudent}
+                  initValue={selectedStudent.name}
+                />
+              </div>
+            )}
+
+            {selectedGroup.id && selectedStudent.id && (
+              <div>
+                <Subtitle>Сумма</Subtitle>
+                <InputField
+                  value={coins}
+                  onChange={setCoins}
+                  type="number"
+                  placeholder="Введите сумму"
+                />
+              </div>
+            )}
+
+            {error && <div className={styles['error']}>{error}</div>}
           </>
         )}
-      </div>
-    </div>,
-    modalRoot,
+      </ModalBody>
+
+      <ModalFooter>
+        <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
+        <PrimaryButton onClick={transfer} disabled={!selectedStudent.id || !coins}>
+          Перевести
+        </PrimaryButton>
+      </ModalFooter>
+    </Modal>
   );
 }
 

@@ -94,10 +94,6 @@ export default function WorkShopsPage(): JSX.Element {
   const closedWorkshops = [...(data?.workshops ?? [])].filter((w) => w.isClosed);
 
   function handleOpenModal() {
-    if (!selectedDate) {
-      alert('Пожалуйста, выберите дату мастеркласса');
-      return;
-    }
     setIsModalOpen(true);
   }
 
@@ -130,14 +126,15 @@ export default function WorkShopsPage(): JSX.Element {
           Добавить мастеркласс
         </PrimaryButton>
 
-        <CreateWorkshopModal
-          isOpen={isModalOpen}
-          onSubmit={handleSubmit}
-          onClose={handleCloseModal}
-          allDates={allDates}
-          selectedDate={selectedDate}
-          onDateChange={handleDateChange}
-        />
+        {isModalOpen && (
+          <CreateWorkshopModal
+            onSubmit={handleSubmit}
+            onClose={handleCloseModal}
+            allDates={allDates}
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+          />
+        )}
         {(activeWorkshops || []).map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}

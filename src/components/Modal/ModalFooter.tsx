@@ -1,23 +1,13 @@
 'use client';
-import { memo } from 'react';
+import { memo, ReactNode } from 'react';
 import styles from './Modal.module.scss';
-import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
-import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 
 type ModalFooterProps = {
-  onSubmit: () => void;
-  onClose: () => void;
-  onCancel?: () => void;
-  hasCancel?: boolean;
+  children: ReactNode;
 };
 
-function Modal({ onSubmit, hasCancel, onCancel }: ModalFooterProps) {
-  return (
-    <div className={styles['modal__footer']}>
-      {hasCancel && onCancel && <SecondaryButton onClick={onCancel}>Отмена</SecondaryButton>}
-      <PrimaryButton onClick={onSubmit}>Принять</PrimaryButton>
-    </div>
-  );
+function Modal({ children }: ModalFooterProps) {
+  return <div className={styles['modal__footer']}>{children}</div>;
 }
 
 export default memo(Modal);
