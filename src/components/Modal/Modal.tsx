@@ -1,22 +1,15 @@
 'use client';
-import { memo } from 'react';
+import { memo, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Modal.module.scss';
-import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
-import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
-import Title from '../Title/Title';
 
 type ModalProps = {
-  text: string;
-  description?: string;
-  onSubmit: () => void;
   onClose: () => void;
-  onCancel?: () => void;
-  hasCancel?: boolean;
   isOpen: boolean;
+  children: ReactNode[];
 };
 
-function Modal({ text, description, onSubmit, onClose, hasCancel, onCancel, isOpen }: ModalProps) {
+function Modal({ onClose, children, isOpen }: ModalProps) {
   if (!isOpen) return null;
 
   if (typeof window === 'undefined') return null;
@@ -37,19 +30,7 @@ function Modal({ text, description, onSubmit, onClose, hasCancel, onCancel, isOp
   return createPortal(
     <div className={styles['modal']} onClick={handleOverlayClick}>
       <div className={styles['modal__content']} onClick={handleContentClick}>
-        <div className={styles['modal__header']}>
-          <Title>{text}</Title>
-          <div className={styles['close-button']} onClick={onClose}>
-            &times;
-          </div>
-        </div>
-        <div className={styles['modal__body']}>
-          <p>{description}</p>
-        </div>
-        <div className={styles['modal__footer']}>
-          {hasCancel && onCancel && <SecondaryButton onClick={onCancel}>Отмена</SecondaryButton>}
-          <PrimaryButton onClick={onSubmit}>Принять</PrimaryButton>
-        </div>
+        {children}
       </div>
     </div>,
     modalRoot,

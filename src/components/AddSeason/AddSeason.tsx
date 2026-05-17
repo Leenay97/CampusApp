@@ -31,29 +31,24 @@ export function AddSeason({ year, number, startDate, endDate, onChange }: AddSea
     <div className={styles['add-season']}>
       <div className={styles['add-season__input']}>
         <Subtitle noMargin>Год</Subtitle>
-        <InputField
-          value={year}
-          width="80px"
-          onChange={handleChangeYear}
-          maxLength={4}
-          placeholder={'Год'}
-        />
+        <InputField value={year} width="80px" onChange={handleChangeYear} maxLength={4} />
         <Subtitle noMargin>Сезон</Subtitle>
-        <InputField
-          value={number}
-          width="40px"
-          maxLength={2}
-          onChange={handleChangeNumber}
-          placeholder="№"
-        />
+        <InputField value={number} width="40px" maxLength={2} onChange={handleChangeNumber} />
       </div>
-      <div>
-        <Subtitle>Начало</Subtitle>
-        <InputField value={startDate} width="150px" type="date" onChange={handleChangeStartDate} />
-      </div>
-      <div>
-        <Subtitle>Конец</Subtitle>
-        <InputField value={endDate} width="150px" type="date" onChange={handleChangeEndDate} />
+      <div className={styles['add-season__row']}>
+        <div>
+          <Subtitle>Начало</Subtitle>
+          <InputField
+            value={startDate}
+            width="150px"
+            type="date"
+            onChange={handleChangeStartDate}
+          />
+        </div>
+        <div>
+          <Subtitle>Конец</Subtitle>
+          <InputField value={endDate} width="150px" type="date" onChange={handleChangeEndDate} />
+        </div>
       </div>
     </div>
   );
