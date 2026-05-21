@@ -12,13 +12,14 @@ export const groupTypeDefs = gql`
 
   extend type Query {
     groups: [Group]
+    seasonGroups(seasonId: ID!): [Group]
     group(id: ID!): Group
     groupByUserId(userId: ID!): Group
   }
 
   extend type Mutation {
-    createGroup(name: String!, userIds: [ID!]!): Group
-    updateGroup(id: ID!, amount: Int, places: String): Group
+    createGroup(name: String!, userIds: [ID!]!, seasonId: ID!): Group
+    updateGroup(id: ID!, amount: Int, places: String, teacherIds: [ID], name: String): Group
     deleteGroup(id: ID!): Group
   }
 `;

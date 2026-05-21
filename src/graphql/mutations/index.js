@@ -6,6 +6,7 @@ import { UPDATE_GROUP } from './UpdateGroup';
 import { CREATE_WORKSHOP } from './CreateWorkshop';
 import { CREATE_SEASON } from './CreateSeason';
 import { ACTIVATE_SEASON } from './ActivateSeason';
+import { ARCHIVE_SEASON } from './ArchiveSeason';
 import { REGISTER_TEACHER } from './RegisterTeacher';
 import { LOGIN } from './Login';
 import { CREATE_STUDENT } from './CreateStudent';
@@ -33,6 +34,7 @@ export const mutations = {
   CREATE_WORKSHOP,
   CREATE_SEASON,
   ACTIVATE_SEASON,
+  ARCHIVE_SEASON,
   REGISTER_TEACHER,
   LOGIN,
   CREATE_STUDENT,

@@ -3,7 +3,15 @@ import { Group, Season, User } from '../../models/index.js';
 export const seasonResolvers = {
   Query: {
     seasons: async () => {
-      return await Season.findAll();
+      const seasons = await Season.findAll({
+        include: [
+          {
+            model: Group,
+            as: 'groups',
+          },
+        ],
+      });
+      return seasons;
     },
     season: async (_, { id }) => {
       return await Season.findByPk(id);
@@ -19,8 +27,25 @@ export const seasonResolvers = {
     },
   },
 
+  Group: {
+    teachers: async (parent) => {
+      if (!parent.teacherIds || parent.teacherIds.length === 0) {
+        return [];
+      }
+
+      const teachers = await User.findAll({
+        where: {
+          id: parent.teacherIds,
+          userLevel: 'TEACHER',
+        },
+      });
+
+      return teachers;
+    },
+  },
+
   Mutation: {
-    createSeason: async (_, { number, year, groupTeachers, startDate, endDate }) => {
+    createSeason: async (_, { number, year, startDate, endDate }) => {
       const existingSeason = await Season.findOne({ where: { number, year } });
       if (existingSeason) {
         throw new Error('Сезон уже существует');
@@ -30,14 +55,6 @@ export const seasonResolvers = {
       }
 
       const season = await Season.create({ number, year, startDate, endDate });
-
-      for (const groupData of groupTeachers) {
-        await Group.create({
-          name: groupData.name,
-          seasonId: season.id,
-          teacherIds: groupData.teacherIds,
-        });
-      }
 
       return season;
     },
@@ -54,27 +71,12 @@ export const seasonResolvers = {
     },
 
     activateSeason: async (_, { id }) => {
-      const season = await Season.findByPk(id, {
-        include: {
-          model: Group,
-          as: 'groups',
-          include: {
-            model: User,
-            as: 'users',
-            where: { userLevel: 'TEACHER' },
-            required: false,
-          },
-        },
-      });
+      const season = await Season.findByPk(id);
       if (!season) throw new Error('Сезон не найден');
       if (season.isActive) throw new Error('Сезон уже активен');
 
-      const deactivateSeasons = await Season.findAll({ where: { isActive: true } });
-      for (const s of deactivateSeasons) {
-        s.isActive = false;
-        s.isArchived = true;
-        await s.save();
-      }
+      const isSomeSeasonActive = await Season.findOne({ where: { isActive: true } });
+      if (isSomeSeasonActive) throw new Error('Существует активный сезон');
 
       season.isActive = true;
       await season.save();
@@ -84,9 +86,38 @@ export const seasonResolvers = {
       for (const group of groups) {
         const teacherIds = group.teacherIds;
 
-        if (teacherIds.length > 0) {
+        if (teacherIds && teacherIds.length > 0) {
           await User.update(
             { seasonId: season.id, groupId: group.id },
+            { where: { id: teacherIds, userLevel: 'TEACHER' } },
+          );
+        }
+        console.log({
+          groupId: group.id,
+          teacherIds,
+        });
+      }
+
+      return season;
+    },
+
+    archiveSeason: async (_, { id }) => {
+      const season = await Season.findByPk(id);
+      if (!season) throw new Error('Сезон не найден');
+      if (season.isArchived) throw new Error('Сезон уже архивирован');
+
+      season.isActive = false;
+      season.isArchived = true;
+      await season.save();
+
+      const groups = await Group.findAll({ where: { seasonId: id } });
+
+      for (const group of groups) {
+        const teacherIds = group.teacherIds;
+
+        if (teacherIds && teacherIds.length > 0) {
+          await User.update(
+            { seasonId: null, groupId: null },
             { where: { id: teacherIds, userLevel: 'TEACHER' } },
           );
         }

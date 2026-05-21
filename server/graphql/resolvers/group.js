@@ -5,6 +5,13 @@ export const groupResolvers = {
     groups: async () => {
       return await Group.findAll();
     },
+
+    seasonGroups: async (_, { seasonId }) => {
+      return await Group.findAll({
+        where: { seasonId },
+      });
+    },
+
     group: async (_, { id }) => {
       return await Group.findByPk(id, {
         include: [{ model: User, as: 'users' }],
@@ -28,8 +35,41 @@ export const groupResolvers = {
       });
     },
   },
+
+  Group: {
+    // 👈 Ключевой момент: резолвер для поля teachers
+    teachers: async (parent) => {
+      const group = await Group.findByPk(parent.id, {
+        include: [
+          {
+            model: User,
+            as: 'users', // Используем существующий алиас 'users'
+            where: { userLevel: 'TEACHER' },
+            required: false,
+          },
+        ],
+      });
+      return group?.users || [];
+    },
+
+    // Если нужно поле students
+    students: async (parent) => {
+      const group = await Group.findByPk(parent.id, {
+        include: [
+          {
+            model: User,
+            as: 'users',
+            where: { userLevel: 'STUDENT' },
+            required: false,
+          },
+        ],
+      });
+      return group?.users || [];
+    },
+  },
+
   Mutation: {
-    createGroup: async (_, { name, userIds }) => {
+    createGroup: async (_, { name, userIds, seasonId }) => {
       const validUserIds = userIds ? userIds.filter((id) => id != null) : [];
 
       if (validUserIds.length < 2) {
@@ -39,6 +79,7 @@ export const groupResolvers = {
       const existingGroup = await Group.findOne({
         where: {
           name,
+          seasonId,
         },
       });
 
@@ -64,31 +105,36 @@ export const groupResolvers = {
         throw new Error(`У учителя уже есть группа: ${userNames}`);
       }
 
-      const group = await Group.create({ name, points: 0 });
-
-      if (userIds && userIds.length > 0) {
-        await User.update(
-          { groupId: group.id },
-          {
-            where: {
-              id: userIds,
-            },
-          },
-        );
-      }
+      const group = await Group.create({ name, points: 0, seasonId, teacherIds: userIds });
 
       return await Group.findByPk(group.id, {
         include: [{ model: User, as: 'users' }],
       });
     },
 
-    updateGroup: async (_, { id, amount, places }) => {
+    updateGroup: async (_, { id, amount, places, name, teacherIds }) => {
+      console.log('teacherIds:', teacherIds);
       const group = await Group.findByPk(id);
       if (!group) throw new Error('Группа не найдена');
 
-      group.points += amount;
-      group.places = places;
+      if (name) {
+        group.name = name;
+      }
+
+      if (places !== undefined) {
+        group.places = places;
+      }
+
+      if (amount !== undefined && amount !== null) {
+        group.points += amount;
+      }
+
+      if (teacherIds && Array.isArray(teacherIds)) {
+        group.teacherIds = teacherIds;
+      }
+
       await group.save();
+
       return group;
     },
 

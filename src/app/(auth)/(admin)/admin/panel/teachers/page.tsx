@@ -49,12 +49,13 @@ export default function TeachersPage() {
     <>
       <CenteredContainer noPadding>
         <Section>
-          <AddTeacher onAdd={refetchTeachers} />
           <List<User>
+            title="Учителя"
             items={teachersData?.teachers}
             isLoading={teachersLoading}
             onDelete={openModal}
           />
+          <AddTeacher onAdd={refetchTeachers} />
         </Section>
       </CenteredContainer>
       {isModalOpen && (

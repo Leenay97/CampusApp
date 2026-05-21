@@ -24,14 +24,9 @@ export const seasonTypeDefs = gql`
   }
 
   extend type Mutation {
-    createSeason(
-      year: String!
-      number: String!
-      groupTeachers: [GroupInput!]!
-      startDate: String!
-      endDate: String!
-    ): Season
+    createSeason(year: String!, number: String!, startDate: String!, endDate: String!): Season
     activateSeason(id: ID!): Season
+    archiveSeason(id: ID!): Season
     updateSeason(id: ID!): Season
     deleteSeason(id: ID!): Season
   }

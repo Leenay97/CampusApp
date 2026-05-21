@@ -8,6 +8,14 @@ export const GET_SEASONS = gql`
       number
       isActive
       isArchived
+      groups {
+        id
+        name
+        teachers {
+          id
+          name
+        }
+      }
     }
   }
 `;

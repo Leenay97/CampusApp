@@ -1,32 +1,49 @@
-.prohibited-section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    background-color: white;
-    border-radius: 10px;
-    padding: 20px;
+.season-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 200px 1fr 1fr 100px;
+    border-bottom: 1px solid rgb(201, 230, 255);
 
-    &__header {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+    &_active {
+        background-color: rgb(201, 230, 255);
     }
 
-    &__content {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        max-height: auto;
+    &_archived {
+        background-color: rgb(235, 235, 235);
+    }
 
-        &--hidden {
-            max-height: 0;
-            overflow: hidden;
+    &__item {
+        padding: 10px 20px; 
+        display: flex;
+        align-items: center;
+
+        &_header {
+            padding: 10px 20px;
+            background-color: var(--color-dark-blue);
+            border-collapse: collapse;
+            color: white;
         }
     }
 
-    .flex-row {
+    &__controls {
         display: flex;
-        flex-direction: row;
         gap: 10px;
     }
+
+    &__group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}
+
+.seasons__table {
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.add-season-btn {
+    width: 150px;
+    margin-left: auto;
 }

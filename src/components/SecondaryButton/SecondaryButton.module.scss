@@ -13,6 +13,7 @@
   justify-content: center;
   height: var(--input-button-height);
   cursor: pointer;
+  background-color: white;
 
   &:disabled {
     background-color: transparent;

@@ -4,32 +4,56 @@ import AddSeasonModal from '@/components/AddSeasonModal/AddSeasonModal';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Section from '@/components/Section/Section';
 import Title from '@/components/Title/Title';
+import { GET_SEASONS } from '@/graphql/queries/GetSeasons';
+import { useQuery } from '@apollo/client';
+import SeasonsTable from './SeasonsTable';
+import styles from './SeasonsPage.module.scss';
 import { useState } from 'react';
-
-// type SeasonDataType = {
-//   seasonName?: string;
-//   seasonDates?: [Date, Date];
-//   seasonGroups?: string[];
-//   seasonTeachers?: string[];
-// };
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import { ACTIVATE_SEASON } from '@/graphql/mutations/ActivateSeason';
+import { ARCHIVE_SEASON } from '@/graphql/mutations/ArchiveSeason';
 
 function SeasonManagementPage() {
-  //   const [seasonData, setSeasonData] = useState<SeasonDataType | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const { data, refetch } = useQuery(GET_SEASONS);
+  const [activateSeason] = useGlobalLoadingMutation(ACTIVATE_SEASON);
+  const [archiveSeason] = useGlobalLoadingMutation(ARCHIVE_SEASON);
 
   function handleOpenModal() {
     setIsCreateModalOpen(true);
   }
 
-  // function handleCloseModal() {
-  //   setIsCreateModalOpen(false);
-  // }
+  async function handleArchiveSeason(seasonId: string) {
+    try {
+      await archiveSeason({ id: seasonId });
+      await refetch();
+    } catch (error) {
+      console.error('Error archiving season:', error);
+    }
+  }
+
+  async function handleActivateSeason(seasonId: string) {
+    try {
+      await activateSeason({ id: seasonId });
+      await refetch();
+    } catch (error) {
+      console.error('Error activating season:', error);
+    }
+  }
+
   return (
     <Section>
       <Title>Season Management</Title>
-      <PrimaryButton onClick={handleOpenModal}>Добавить сезон</PrimaryButton>
+      <PrimaryButton className={styles['add-season-btn']} onClick={handleOpenModal}>
+        Добавить сезон
+      </PrimaryButton>
       {isCreateModalOpen && <AddSeasonModal onClose={() => setIsCreateModalOpen(false)} />}
-      {/* <InputField value={seasonData} onChange={setSeasonData} /> */}
+      <SeasonsTable
+        onRefetchSeason={refetch}
+        onArchive={handleArchiveSeason}
+        onActivate={handleActivateSeason}
+        seasons={data?.seasons}
+      />
     </Section>
   );
 }

@@ -6,7 +6,7 @@ import styles from './List.module.scss';
 type ListProps<T> = {
   items: T[];
   title?: string;
-  isLoading: boolean;
+  isLoading?: boolean;
   onDelete?: (item: T | null) => void;
 };
 

@@ -8,6 +8,7 @@ export type Teacher = {
 export type Group = {
   id: string;
   name: string;
+  teachers: User[];
   teacherIds: string[];
   users: Record<string, string>;
   points: number;
@@ -61,6 +62,7 @@ export type Season = {
   year: string;
   isActive: boolean;
   isArchived: boolean;
+  groups?: Group[];
 };
 
 export type House = {

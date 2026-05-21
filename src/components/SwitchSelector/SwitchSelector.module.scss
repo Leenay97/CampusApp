@@ -1,0 +1,28 @@
+.switch-selector {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    border-radius: 5px;
+    overflow: hidden;
+
+    &__item {
+        width: 100%;
+        text-align: center;
+        padding: 5px 10px;
+        cursor: pointer;
+        background-color: rgb(244, 244, 244);
+
+        &:hover {
+            background-color: var(--color-dark-blue);
+            color: white;
+        }
+
+        &_active {
+            width: 100%;
+            text-align: center;
+            background-color: var(--color-dark-blue);
+            color: white;
+            padding: 5px 10px;
+        }
+    }
+}

@@ -4,7 +4,7 @@ type MenuOption = {
 };
 
 export const AdminPanelOptions: MenuOption[] = [
-  { name: 'Управление сезонами', link: '/admin/panel/seasons' },
+  { name: 'Управление сезонами', link: '/admin/panel/season-management' },
   { name: 'Учителя', link: '/admin/panel/teachers' },
   { name: 'Points', link: '/admin/panel/points' },
   { name: 'Места', link: '/admin/panel/places' },
@@ -12,6 +12,6 @@ export const AdminPanelOptions: MenuOption[] = [
   { name: 'Sport Time', link: '/admin/panel/sporttime' },
   { name: 'Распорядок дня', link: '/admin/panel/schedule' },
   { name: 'Тех. данные', link: '/admin/panel/technical-data' },
-  { name: 'Управление домиками', link: '/houses' },
+  { name: 'Управление домиками', link: '/admin/panel/houses' },
   { name: 'Cтуденты', link: '/admin/panel/students' },
 ];

@@ -39,6 +39,11 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
     };
   }, []);
 
+  useEffect(() => {
+    /*eslint-disable-next-line react-hooks/set-state-in-effect*/
+    setValue(initValue ?? '');
+  }, [initValue]);
+
   if (!items || !items.length) return null;
 
   const filteredItems = items.filter(
