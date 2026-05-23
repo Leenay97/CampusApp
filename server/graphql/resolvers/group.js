@@ -99,12 +99,6 @@ export const groupResolvers = {
         throw new Error('Учителя не найдены');
       }
 
-      const usersWithGroup = users.filter((user) => user.groupId !== null);
-      if (usersWithGroup.length > 0) {
-        const userNames = usersWithGroup.map((u) => u.name || u.id).join(', ');
-        throw new Error(`У учителя уже есть группа: ${userNames}`);
-      }
-
       const group = await Group.create({ name, points: 0, seasonId, teacherIds: userIds });
 
       return await Group.findByPk(group.id, {
