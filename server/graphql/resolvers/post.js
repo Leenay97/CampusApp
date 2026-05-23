@@ -1,4 +1,5 @@
 import { Post } from '../../models/index.js';
+import { broadcast } from '../../index.js'; // или путь где сервер
 
 export const postResolvers = {
   Query: {
@@ -8,7 +9,7 @@ export const postResolvers = {
     },
   },
   Mutation: {
-    createPost: async (_, { text, title }, { broadcast }) => {
+    createPost: async (_, { text, title }) => {
       if (!text || !title) {
         throw new Error('У поста должны быть текст и название');
       }
@@ -17,7 +18,7 @@ export const postResolvers = {
 
       broadcast({
         type: 'NEW_POST',
-        payload: post,
+        payload: post.toJSON(),
       });
 
       return post;

@@ -21,7 +21,7 @@ const PORT = 5000;
 // ======================
 const clients = new Set();
 
-function broadcast(event) {
+export function broadcast(event) {
   const msg = JSON.stringify(event);
 
   clients.forEach((ws) => {
