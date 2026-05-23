@@ -129,8 +129,6 @@ export default function HousesPage() {
       </Section>
 
       <Section>
-        <Title noMargin>Редактировать домики</Title>
-
         <div className={styles['houses__filters']}>
           <Subtitle>Сортировать:</Subtitle>
           <Filters

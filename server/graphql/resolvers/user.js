@@ -261,6 +261,7 @@ export const userResolvers = {
       const user = await User.findByPk(userId);
       const reciever = await User.findByPk(recieverId);
       if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
+      if (amount <= 0) throw new Error('Некорректная сумма');
       if (!user) throw new Error('Отправитель не найден');
       if (!reciever) throw new Error('Получатель не найден');
 

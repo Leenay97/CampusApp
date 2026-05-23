@@ -35,9 +35,9 @@ function CloseWorkshopModal({ students, onSubmit, onClose }: ModalProps) {
   return (
     <Modal onClose={onClose}>
       <ModalHeader onClose={onClose} title="Закрыть МК" />
-      <ModalBody>
+      <ModalBody className={styles['close-workshop-modal']}>
         {students?.map((student) => (
-          <div key={student.id} className={styles['modal__row']}>
+          <div key={student.id} className={styles['close-workshop-modal__row']}>
             <Checkbox
               label={student.name}
               checked={checkedStudents.includes(student.id)}

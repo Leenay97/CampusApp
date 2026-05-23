@@ -19,6 +19,7 @@ export const TeacherHeaderMenuOptions: MenuOption[] = [
   { name: 'Главная', link: '/' },
   { name: 'Мастерклассы', link: '/workshops' },
   { name: 'Sport Time', link: '/sporttime' },
+  { name: 'Домики', link: '/houses' },
   { name: 'Мой мастеркласс', link: '/teacher/my-workshop' },
   { name: 'Моя группа', link: '/teacher/group' },
   { name: 'Расписание', link: '/schedule' },
