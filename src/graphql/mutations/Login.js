@@ -11,6 +11,7 @@ export const LOGIN = gql`
         group {
           id
           name
+          places
         }
         userLevel
         photoUrl

@@ -1,6 +1,6 @@
 'use client';
 import { Place } from '@/app/types';
-import { createContext, useContext, useState, ReactNode, useRef } from 'react';
+import { createContext, useContext, useState, ReactNode, useRef, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
@@ -89,7 +89,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           return placeDate === todayStart;
         });
 
-        if (todayPlaceData?.placeId) {
+        if (todayPlaceData?.placeId && !placeIdRef.current) {
           placeIdRef.current = todayPlaceData.placeId;
           getPlace({ variables: { id: todayPlaceData.placeId } });
         }
