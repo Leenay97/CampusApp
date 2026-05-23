@@ -288,6 +288,7 @@ export const userResolvers = {
       await user.addWorkshop(workshop);
       return user;
     },
+
     fineUser: async (_, { id }) => {
       const user = await User.findByPk(id);
       const group = await Group.findOne({ where: { id: user.groupId } });
@@ -297,11 +298,14 @@ export const userResolvers = {
       }
       user.lives -= 1;
 
+      group.rubbers += 1;
+
       user.save();
       group.save();
 
       return user;
     },
+
     uploadAvatar: async (_, { file, userId }) => {
       try {
         console.log('Starting upload for userId:', userId);

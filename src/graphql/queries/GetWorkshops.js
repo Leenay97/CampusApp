@@ -9,6 +9,7 @@ export const GET_WORKSHOPS = gql`
       date
       teacher {
         name
+        photoUrl
       }
       students {
         id

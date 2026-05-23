@@ -8,6 +8,7 @@ export const GET_TODAY_WORKSHOPS = gql`
       description
       teacher {
         name
+        photoUrl
       }
       students {
         id

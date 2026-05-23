@@ -11,6 +11,7 @@ import { JOIN_WORKSHOP } from '@/graphql/mutations/JoinWorkshop';
 import Section from '@/components/Section/Section';
 import Loader from '@/components/Loader/Loaader';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import Title from '@/components/Title/Title';
 
 export default function SportPage(): JSX.Element {
   const { data, loading, refetch } = useQuery(queries.GET_TODAY_WORKSHOPS, {
@@ -44,6 +45,16 @@ export default function SportPage(): JSX.Element {
     return joinedWorkshop ? [joinedWorkshop] : data?.todayWorkshops;
   })();
 
+  if (!workshopsToShow?.length) {
+    return (
+      <CenteredContainer>
+        <Section>
+          <Title noMargin>Sport Time еще нет</Title>
+        </Section>
+      </CenteredContainer>
+    );
+  }
+
   return (
     <CenteredContainer>
       <div className={style['workshops-wrapper']}>
@@ -56,6 +67,7 @@ export default function SportPage(): JSX.Element {
             maxStudentAmount={workshop.maxStudents}
             place={workshop.place.name}
             teacher={workshop.teacher.name}
+            avatar={workshop.teacher.photoUrl}
             maxAge={workshop.maxAge}
             handleJoin={() => handleJoin(workshop.id)}
             joined={workshop.students.some((student) => student.id === user?.id)}

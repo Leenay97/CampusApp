@@ -9,6 +9,7 @@ export const GET_SEASON_GROUPS = gql`
       teachers {
         name
       }
+      rubbers
     }
   }
 `;

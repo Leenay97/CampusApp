@@ -103,9 +103,9 @@ function CreateWorkshopModal({
               onChange={onDateChange}
               style={{
                 width: '100%',
-                padding: '10px',
-                fontSize: '16px',
-                borderRadius: '8px',
+                padding: '6px',
+                fontSize: '14px',
+                borderRadius: '4px',
                 border: '1px solid #ddd',
                 backgroundColor: 'white',
                 cursor: 'pointer',

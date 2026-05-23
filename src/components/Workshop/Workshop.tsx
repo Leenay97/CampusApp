@@ -9,6 +9,7 @@ import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 function Workshop({
   name,
   teacher,
+  avatar,
   joined,
   description,
   students,
@@ -24,6 +25,8 @@ function Workshop({
 }: WorkshopType) {
   const studentCount = students?.length ?? 0;
   const isFull = studentCount >= (maxStudentAmount ?? 0);
+
+  console.log(date);
 
   if (isClosed) {
     return (
@@ -45,11 +48,21 @@ function Workshop({
       {place && <div className={styles['workshop__place']}>{place}</div>}
       {description && <div className={styles['workshop__description']}>{description}</div>}
       <div className={styles['workshop__teacher']}>
-        <div className={styles['teacher-photo']} />
+        <div
+          className={styles['teacher-photo']}
+          style={{
+            backgroundImage: avatar ? `url(${process.env.NEXT_PUBLIC_API_URL}${avatar})` : 'none',
+          }}
+        ></div>
         {teacher}
       </div>
       {Number(maxAge) > 0 && <div className={styles['workshop__place']}>Возраст: {maxAge}+</div>}
       {!isSport && <WorkshopCounter number={studentCount} maxNumber={maxStudentAmount} />}
+      {toClose && date && (
+        <div className={styles['workshop__place']}>
+          {new Date(Number(date)).toLocaleDateString()}
+        </div>
+      )}
 
       {!noButtons && (
         <>

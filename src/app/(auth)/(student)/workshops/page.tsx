@@ -43,9 +43,7 @@ export default function WorkShopsPage(): JSX.Element {
     return joinedWorkshop ? [joinedWorkshop] : data?.todayWorkshops;
   })();
 
-  console.log(workshopsToShow);
-
-  if (!workshopsToShow?.lenght) {
+  if (!workshopsToShow?.length) {
     return (
       <CenteredContainer>
         <Section>
@@ -67,6 +65,7 @@ export default function WorkShopsPage(): JSX.Element {
             maxStudentAmount={workshop.maxStudents}
             place={workshop.place.name}
             teacher={workshop.teacher.name}
+            avatar={workshop.teacher.photoUrl}
             maxAge={workshop.maxAge}
             handleJoin={() => handleJoin(workshop.id)}
             joined={workshop.students.some((student) => student.id === user?.id)}

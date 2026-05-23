@@ -146,6 +146,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
           <div className={styles['scanner']}>
             <Scanner
               key="scanner"
+              sound={false}
               onScan={handleScan}
               onError={handleError}
               formats={['qr_code']}

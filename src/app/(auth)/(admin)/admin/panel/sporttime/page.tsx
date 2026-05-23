@@ -149,6 +149,7 @@ export default function SportTimePage(): JSX.Element {
             maxStudentAmount={workshop.maxStudents}
             place={workshop.place?.name}
             teacher={workshop.teacher.name}
+            avatar={workshop.teacher.photoUrl}
             isClosed={workshop.isClosed}
             toClose
           />
@@ -166,6 +167,7 @@ export default function SportTimePage(): JSX.Element {
               maxStudentAmount={workshop.maxStudents}
               place={workshop.place?.name}
               teacher={workshop.teacher?.name}
+              avatar={workshop.teacher.photoUrl}
               maxAge={workshop.maxAge}
               toClose
               isClosed={workshop.isClosed}

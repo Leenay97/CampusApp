@@ -7,9 +7,11 @@ import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 import Section from '../Section/Section';
 import Title from '../Title/Title';
 import { GET_TECHICAL_DATA } from '@/graphql/queries/GetTechnicalData';
+import CenteredContainer from '../CenteredContainer/CenteredContainer';
+import Loader from '../Loader/Loaader';
 
 function TeamRaiting() {
-  const { data, loading, error } = useQuery(GET_ACTIVE_SEASON);
+  const { data, loading } = useQuery(GET_ACTIVE_SEASON);
   const { data: technicalData, loading: technicalDataLoading } = useQuery(GET_TECHICAL_DATA);
 
   const sortedGroups = useMemo(() => {
@@ -19,30 +21,21 @@ function TeamRaiting() {
 
   if (loading || technicalDataLoading) {
     return (
-      <div className={styles['raiting']}>
-        <Title>Рейтинг команд</Title>
-        <div className={styles['loading']}>Загрузка...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles['raiting']}>
-        <Title>Рейтинг команд</Title>
-        <div className={styles['error']}>Ошибка загрузки</div>
-      </div>
+      <CenteredContainer noPadding>
+        <Title noMargin>Рейтинг команд</Title>
+        <Loader />
+      </CenteredContainer>
     );
   }
 
   return (
-    <Section>
-      <div className={styles['raiting']}>
-        <Title>Рейтинг команд</Title>
+    <CenteredContainer noPadding>
+      <Section>
+        <Title noMargin>Рейтинг команд</Title>
         {sortedGroups.length > 0 ? (
           sortedGroups.map((team, index) => (
             <Team
-              key={team.name}
+              key={team.id}
               team={team}
               place={index + 1}
               hidden={!technicalData?.technicalData.isRatingShown}
@@ -51,8 +44,8 @@ function TeamRaiting() {
         ) : (
           <div className={styles['empty']}>Нет команд</div>
         )}
-      </div>
-    </Section>
+      </Section>
+    </CenteredContainer>
   );
 }
 

@@ -41,6 +41,12 @@ function Header() {
     setIsProfileOpen(false);
   }
 
+  function handleLogoClick() {
+    if (location.pathname !== '/') {
+      window.location.href = '/';
+    }
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -87,7 +93,12 @@ function Header() {
             {app?.todayPlace?.name}
           </div>
         ) : (
-          <Image className={styles['header__logo']} src={Logo} alt="Logo" />
+          <Image
+            className={styles['header__logo']}
+            src={Logo}
+            alt="Logo"
+            onClick={handleLogoClick}
+          />
         )}
         <Burger isOpen={isBurgerOpen} onClick={handleBurgerClick} />
         <BurgerMenu userLevel={userLevel} isOpen={isBurgerOpen} onClose={handleBurgerClose} />

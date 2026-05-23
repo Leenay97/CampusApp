@@ -8,6 +8,7 @@ export const groupTypeDefs = gql`
     teachers: [User]
     places: String
     points: Int
+    rubbers: Int
   }
 
   extend type Query {

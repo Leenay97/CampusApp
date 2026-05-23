@@ -2,6 +2,7 @@ import { User } from '@/app/types';
 
 export type Workshop = {
   teacher: string;
+  avatar?: string;
   joined?: boolean;
   name: string;
   description?: string;

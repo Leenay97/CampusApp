@@ -34,6 +34,9 @@
       width: 30px;
       border-radius: 50%;
       background-color: var(--color-light-blue);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
   }
@@ -62,6 +65,9 @@
       width: 30px;
       border-radius: 50%;
       background-color: var(--color-light-blue);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
   }
@@ -88,5 +94,8 @@
     width: 30px;
     border-radius: 50%;
     background-color: var(--color-light-blue);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 }

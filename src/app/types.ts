@@ -13,6 +13,7 @@ export type Group = {
   users: Record<string, string>;
   points: number;
   places: string;
+  rubbers: number;
 };
 
 export type GroupInput = {

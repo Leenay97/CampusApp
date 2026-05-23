@@ -6,10 +6,12 @@ type TeamProps = {
   place?: number;
   changedPoints?: number;
   hidden?: boolean;
+  mode?: 'rubbers';
 };
 
-function Team({ team, place, changedPoints, hidden }: TeamProps) {
+function Team({ team, place, changedPoints, hidden, mode }: TeamProps) {
   const originalPoints = team.points - (changedPoints ?? 0);
+  const rubbers = team.rubbers ?? 0;
 
   const emojiSets = [
     '🌸🌼🌸🌼🌸🌼🌸',
@@ -47,7 +49,11 @@ function Team({ team, place, changedPoints, hidden }: TeamProps) {
     const emojis = getEmojisByTeamId(String((place ?? 1) - 1));
     return (
       <div
-        className={`${styles['team']} ${place ? styles[`team--${place}`] : ''} ${styles['team--hidden']}`}
+        className={`${styles['team']} 
+        ${place ? styles[`team_${place}`] : ''} 
+        ${mode === 'rubbers' ? styles['team_rubbers'] : ''}
+        ${hidden ? styles['team_hidden'] : ''}
+    `}
       >
         <div className={styles['team__place']}>{place}</div>
         <div className={styles['team__name']}>{emojis}</div>
@@ -56,11 +62,13 @@ function Team({ team, place, changedPoints, hidden }: TeamProps) {
   }
 
   return (
-    <div className={`${styles['team']} ${place ? styles[`team--${place}`] : ''}`}>
+    <div
+      className={`${styles['team']} ${place ? styles[`team_${place}`] : ''} ${mode === 'rubbers' ? styles['team_rubbers'] : ''}`}
+    >
       <div className={styles['team__place']}>{place}</div>
       <div className={styles['team__name']}>{team.name}</div>
       <div className={styles['team__points']}>
-        <span>{originalPoints}</span>
+        <span>{mode === 'rubbers' ? rubbers : originalPoints}</span>
         {changedPoints !== 0 && changedPoints !== undefined && (
           <span className={styles['team__add-points']}> ({changedPoints})</span>
         )}

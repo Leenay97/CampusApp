@@ -21,4 +21,8 @@ export const Group = sequelize.define('Group', {
   places: {
     type: DataTypes.JSONB,
   },
+  rubbers: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
 });
