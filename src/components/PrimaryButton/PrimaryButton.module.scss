@@ -18,14 +18,14 @@
   &:disabled {
     background-color: var(--primary-button-disabled);
 
-    &:hover {
-      background-color: var(--primary-button-disabled);
-      color: white;
-    }
+    // &:hover {
+    //   background-color: var(--primary-button-disabled);
+    //   color: white;
+    // }
   }
 
-  &:hover {
-    background-color: var(--primary-button-disabled);
-    color: white;
-  }
+  // &:hover {
+  //   background-color: var(--primary-button-disabled);
+  //   color: white;
+  // }
 }

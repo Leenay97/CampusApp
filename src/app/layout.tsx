@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={chiron.className}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
         <link rel="preload" href="/bg-colored.png" as="image" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
