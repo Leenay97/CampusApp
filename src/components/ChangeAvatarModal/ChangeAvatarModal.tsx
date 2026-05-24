@@ -168,17 +168,19 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
   };
 
   return (
-    <Modal onClose={onClose} className={styles['modal__content']}>
+    <Modal onClose={onClose} className={styles['modal-content']}>
       <ModalHeader title="Сменить аватар" onClose={onClose} />
       <ModalBody>
         {!image ? (
           <>
-            {photoUrl && (
+            {photoUrl ? (
               <img
                 src={`${process.env.NEXT_PUBLIC_API_URL}${photoUrl}`}
                 className={styles.image}
                 alt="Avatar"
               />
+            ) : (
+              <div className={styles.placeholder}>You</div>
             )}
             <label className={styles.uploadButton}>
               <input
