@@ -15,7 +15,6 @@ function Header() {
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const { user } = useUser();
   const { app } = useApp();
 
@@ -48,25 +47,24 @@ function Header() {
   }
 
   useEffect(() => {
+    let lastY = window.scrollY;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+      const currentY = window.scrollY;
 
-      if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      if (isBurgerOpen || isProfileOpen) {
-        setIsVisible(true);
+      if (!isBurgerOpen && !isProfileOpen) {
+        setIsVisible(!(currentY > lastY && currentY > 50));
       }
 
-      setLastScrollY(currentScrollY);
+      lastY = currentY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, isBurgerOpen, isProfileOpen]);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isBurgerOpen, isProfileOpen]);
 
   useEffect(() => {
     const checkWidth = () => {
