@@ -18,7 +18,7 @@ export default function InfoPage() {
   const { data, loading, refetch } = useQuery(GET_POSTS);
 
   useEffect(() => {
-    const ws = new WebSocket('wss://localhost:5000');
+    const ws = new WebSocket(`wss://${process.env.NEXT_PUBLIC_WSS_URL}`);
 
     ws.onmessage = (event) => {
       try {
