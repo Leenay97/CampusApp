@@ -69,7 +69,10 @@ const startServer = async () => {
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
   });
 
-  const wss = new WebSocketServer({ server: httpServer });
+  const wss = new WebSocketServer({
+    server: httpServer,
+    path: '/ws',
+  });
 
   wss.on('connection', (ws) => {
     clients.add(ws);
