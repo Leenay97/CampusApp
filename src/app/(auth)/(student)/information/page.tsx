@@ -10,12 +10,44 @@ import Section from '@/components/Section/Section';
 import { useUser } from '@/contexts/UserContext';
 import { GET_POSTS } from '@/graphql/queries/GetPosts';
 import { useQuery } from '@apollo/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function InfoPage() {
   const { user } = useUser();
   const [showCreator, setShowCreator] = useState(false);
   const { data, loading, refetch } = useQuery(GET_POSTS);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:5000');
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+
+        if (msg.type === 'NEW_POST') {
+          refetch();
+
+          if (Notification.permission === 'granted') {
+            new Notification('Новый пост', {
+              body: msg.payload?.title ?? 'Без названия',
+            });
+          }
+        }
+      } catch (e) {
+        console.error('WS error:', e);
+      }
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [refetch]);
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      Notification.requestPermission();
+    }
+  }, []);
 
   if (loading)
     return (

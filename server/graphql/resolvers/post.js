@@ -8,10 +8,19 @@ export const postResolvers = {
     },
   },
   Mutation: {
-    createPost: async (_, { text, title }) => {
-      if (!text || !title) throw new Error('У поста должны быть текст и название');
+    createPost: async (_, { text, title }, { broadcast }) => {
+      if (!text || !title) {
+        throw new Error('У поста должны быть текст и название');
+      }
 
-      return await Post.create({ text, title });
+      const post = await Post.create({ text, title });
+
+      broadcast({
+        type: 'NEW_POST',
+        payload: post,
+      });
+
+      return post;
     },
     updatePost: async (_, { id, text, title }) => {
       const post = await Post.findByPk(id);
