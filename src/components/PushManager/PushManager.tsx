@@ -150,21 +150,19 @@ export default function PushManager() {
   }
 
   if (!isSupported) {
-    return (
-      <div style={{ padding: 10, background: '#f0f0f0', borderRadius: 8 }}>
-        ⚠️ Ваш браузер не поддерживает push-уведомления
-      </div>
-    );
+    return <div>⚠️ Браузер не поддерживает уведомления</div>;
   }
 
-  if (!swReady) return;
+  if (!swReady) {
+    return <div>⏳ Загрузка Service Worker... Подождите</div>;
+  }
+
+  if (permission === 'denied') {
+    return <div>🔕 Уведомления запрещены. Разрешите в настройках браузера</div>;
+  }
 
   return (
-    <button
-      className={`${styles['push-manager']} ${isSubscribed ? styles['push-manager_enabled'] : styles['push-manager_disabled']}`}
-      onClick={isSubscribed ? unsubscribeFromPush : subscribeToPush}
-      disabled={loading || !swReady}
-    >
+    <button onClick={isSubscribed ? unsubscribeFromPush : subscribeToPush} disabled={loading}>
       {loading ? 'Загрузка...' : isSubscribed ? 'Отключить уведомления' : 'Включить уведомления'}
     </button>
   );
