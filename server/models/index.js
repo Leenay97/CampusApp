@@ -11,6 +11,7 @@ import { IpodMatch } from './IpodMatch.js';
 import { House } from './House.js';
 import { Post } from './Post.js';
 import { Class } from './Class.js';
+import { PushSubscription } from './PushSubscription.js';
 
 // Сначала определите все ассоциации
 // Ассоциации Season
@@ -106,4 +107,5 @@ export {
   House,
   Post,
   Class,
+  PushSubscription,
 };

@@ -7,12 +7,12 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { WebSocketServer } from 'ws';
 import webpush from 'web-push';
-import dotenv from 'dotenv'; // ДОБАВЛЕНО
+import dotenv from 'dotenv';
 
 // ЗАГРУЖАЕМ ПЕРЕМЕННЫЕ ИЗ .env
 dotenv.config();
 
-import { sequelize } from './models/index.js';
+import { sequelize, PushSubscription } from './models/index.js';
 import { typeDefs } from './graphql/typeDefs/index.js';
 import { resolvers } from './graphql/resolvers/index.js';
 
@@ -38,7 +38,6 @@ webpush.setVapidDetails('mailto:your-email@example.com', VAPID_PUBLIC_KEY, VAPID
 // WS STORAGE
 // ======================
 const clients = new Set();
-const pushSubscriptions = new Map();
 
 export function broadcast(event) {
   const msg = JSON.stringify(event);
@@ -50,24 +49,36 @@ export function broadcast(event) {
   });
 }
 
+// Функция отправки push с сохранением в БД
 async function sendPushNotification(userId, title, body, url = '/') {
-  const subscription = pushSubscriptions.get(userId);
-
-  if (!subscription) {
-    console.log(`Нет push подписки для пользователя ${userId}`);
-    return false;
-  }
-
-  const payload = JSON.stringify({ title, body, url });
-
   try {
+    // Ищем подписку в БД
+    const subscriptionRecord = await PushSubscription.findOne({ where: { userId } });
+
+    if (!subscriptionRecord) {
+      console.log(`Нет push подписки для пользователя ${userId}`);
+      return false;
+    }
+
+    const subscription = {
+      endpoint: subscriptionRecord.endpoint,
+      expirationTime: null,
+      keys: {
+        p256dh: subscriptionRecord.p256dh,
+        auth: subscriptionRecord.auth,
+      },
+    };
+
+    const payload = JSON.stringify({ title, body, url });
+
     await webpush.sendNotification(subscription, payload);
     console.log(`✅ Push отправлен пользователю ${userId}`);
     return true;
   } catch (error) {
     console.error(`❌ Ошибка push для ${userId}:`, error);
     if (error.statusCode === 410) {
-      pushSubscriptions.delete(userId);
+      // Подписка истекла - удаляем из БД
+      await PushSubscription.destroy({ where: { userId } });
     }
     return false;
   }
@@ -94,25 +105,41 @@ const startServer = async () => {
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
   // ======================
-  // PUSH ENDPOINTS
+  // PUSH ENDPOINTS С БД
   // ======================
 
-  app.post('/api/push/subscribe', (req, res) => {
+  app.post('/api/push/subscribe', async (req, res) => {
     const userId = req.headers['x-user-id'] || 'anonymous';
     const subscription = req.body;
 
-    pushSubscriptions.set(userId, subscription);
-    console.log(`✅ Push подписка сохранена для ${userId}`);
-    console.log(`📊 Всего подписок: ${pushSubscriptions.size}`);
+    try {
+      // Сохраняем или обновляем подписку в PostgreSQL
+      await PushSubscription.upsert({
+        userId,
+        endpoint: subscription.endpoint,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+      });
 
-    res.json({ success: true });
+      console.log(`✅ Push подписка сохранена для ${userId}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(`❌ Ошибка сохранения подписки:`, error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
-  app.post('/api/push/unsubscribe', (req, res) => {
+  app.post('/api/push/unsubscribe', async (req, res) => {
     const userId = req.headers['x-user-id'] || 'anonymous';
-    pushSubscriptions.delete(userId);
-    console.log(`❌ Push подписка удалена для ${userId}`);
-    res.json({ success: true });
+
+    try {
+      await PushSubscription.destroy({ where: { userId } });
+      console.log(`❌ Push подписка удалена для ${userId}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(`❌ Ошибка удаления подписки:`, error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
   app.post('/api/push/test', async (req, res) => {
