@@ -157,7 +157,7 @@ export default function PushManager() {
     );
   }
 
-  if (!swReady || permission === 'denied') return;
+  if (!swReady) return;
 
   return (
     <button
