@@ -130,6 +130,7 @@ const startServer = async () => {
   });
 
   app.post('/api/push/unsubscribe', async (req, res) => {
+    console.log('📦 req.body:', JSON.stringify(req.body, null, 2));
     const userId = req.headers['x-user-id'] || 'anonymous';
 
     try {
