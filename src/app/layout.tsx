@@ -8,6 +8,7 @@ import ModalLoading from '@/components/ModalLoading/ModalLoading';
 import { useLoading } from '@/contexts/LoadingContext';
 import { LoadingProvider } from '@/contexts/LoadingContext';
 import { chiron } from './fonts';
+import PushManager from '@/components/PushManager/PushManager';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
