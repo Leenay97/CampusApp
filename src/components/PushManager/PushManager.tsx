@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './PushManager.module.scss';
+import { useUser } from '@/contexts/UserContext';
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -22,6 +23,7 @@ export default function PushManager() {
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [loading, setLoading] = useState<boolean>(false);
   const [swReady, setSwReady] = useState<boolean>(false);
+  const { user } = useUser();
 
   const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
@@ -61,6 +63,8 @@ export default function PushManager() {
   async function subscribeToPush(): Promise<void> {
     setLoading(true);
 
+    if (!user?.id) return;
+
     try {
       let currentPermission: NotificationPermission = Notification.permission;
 
@@ -93,15 +97,13 @@ export default function PushManager() {
 
       console.log('Подписка создана:', subscription);
 
-      const userId = localStorage.getItem('userId') || 'anonymous';
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-      // ИСПРАВЛЕНО: добавил /api/ перед push/subscribe
       const response = await fetch(`${apiUrl}/api/push/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Id': userId,
+          'X-User-Id': user.id,
         },
         body: JSON.stringify(subscription.toJSON()),
       });
@@ -130,13 +132,13 @@ export default function PushManager() {
 
       if (subscription) {
         await subscription.unsubscribe();
+        if (!user?.id) return;
 
-        const userId = localStorage.getItem('userId') || 'anonymous';
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
         await fetch(`${apiUrl}/api/push/unsubscribe`, {
           method: 'POST',
-          headers: { 'X-User-Id': userId },
+          headers: { 'X-User-Id': user?.id },
         });
 
         setIsSubscribed(false);

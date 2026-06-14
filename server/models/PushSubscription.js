@@ -12,7 +12,6 @@ export const PushSubscription = sequelize.define(
     userId: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     endpoint: {
       type: DataTypes.STRING(500),
