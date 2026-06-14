@@ -97,6 +97,16 @@ const startServer = async () => {
   // PUSH ENDPOINTS
   // ======================
 
+  // Проверка статуса подписки
+  app.get('/api/push/check', async (req, res) => {
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.json({ hasSubscription: false });
+    }
+    const subscription = await PushSubscription.findOne({ where: { userId } });
+    res.json({ hasSubscription: !!subscription });
+  });
+
   app.post('/api/push/subscribe', async (req, res) => {
     console.log('📥 Получен запрос на подписку');
     console.log('📦 Тело:', JSON.stringify(req.body, null, 2));
@@ -173,6 +183,7 @@ const startServer = async () => {
   const httpServer = app.listen(PORT, () => {
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
     console.log(`📱 Push endpoint: http://localhost:5000/api/push/subscribe`);
+    console.log(`🔍 Check endpoint: http://localhost:5000/api/push/check`);
   });
 
   const wss = new WebSocketServer({

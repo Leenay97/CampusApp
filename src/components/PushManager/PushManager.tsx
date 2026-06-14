@@ -26,7 +26,9 @@ export default function PushManager() {
   const { user } = useUser();
 
   const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+  // Регистрация SW при загрузке
   useEffect(() => {
     const init = async () => {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -39,7 +41,6 @@ export default function PushManager() {
           });
           console.log('SW зарегистрирован:', registration);
           setSwReady(true);
-          await checkSubscription();
         } catch (error) {
           console.error('SW регистрация ошибка:', error);
         }
@@ -49,11 +50,27 @@ export default function PushManager() {
     init();
   }, []);
 
+  // Проверка статуса подписки при смене пользователя или готовности SW
+  useEffect(() => {
+    if (swReady) {
+      checkSubscription();
+    }
+  }, [swReady, user?.id]);
+
   async function checkSubscription(): Promise<void> {
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
-      setIsSubscribed(!!subscription);
+
+      if (subscription && user?.id) {
+        // Проверяем, есть ли эта подписка в базе для текущего пользователя
+        const response = await fetch(`${apiUrl}/api/push/check?userId=${user.id}`);
+        const data = await response.json();
+        setIsSubscribed(data.hasSubscription);
+      } else {
+        setIsSubscribed(false);
+      }
+
       setPermission(Notification.permission);
     } catch (error) {
       console.error('Ошибка проверки подписки:', error);
@@ -63,7 +80,11 @@ export default function PushManager() {
   async function subscribeToPush(): Promise<void> {
     setLoading(true);
 
-    if (!user?.id) return;
+    if (!user?.id) {
+      alert('Пожалуйста, авторизуйтесь');
+      setLoading(false);
+      return;
+    }
 
     try {
       let currentPermission: NotificationPermission = Notification.permission;
@@ -96,8 +117,6 @@ export default function PushManager() {
       });
 
       console.log('Подписка создана:', subscription);
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
       const response = await fetch(`${apiUrl}/api/push/subscribe`, {
         method: 'POST',
@@ -134,11 +153,9 @@ export default function PushManager() {
         await subscription.unsubscribe();
         if (!user?.id) return;
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
         await fetch(`${apiUrl}/api/push/unsubscribe`, {
           method: 'POST',
-          headers: { 'X-User-Id': user?.id },
+          headers: { 'X-User-Id': user.id },
         });
 
         setIsSubscribed(false);
