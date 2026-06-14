@@ -182,7 +182,11 @@ export default function PushManager() {
   }
 
   return (
-    <button onClick={isSubscribed ? unsubscribeFromPush : subscribeToPush} disabled={loading}>
+    <button
+      className={`${styles['push-manager']} ${isSubscribed ? styles['push-manager_enabled'] : styles['push-manager_disabled']}`}
+      onClick={isSubscribed ? unsubscribeFromPush : subscribeToPush}
+      disabled={loading || !swReady}
+    >
       {loading ? 'Загрузка...' : isSubscribed ? 'Отключить уведомления' : 'Включить уведомления'}
     </button>
   );
