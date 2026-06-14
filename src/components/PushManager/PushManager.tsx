@@ -96,7 +96,8 @@ export default function PushManager() {
       const userId = localStorage.getItem('userId') || 'anonymous';
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-      const response = await fetch(`${apiUrl}/push/subscribe`, {
+      // ИСПРАВЛЕНО: добавил /api/ перед push/subscribe
+      const response = await fetch(`${apiUrl}/api/push/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -82,7 +82,7 @@ const startServer = async () => {
   }
 
   app.use(cors());
-  app.use(express.json());
+  app.use(express.json({ limit: '10mb' }));
 
   app.use(
     graphqlUploadExpress({
@@ -94,50 +94,39 @@ const startServer = async () => {
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
   // ======================
-  // PUSH ENDPOINTS С РУЧНЫМ ПАРСИНГОМ
+  // PUSH ENDPOINTS
   // ======================
 
   app.post('/api/push/subscribe', async (req, res) => {
-    let rawBody = '';
-    req.on('data', (chunk) => {
-      rawBody += chunk;
-    });
-    req.on('end', async () => {
-      console.log('📦 raw body:', rawBody);
+    console.log('📥 Получен запрос на подписку');
+    console.log('📦 Тело:', JSON.stringify(req.body, null, 2));
 
-      let subscription;
-      try {
-        subscription = JSON.parse(rawBody);
-      } catch (e) {
-        subscription = req.body;
-      }
+    const userId = req.headers['x-user-id'] || 'anonymous';
+    const subscription = req.body;
 
-      const userId = req.headers['x-user-id'] || 'anonymous';
+    if (
+      !subscription ||
+      !subscription.endpoint ||
+      !subscription.keys ||
+      !subscription.keys.p256dh
+    ) {
+      console.error('❌ Невалидная подписка');
+      return res.status(400).json({ error: 'Invalid subscription' });
+    }
 
-      if (
-        !subscription ||
-        !subscription.endpoint ||
-        !subscription.keys ||
-        !subscription.keys.p256dh
-      ) {
-        console.error('❌ Невалидная подписка:', subscription);
-        return res.status(400).json({ error: 'Invalid subscription' });
-      }
-
-      try {
-        await PushSubscription.upsert({
-          userId,
-          endpoint: subscription.endpoint,
-          p256dh: subscription.keys.p256dh,
-          auth: subscription.keys.auth,
-        });
-        console.log(`✅ Push подписка сохранена для ${userId}`);
-        res.json({ success: true });
-      } catch (error) {
-        console.error(`❌ Ошибка сохранения подписки:`, error);
-        res.status(500).json({ error: 'Database error' });
-      }
-    });
+    try {
+      await PushSubscription.upsert({
+        userId,
+        endpoint: subscription.endpoint,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+      });
+      console.log(`✅ Push подписка сохранена для ${userId}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(`❌ Ошибка сохранения подписки:`, error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
   app.post('/api/push/unsubscribe', async (req, res) => {
@@ -183,7 +172,7 @@ const startServer = async () => {
 
   const httpServer = app.listen(PORT, () => {
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
-    console.log(`📱 Push endpoint: http://localhost:${PORT}/api/push/subscribe`);
+    console.log(`📱 Push endpoint: http://localhost:5000/api/push/subscribe`);
   });
 
   const wss = new WebSocketServer({
