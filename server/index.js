@@ -43,32 +43,38 @@ export function broadcast(event) {
 
 async function sendPushNotification(userId, title, body, url = '/') {
   try {
-    const subscriptionRecord = await PushSubscription.findOne({ where: { userId } });
+    const subscriptions = await PushSubscription.findAll({ where: { userId } });
 
-    if (!subscriptionRecord) {
-      console.log(`Нет push подписки для пользователя ${userId}`);
+    if (subscriptions.length === 0) {
+      console.log(`Нет push подписок для пользователя ${userId}`);
       return false;
     }
 
-    const subscription = {
-      endpoint: subscriptionRecord.endpoint,
-      expirationTime: null,
-      keys: {
-        p256dh: subscriptionRecord.p256dh,
-        auth: subscriptionRecord.auth,
-      },
-    };
-
-    const payload = JSON.stringify({ title, body, url });
-
-    await webpush.sendNotification(subscription, payload);
-    console.log(`✅ Push отправлен пользователю ${userId}`);
-    return true;
+    let successCount = 0;
+    for (const sub of subscriptions) {
+      const subscription = {
+        endpoint: sub.endpoint,
+        expirationTime: null,
+        keys: {
+          p256dh: sub.p256dh,
+          auth: sub.auth,
+        },
+      };
+      const payload = JSON.stringify({ title, body, url });
+      try {
+        await webpush.sendNotification(subscription, payload);
+        successCount++;
+      } catch (error) {
+        console.error(`❌ Ошибка отправки на ${sub.endpoint}:`, error.message);
+        if (error.statusCode === 410) {
+          await sub.destroy();
+        }
+      }
+    }
+    console.log(`✅ Push отправлен на ${successCount} устройств для пользователя ${userId}`);
+    return successCount > 0;
   } catch (error) {
     console.error(`❌ Ошибка push для ${userId}:`, error);
-    if (error.statusCode === 410) {
-      await PushSubscription.destroy({ where: { userId } });
-    }
     return false;
   }
 }
@@ -125,13 +131,26 @@ const startServer = async () => {
     }
 
     try {
-      await PushSubscription.upsert({
-        userId,
-        endpoint: subscription.endpoint,
-        p256dh: subscription.keys.p256dh,
-        auth: subscription.keys.auth,
+      const existing = await PushSubscription.findOne({
+        where: { endpoint: subscription.endpoint },
       });
-      console.log(`✅ Push подписка сохранена для ${userId}`);
+
+      if (existing) {
+        await existing.update({
+          userId,
+          p256dh: subscription.keys.p256dh,
+          auth: subscription.keys.auth,
+        });
+        console.log(`🔄 Подписка обновлена для ${userId}`);
+      } else {
+        await PushSubscription.create({
+          userId,
+          endpoint: subscription.endpoint,
+          p256dh: subscription.keys.p256dh,
+          auth: subscription.keys.auth,
+        });
+        console.log(`✅ Новая подписка создана для ${userId}`);
+      }
       res.json({ success: true });
     } catch (error) {
       console.error(`❌ Ошибка сохранения подписки:`, error);
@@ -144,7 +163,7 @@ const startServer = async () => {
 
     try {
       await PushSubscription.destroy({ where: { userId } });
-      console.log(`❌ Push подписка удалена для ${userId}`);
+      console.log(`❌ Push подписки удалены для ${userId}`);
       res.json({ success: true });
     } catch (error) {
       console.error(`❌ Ошибка удаления подписки:`, error);
