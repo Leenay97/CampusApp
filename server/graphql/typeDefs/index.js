@@ -9,6 +9,7 @@ import { technicalDataTypeDefs } from './technicalData.js';
 import { houseTypeDefs } from './house.js';
 import { postTypeDefs } from './post.js';
 import { classTypeDefs } from './class.js';
+import { pushTypeDefs } from './pushNotifications.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -22,4 +23,5 @@ export const typeDefs = [
   houseTypeDefs,
   postTypeDefs,
   classTypeDefs,
+  pushTypeDefs,
 ];

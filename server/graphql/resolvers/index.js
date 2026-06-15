@@ -8,6 +8,7 @@ import { technicalDataResolvers } from './technicalData.js';
 import { houseResolvers } from './house.js';
 import { postResolvers } from './post.js';
 import { classResolvers } from './class.js';
+import { pushResolvers } from './pushNotifications.js';
 
 export const resolvers = [
   userResolvers,
@@ -20,4 +21,5 @@ export const resolvers = [
   houseResolvers,
   postResolvers,
   classResolvers,
+  pushResolvers,
 ];
