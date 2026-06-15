@@ -8,48 +8,44 @@ import Post from '@/components/Post/Post';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Section from '@/components/Section/Section';
 import { useUser } from '@/contexts/UserContext';
+import { SEND_PUSH_ALL } from '@/graphql/mutations/SendPushAll';
 import { GET_POSTS } from '@/graphql/queries/GetPosts';
-import { useQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { useQuery, useMutation } from '@apollo/client';
+import { useState } from 'react';
 
 export default function InfoPage() {
   const { user } = useUser();
   const [showCreator, setShowCreator] = useState(false);
   const { data, loading, refetch } = useQuery(GET_POSTS);
+  const [sendPushToAll] = useMutation(SEND_PUSH_ALL);
+  const [title, setTitle] = useState<string>('');
+  const [text, setText] = useState<string>('');
 
-  useEffect(() => {
-    const ws = new WebSocket(`wss://${process.env.NEXT_PUBLIC_WSS_URL}`);
+  function handleChangeText(value: string) {
+    setText(value);
+  }
 
-    ws.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
+  function handleChangeTitle(value: string) {
+    setTitle(value);
+  }
 
-        if (msg.type === 'NEW_POST') {
-          refetch();
+  const handlePostCreated = async () => {
+    await refetch();
 
-          if (Notification.permission === 'granted') {
-            new Notification('Новый пост', {
-              body: msg.payload?.title ?? 'Без названия',
-            });
-          }
-        }
-      } catch (e) {
-        console.error('WS error:', e);
-      }
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, [refetch]);
-
-  useEffect(() => {
-    if ('Notification' in window) {
-      Notification.requestPermission();
+    try {
+      await sendPushToAll({
+        variables: {
+          title: `Новый пост от ${user?.name || 'Easy Campus'}`,
+          body: text,
+          url: '/information',
+        },
+      });
+    } catch (error) {
+      console.error('❌ Ошибка push:', error);
     }
-  }, []);
+  };
 
-  if (loading)
+  if (loading) {
     return (
       <CenteredContainer>
         <Section>
@@ -57,6 +53,8 @@ export default function InfoPage() {
         </Section>
       </CenteredContainer>
     );
+  }
+
   return (
     <CenteredContainer>
       {user?.userLevel !== 'STUDENT' && (
@@ -65,8 +63,16 @@ export default function InfoPage() {
       {data?.posts?.map((post: PostType) => (
         <Post key={post?.id} post={post} />
       ))}
-      <div className=""></div>
-      {showCreator && <CreatePostModal onSubmit={refetch} onClose={() => setShowCreator(false)} />}
+      {showCreator && (
+        <CreatePostModal
+          text={text}
+          title={title}
+          onTextChange={handleChangeText}
+          onTitleChange={handleChangeTitle}
+          onSubmit={handlePostCreated}
+          onClose={() => setShowCreator(false)}
+        />
+      )}
     </CenteredContainer>
   );
 }

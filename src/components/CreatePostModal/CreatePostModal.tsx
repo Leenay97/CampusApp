@@ -1,5 +1,5 @@
 'use client';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import styles from './CreatePostModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
@@ -14,13 +14,22 @@ import ModalBody from '../Modal/ModalBody';
 import ModalFooter from '../Modal/ModalFooter';
 
 type ModalProps = {
+  title: string;
+  text: string;
+  onTextChange: (value: string) => void;
+  onTitleChange: (value: string) => void;
   onClose: () => void;
   onSubmit: () => void;
 };
 
-function CreatePostModal({ onClose, onSubmit }: ModalProps) {
-  const [title, setTitle] = useState<string>('');
-  const [text, setText] = useState<string>('');
+function CreatePostModal({
+  title,
+  text,
+  onTextChange,
+  onTitleChange,
+  onClose,
+  onSubmit,
+}: ModalProps) {
   const [createPost] = useGlobalLoadingMutation(CREATE_POST);
 
   function handleClose() {
@@ -44,10 +53,10 @@ function CreatePostModal({ onClose, onSubmit }: ModalProps) {
       <ModalHeader title="Добавить пост" onClose={onClose} />
 
       <ModalBody>
-        <InputField placeholder="Название" value={title} onChange={setTitle} />
+        <InputField placeholder="Название" value={title} onChange={onTitleChange} />
         <SimpleMdeReact
           value={text}
-          onChange={setText}
+          onChange={onTextChange}
           options={{
             spellChecker: false,
             placeholder: 'Текст',
