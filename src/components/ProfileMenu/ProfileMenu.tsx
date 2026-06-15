@@ -7,6 +7,7 @@ import Image from 'next/image';
 import QRModal from '../QRModal/QRModal';
 import FineStudentModal from '../FineStudentModal/FineStudentModal';
 import { ChangeAvatarModal } from '../ChangeAvatarModal/ChangeAvatarModal';
+import PushManager from '../PushManager/PushManager';
 
 type ProfileMenuProps = {
   isOpen: boolean;
@@ -87,6 +88,7 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
           <div className={styles['profile-menu__option']} onClick={handleOpenAvatarModal}>
             Сменить аватар
           </div>
+          <PushManager />
           <div className={styles['profile-menu__option']} onClick={handleLogout}>
             Выйти
           </div>

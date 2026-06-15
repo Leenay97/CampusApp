@@ -1,4 +1,5 @@
 import { Post } from '../../models/index.js';
+import { broadcast } from '../../index.js'; // или путь где сервер
 
 export const postResolvers = {
   Query: {
@@ -9,9 +10,18 @@ export const postResolvers = {
   },
   Mutation: {
     createPost: async (_, { text, title }) => {
-      if (!text || !title) throw new Error('У поста должны быть текст и название');
+      if (!text || !title) {
+        throw new Error('У поста должны быть текст и название');
+      }
 
-      return await Post.create({ text, title });
+      const post = await Post.create({ text, title });
+
+      broadcast({
+        type: 'NEW_POST',
+        payload: post.toJSON(),
+      });
+
+      return post;
     },
     updatePost: async (_, { id, text, title }) => {
       const post = await Post.findByPk(id);
