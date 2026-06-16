@@ -2,13 +2,13 @@
 
 import Message from '@/components/Message/Message';
 import styles from './Chat.module.scss';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { Message as MessageType } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import { SEND_MESSAGE } from '@/graphql/mutations/SendMessage';
 import { MESSAGE_SENT } from '@/graphql/subscriptions/MessageSent';
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { GET_MESSAGES } from '@/graphql/queries/GetMessages';
 
 export default function GroupChat() {
@@ -17,25 +17,38 @@ export default function GroupChat() {
   const { user } = useUser();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { data } = useQuery(GET_MESSAGES, {
+  const { data, loading, subscribeToMore } = useQuery(GET_MESSAGES, {
     variables: { groupId: user?.group?.id || '' },
     skip: !user?.group?.id,
   });
 
-  const { data: subscriptionData } = useSubscription(MESSAGE_SENT, {
-    variables: { groupId: user?.group?.id || '' },
-    skip: !user?.group?.id,
-  });
+  useEffect(() => {
+    if (!user?.group?.id) return;
+
+    const unsubscribe = subscribeToMore({
+      document: MESSAGE_SENT,
+      variables: { groupId: user.group.id },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const newMessage = subscriptionData.data.messageSent;
+
+        const exists = prev.getMessages.some((msg: MessageType) => msg.id === newMessage.id);
+        if (exists) return prev;
+
+        return {
+          ...prev,
+          getMessages: [...prev.getMessages, newMessage],
+        };
+      },
+    });
+
+    return () => unsubscribe();
+  }, [subscribeToMore, user?.group?.id]);
 
   const messages: MessageType[] = useMemo(() => {
-    const existing = data?.getMessages || [];
-    const newMsg = subscriptionData?.messageSent;
-
-    if (newMsg && !existing.some((msg: MessageType) => msg.id === newMsg.id)) {
-      return [...existing, newMsg];
-    }
-    return existing;
-  }, [data, subscriptionData]);
+    return data?.getMessages || [];
+  }, [data]);
 
   const sortedMessages = useMemo(() => {
     return [...messages].sort((a, b) => {
@@ -44,6 +57,30 @@ export default function GroupChat() {
       return timeA - timeB;
     });
   }, [messages]);
+
+  const groupedMessages = useMemo(() => {
+    return sortedMessages.map((msg, index, arr) => {
+      const prevMsg = arr[index - 1];
+      const nextMsg = arr[index + 1];
+
+      const isFirstInGroup = !prevMsg || prevMsg.author.id !== msg.author.id;
+      const isLastInGroup = !nextMsg || nextMsg.author.id !== msg.author.id;
+      const showAvatar = isLastInGroup;
+
+      return {
+        ...msg,
+        showAvatar,
+        isFirstInGroup,
+        isLastInGroup,
+      };
+    });
+  }, [sortedMessages]);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [groupedMessages]);
 
   const handleSendMessage = useCallback(() => {
     if (!message.trim() || !user?.id || !user?.group?.id) return;
@@ -58,24 +95,25 @@ export default function GroupChat() {
     setMessage('');
   }, [user, message, sendMessage]);
 
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, [sortedMessages]);
+  if (loading) {
+    return <div>Загрузка...</div>;
+  }
 
   return (
     <div className={styles['chat']}>
       <div className={styles['chat__container']} ref={containerRef}>
-        {sortedMessages.map((msg) => (
+        {groupedMessages.map((msg) => (
           <Message
             key={msg.id}
-            userId={user?.id || ''}
+            userId={user?.id ?? ''}
             authorId={msg.author.id}
             text={msg.text}
             name={msg.author.name}
             role={msg.author.userLevel}
-            avatar=""
+            avatar={msg.author.photoUrl}
+            showAvatar={msg.showAvatar}
+            isFirstInGroup={msg.isFirstInGroup}
+            isLastInGroup={msg.isLastInGroup}
           />
         ))}
       </div>
@@ -92,17 +130,20 @@ export default function GroupChat() {
             }
           }}
         />
-        <button className={styles['chat__send-button']} onClick={handleSendMessage}>
+        <button
+          className={styles['chat__send-button']}
+          onClick={handleSendMessage}
+          disabled={!message.trim()}
+        >
           <svg
             width="24"
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#FFFFFF"
+            stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            rotate="45deg"
           >
             <line x1="12" y1="19" x2="12" y2="5"></line>
             <polyline points="5 12 12 5 19 12"></polyline>

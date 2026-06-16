@@ -9,6 +9,7 @@ export const GET_MESSAGES = gql`
         id
         name
         userLevel
+        photoUrl
       }
       createdAt
     }
