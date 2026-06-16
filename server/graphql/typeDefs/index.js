@@ -10,6 +10,7 @@ import { houseTypeDefs } from './house.js';
 import { postTypeDefs } from './post.js';
 import { classTypeDefs } from './class.js';
 import { pushTypeDefs } from './pushNotifications.js';
+import { messageTypeDefs } from './message.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -24,4 +25,5 @@ export const typeDefs = [
   postTypeDefs,
   classTypeDefs,
   pushTypeDefs,
+  messageTypeDefs,
 ];

@@ -25,6 +25,7 @@ import { CREATE_POST } from './CreatePost';
 import { CREATE_CLASS } from './CreateClass';
 import { UPLOAD_AVATAR } from './UploadAvatar';
 import { SEND_PUSH_ALL } from './SendPushAll';
+import { SEND_MESSAGE } from './SendMessage';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -54,5 +55,6 @@ export const mutations = {
   CREATE_CLASS,
   UPLOAD_AVATAR,
   SEND_PUSH_ALL,
+  SEND_MESSAGE,
 };
 export default mutations;

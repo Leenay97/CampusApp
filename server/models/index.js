@@ -12,6 +12,7 @@ import { House } from './House.js';
 import { Post } from './Post.js';
 import { Class } from './Class.js';
 import { PushSubscription } from './PushSubscription.js';
+import { Message } from './Message.js';
 
 // Сначала определите все ассоциации
 // Ассоциации Season
@@ -95,6 +96,9 @@ Class.hasMany(User, { foreignKey: 'classId', as: 'students' });
 // Ассоциация Class-Place
 Class.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
 
+Message.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
+User.hasMany(Message, { foreignKey: 'authorId', as: 'messages' });
+
 export {
   sequelize,
   User,
@@ -108,4 +112,5 @@ export {
   Post,
   Class,
   PushSubscription,
+  Message,
 };

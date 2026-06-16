@@ -18,6 +18,7 @@ import { GET_SEASON_STUDENTS } from './GetSeasonStudents';
 import { GET_POSTS } from './GetPosts';
 import { GET_CLASSES } from './GetClasses';
 import { GET_SEASON_GROUPS } from './GetSeasonGroups';
+import { GET_MESSAGES } from './GetMessages';
 
 export const queries = {
   GET_GROUPS,
@@ -40,5 +41,6 @@ export const queries = {
   GET_POSTS,
   GET_CLASSES,
   GET_SEASON_GROUPS,
+  GET_MESSAGES,
 };
 export default queries;

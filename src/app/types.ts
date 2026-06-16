@@ -111,4 +111,12 @@ export type Class = {
   level: number;
 };
 
+export type Message = {
+  id: string;
+  groupId: string;
+  text: string;
+  author: User;
+  createdAt: string;
+};
+
 export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';

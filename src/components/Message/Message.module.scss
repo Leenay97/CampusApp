@@ -1,0 +1,92 @@
+.message {
+    &:first-child {
+        margin-top: 20px;
+    }
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        font-size: 14px;
+        align-items: flex-end;
+
+        &__avatar {
+            height: 35px;
+            width: 35px;
+            background-color: green;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        &__popup {
+            background-color: white;
+            max-width: calc(100% - 60px);
+            padding: 10px 15px;
+            border-radius: 8px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        &__name {
+            color: var(--primary-button-color);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        &_incoming {
+            .message__popup {
+                box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: -8px;
+                    bottom: 0;
+                    width: 0;
+                    height: 0;
+                    border-style: solid;
+                    border-width: 0 0 30px 20px;
+                    border-color: transparent transparent white transparent;
+                }
+            }
+        }
+
+        &_teacher {
+            .message__popup {
+                color: rgba(255, 255, 255, 0.9);
+                background-color: var(--color-purple);
+                box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
+                &::before {
+                    content: '';
+                    border-color: transparent transparent var(--color-purple) transparent;
+                }
+            }
+            .message__name {
+                color: rgba(246, 241, 108, 0.9);
+            }
+        }
+
+        &_my {
+            flex-direction: row-reverse;
+            margin-right: 8px;
+            
+            .message__popup {
+                background-color: var(--primary-button-color);
+                color: white;
+                box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
+                
+                .message__name {
+                    color: rgba(255, 255, 255, 0.9);
+                }
+                
+                &::before {
+                    content: '';
+                    position: absolute;
+                    right: -8px;
+                    bottom: 0;
+                    width: 0;
+                    height: 0;
+                    border-style: solid;
+                    border-width: 20px 20px 30px 0;
+                    border-color: transparent transparent var(--primary-button-color) transparent;
+                }
+            }
+        }
+    }

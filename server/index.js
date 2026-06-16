@@ -2,10 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import { ApolloServer } from 'apollo-server-express';
 import { graphqlUploadExpress } from 'graphql-upload-minimal';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
 import webpush from 'web-push';
 import dotenv from 'dotenv';
 
@@ -14,6 +16,7 @@ dotenv.config();
 import { sequelize, PushSubscription } from './models/index.js';
 import { typeDefs } from './graphql/typeDefs/index.js';
 import { resolvers } from './graphql/resolvers/index.js';
+import { pubsub } from './graphql/pubsub.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,11 +102,6 @@ const startServer = async () => {
 
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  // ======================
-  // PUSH ENDPOINTS
-  // ======================
-
-  // Проверка статуса подписки
   app.get('/api/push/check', async (req, res) => {
     const userId = req.query.userId;
     if (!userId) {
@@ -187,35 +185,58 @@ const startServer = async () => {
     res.json({ success });
   });
 
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+  const httpServer = app.listen(PORT, () => {
+    console.log(`🚀 HTTP Server running on http://localhost:${PORT}`);
+  });
+
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql',
+  });
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: async () => {
+        return {
+          pubsub,
+          broadcast,
+          sendPushNotification,
+        };
+      },
+    },
+    wsServer,
+  );
+
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: () => ({
+    schema,
+    context: ({ req }) => ({
+      req,
+      pubsub,
       broadcast,
       sendPushNotification,
     }),
+    plugins: [
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
   });
 
   await server.start();
   server.applyMiddleware({ app });
 
-  const httpServer = app.listen(PORT, () => {
-    console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
-    console.log(`📱 Push endpoint: http://localhost:5000/api/push/subscribe`);
-    console.log(`🔍 Check endpoint: http://localhost:5000/api/push/check`);
-  });
-
-  const wss = new WebSocketServer({
-    server: httpServer,
-    path: '/ws',
-  });
-
-  wss.on('connection', (ws) => {
-    clients.add(ws);
-    ws.on('close', () => {
-      clients.delete(ws);
-    });
-  });
+  console.log(`🚀 GraphQL Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+  console.log(`🔌 WebSocket ready at ws://localhost:${PORT}/graphql`);
 
   try {
     await sequelize.authenticate();
