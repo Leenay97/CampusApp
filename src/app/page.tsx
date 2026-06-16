@@ -1,5 +1,6 @@
 import { AuthGuard } from '@/auth/AuthGuard';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import ChatButton from '@/components/ChatButton/ChatButton';
 import Header from '@/components/Header/Header';
 import TeamRaiting from '@components/TeamRaiting/TeamRaiting';
 
@@ -10,6 +11,7 @@ export default function Home() {
         <Header />
         <TeamRaiting />
       </CenteredContainer>
+      <ChatButton />
     </AuthGuard>
   );
 }
