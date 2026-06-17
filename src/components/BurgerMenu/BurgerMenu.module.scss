@@ -6,6 +6,8 @@
     z-index: 200;
     padding: 10px;
     padding-top: 50px;
+    opacity: 1;
+    transition: all 0.3s ease-in-out;
 
     &__wrapper {
         display: flex;
@@ -26,11 +28,6 @@
         justify-content: center;
         opacity: 1;
         touch-action: manipulation;
-
-        // &:hover {
-        //     background-color: #8dd0e1;
-        // }
-
     }
 
     &--hidden {
