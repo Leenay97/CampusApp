@@ -1,7 +1,7 @@
 import { AuthGuard } from '@/auth/AuthGuard';
 import Header from '@components/Header/Header';
 import { UserLevel } from '../types';
-import ChatButton from '@/components/ChatButton/ChatButton';
+import ChatButton from '@/components/Chat/ChatButton/ChatButton';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

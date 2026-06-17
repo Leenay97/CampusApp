@@ -6,12 +6,12 @@ import styles from './ChatButton.module.scss';
 export default function ChatButton() {
   const pathname = usePathname();
 
-  if (pathname === '/chats') {
+  if (pathname === '/chat') {
     return null;
   }
 
   function handleOpenChat() {
-    window.location.href = '/chats';
+    window.location.href = '/chat';
   }
 
   return (

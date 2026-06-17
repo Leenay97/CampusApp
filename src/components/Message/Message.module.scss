@@ -10,6 +10,10 @@
     margin-top: 20px;
   }
 
+  &:last-child {
+    margin-bottom: 20px;
+  }
+
   &__avatar {
     height: 35px;
     width: 35px;
