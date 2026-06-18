@@ -28,22 +28,38 @@ const uploadLink = createUploadLink({
   credentials: 'same-origin',
 });
 
-const wsLink = new GraphQLWsLink(
-  createClient({
-    url: process.env.NEXT_PUBLIC_API_URL?.replace('http', 'ws') + '/graphql',
-  }),
-);
+let wsLink: GraphQLWsLink | null = null;
+if (typeof window !== 'undefined' && typeof WebSocket !== 'undefined') {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const urlObj = new URL(apiUrl);
+    const wsProtocol = urlObj.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = urlObj.host;
+    const wsUrl = `${wsProtocol}//${wsHost}/graphql`;
 
-const splitLink = split(
-  ({ query }) => {
-    const definition = getMainDefinition(query);
-    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
-  },
-  wsLink,
-  uploadLink,
-);
+    wsLink = new GraphQLWsLink(
+      createClient({
+        url: wsUrl,
+      }),
+    );
+  } catch (e) {
+    console.error('Не удалось создать wsLink:', e);
+    wsLink = null;
+  }
+}
+
+const link = wsLink
+  ? split(
+      ({ query }) => {
+        const definition = getMainDefinition(query);
+        return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+      },
+      wsLink,
+      from([errorLink, uploadLink]),
+    )
+  : from([errorLink, uploadLink]);
 
 export const client = new ApolloClient({
-  link: from([errorLink, splitLink]),
+  link,
   cache: new InMemoryCache(),
 });
