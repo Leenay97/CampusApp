@@ -64,6 +64,12 @@
 
     &__edit {
         position: absolute;
+        right: 50px;
+        opacity: 0.5;
+    }
+
+    &__delete {
+        position: absolute;
         right: 20px;
         opacity: 0.5;
     }

@@ -2,13 +2,16 @@ import { Post as PostType } from '@/app/types';
 import DOMPurify from 'dompurify';
 import styles from './Post.module.scss';
 import EditButton from '../EditButton/EditButton';
+import DeleteButton from '../DeleteButton/DeleteButton';
 
 type PostProps = {
   post: PostType;
+  isEditable?: boolean;
   onEdit?: (post: PostType) => void;
+  onDelete?: (id: string) => Promise<void>;
 };
 
-export default function Post({ post, onEdit }: PostProps) {
+export default function Post({ post, isEditable = false, onEdit, onDelete }: PostProps) {
   const formattedDate = new Date(Number(post.createdAt)).toLocaleString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
@@ -23,7 +26,12 @@ export default function Post({ post, onEdit }: PostProps) {
     <div className={styles['post']}>
       <div className={styles['post__header']}>
         {post.title}
-        <EditButton className={styles['post__edit']} onClick={() => onEdit?.(post)} />
+        {isEditable && (
+          <EditButton className={styles['post__edit']} onClick={() => onEdit?.(post)} />
+        )}
+        {isEditable && (
+          <DeleteButton className={styles['post__delete']} onClick={() => onDelete?.(post.id)} />
+        )}
       </div>
       <div
         className={styles['post__body']}

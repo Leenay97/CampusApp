@@ -27,6 +27,7 @@ import { UPLOAD_AVATAR } from './UploadAvatar';
 import { SEND_PUSH_ALL } from './SendPushAll';
 import { SEND_MESSAGE } from './SendMessage';
 import { UPDATE_POST } from './UpdatePost';
+import { DELETE_POST } from './DeletePost';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -58,5 +59,6 @@ export const mutations = {
   UPLOAD_AVATAR,
   SEND_PUSH_ALL,
   SEND_MESSAGE,
+  DELETE_POST,
 };
 export default mutations;

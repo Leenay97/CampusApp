@@ -1,6 +1,6 @@
 'use client';
 
-import { Post as PostType } from '@/app/types';
+import { Post as PostType, UserLevel } from '@/app/types';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import CreatePostModal from '@/components/CreatePostModal/CreatePostModal';
 import Loader from '@/components/Loader/Loaader';
@@ -8,8 +8,10 @@ import Post from '@/components/Post/Post';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Section from '@/components/Section/Section';
 import { useUser } from '@/contexts/UserContext';
+import { DELETE_POST } from '@/graphql/mutations/DeletePost';
 import { SEND_PUSH_ALL } from '@/graphql/mutations/SendPushAll';
 import { GET_POSTS } from '@/graphql/queries/GetPosts';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { useQuery, useMutation } from '@apollo/client';
 import { useMemo, useState } from 'react';
 
@@ -19,6 +21,7 @@ export default function InfoPage() {
   const [editingPost, setEditingPost] = useState<PostType | null>(null);
   const { data, loading, refetch } = useQuery(GET_POSTS);
   const [sendPushToAll] = useMutation(SEND_PUSH_ALL);
+  const [deletePost] = useGlobalLoadingMutation(DELETE_POST);
 
   const [createTitle, setCreateTitle] = useState<string>('');
   const [createText, setCreateText] = useState<string>('');
@@ -57,6 +60,11 @@ export default function InfoPage() {
     setEditText('');
   }
 
+  async function handleDeletePost(id: string) {
+    await deletePost({ id });
+    refetch();
+  }
+
   const sortedPosts = useMemo(() => {
     if (!data?.posts) return [];
     return [...data.posts].sort((a, b) => b.createdAt - a.createdAt);
@@ -79,7 +87,13 @@ export default function InfoPage() {
       )}
 
       {sortedPosts.map((post: PostType) => (
-        <Post key={post.id} post={post} onEdit={handleEditPost} />
+        <Post
+          key={post.id}
+          post={post}
+          isEditable={user?.userLevel !== UserLevel.Student}
+          onEdit={handleEditPost}
+          onDelete={handleDeletePost}
+        />
       ))}
 
       {showCreator && (
