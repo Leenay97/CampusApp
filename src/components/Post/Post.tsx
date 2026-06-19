@@ -1,8 +1,14 @@
 import { Post as PostType } from '@/app/types';
 import ReactMarkdown from 'react-markdown';
 import styles from './Post.module.scss';
+import EditButton from '../EditButton/EditButton';
 
-export default function Post({ post }: { post: PostType }) {
+type PostProps = {
+  post: PostType;
+  onEdit?: (post: PostType) => void;
+};
+
+export default function Post({ post, onEdit }: PostProps) {
   const formattedDate = new Date(Number(post.createdAt)).toLocaleString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
@@ -15,7 +21,10 @@ export default function Post({ post }: { post: PostType }) {
 
   return (
     <div className={styles['post']}>
-      <div className={styles['post__header']}>{post.title}</div>
+      <div className={styles['post__header']}>
+        {post.title}
+        <EditButton className={styles['post__edit']} onClick={() => onEdit?.(post)} />
+      </div>
       <div className={styles['post__body']}>
         <ReactMarkdown>{post.text}</ReactMarkdown>
       </div>

@@ -6,14 +6,15 @@ type EditButtonProps = {
   size?: string;
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
+  className?: string;
   onClick?: () => void;
 };
 
-function EditButton({ size, type, disabled = false, onClick }: EditButtonProps) {
+function EditButton({ size, type, className, disabled = false, onClick }: EditButtonProps) {
   return (
     <button
       type={type}
-      className={styles['edit-button']}
+      className={`${styles['edit-button']} ${className}`}
       onClick={onClick}
       style={{ width: size, height: size }}
       disabled={disabled}

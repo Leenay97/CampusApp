@@ -16,18 +16,20 @@ import { useMemo, useState } from 'react';
 export default function InfoPage() {
   const { user } = useUser();
   const [showCreator, setShowCreator] = useState(false);
+  const [editingPost, setEditingPost] = useState<PostType | null>(null);
   const { data, loading, refetch } = useQuery(GET_POSTS);
   const [sendPushToAll] = useMutation(SEND_PUSH_ALL);
-  const [title, setTitle] = useState<string>('');
-  const [text, setText] = useState<string>('');
 
-  function handleChangeText(value: string) {
-    setText(value);
-  }
+  const [createTitle, setCreateTitle] = useState<string>('');
+  const [createText, setCreateText] = useState<string>('');
+  const [editTitle, setEditTitle] = useState<string>('');
+  const [editText, setEditText] = useState<string>('');
 
-  function handleChangeTitle(value: string) {
-    setTitle(value);
-  }
+  const handleEditPost = (post: PostType) => {
+    setEditingPost(post);
+    setEditTitle(post.title);
+    setEditText(post.text);
+  };
 
   const handlePostCreated = async () => {
     await refetch();
@@ -36,14 +38,24 @@ export default function InfoPage() {
       await sendPushToAll({
         variables: {
           title: `Новый пост от ${user?.name || 'Easy Campus'}`,
-          body: text,
+          body: createText,
           url: '/information',
         },
       });
     } catch (error) {
       console.error('❌ Ошибка push:', error);
     }
+
+    setCreateTitle('');
+    setCreateText('');
   };
+
+  async function handleEditSubmit() {
+    await refetch();
+    setEditingPost(null);
+    setEditTitle('');
+    setEditText('');
+  }
 
   const sortedPosts = useMemo(() => {
     if (!data?.posts) return [];
@@ -65,18 +77,42 @@ export default function InfoPage() {
       {user?.userLevel !== 'STUDENT' && (
         <PrimaryButton onClick={() => setShowCreator(true)}>Добавить пост</PrimaryButton>
       )}
+
       {sortedPosts.map((post: PostType) => (
-        <Post key={post?.id} post={post} />
+        <Post key={post.id} post={post} onEdit={handleEditPost} />
       ))}
+
       {showCreator && (
         <CreatePostModal
-          text={text}
-          title={title}
+          title={createTitle}
+          text={createText}
           userId={user?.id ?? ''}
-          onTextChange={handleChangeText}
-          onTitleChange={handleChangeTitle}
+          onTextChange={setCreateText}
+          onTitleChange={setCreateTitle}
           onSubmit={handlePostCreated}
-          onClose={() => setShowCreator(false)}
+          onClose={() => {
+            setShowCreator(false);
+            setCreateTitle('');
+            setCreateText('');
+          }}
+        />
+      )}
+
+      {editingPost && (
+        <CreatePostModal
+          editMode
+          postId={editingPost.id}
+          userId={user?.id ?? ''}
+          title={editTitle}
+          text={editText}
+          onTextChange={setEditText}
+          onTitleChange={setEditTitle}
+          onSubmit={handleEditSubmit}
+          onClose={() => {
+            setEditingPost(null);
+            setEditTitle('');
+            setEditText('');
+          }}
         />
       )}
     </CenteredContainer>

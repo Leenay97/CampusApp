@@ -52,4 +52,10 @@
             background-size: 20px;
         }
     }
+
+    &__edit {
+        position: absolute;
+        right: 20px;
+        opacity: 0.5;
+    }
 }
