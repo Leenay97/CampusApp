@@ -55,6 +55,8 @@ export type Post = {
   id: string;
   text: string;
   title: string;
+  createdAt: string;
+  author: User;
 };
 
 export type Season = {

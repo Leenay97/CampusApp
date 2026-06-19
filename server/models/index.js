@@ -99,6 +99,16 @@ Class.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
 Message.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
 User.hasMany(Message, { foreignKey: 'authorId', as: 'messages' });
 
+User.hasMany(Post, {
+  foreignKey: 'authorId',
+  as: 'posts',
+});
+
+Post.belongsTo(User, {
+  foreignKey: 'authorId',
+  as: 'author',
+});
+
 export {
   sequelize,
   User,

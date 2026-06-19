@@ -16,6 +16,7 @@ import ModalFooter from '../Modal/ModalFooter';
 type ModalProps = {
   title: string;
   text: string;
+  userId: string;
   onTextChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onClose: () => void;
@@ -25,6 +26,7 @@ type ModalProps = {
 function CreatePostModal({
   title,
   text,
+  userId,
   onTextChange,
   onTitleChange,
   onClose,
@@ -41,8 +43,10 @@ function CreatePostModal({
       await createPost({
         text,
         title,
+        authorId: userId,
       });
       onSubmit();
+      onClose();
     } catch (error) {
       console.error('Error creating workshop:', error);
     }
@@ -60,7 +64,7 @@ function CreatePostModal({
           options={{
             spellChecker: false,
             placeholder: 'Текст',
-            toolbar: ['bold', 'italic', 'heading', '|', 'unordered-list', 'ordered-list'],
+            toolbar: ['bold', 'italic'],
           }}
         />
       </ModalBody>

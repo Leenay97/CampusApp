@@ -1,20 +1,27 @@
-import { Post } from '../../models/index.js';
+import { Post, User } from '../../models/index.js';
 import { broadcast } from '../../index.js'; // или путь где сервер
 
 export const postResolvers = {
   Query: {
     posts: async () => {
-      console.log('HERE');
-      return await Post.findAll();
+      return await Post.findAll({
+        include: [
+          {
+            model: User,
+            as: 'author',
+            attributes: ['name', 'photoUrl'],
+          },
+        ],
+      });
     },
   },
   Mutation: {
-    createPost: async (_, { text, title }) => {
+    createPost: async (_, { text, title, authorId }) => {
       if (!text || !title) {
         throw new Error('У поста должны быть текст и название');
       }
 
-      const post = await Post.create({ text, title });
+      const post = await Post.create({ text, title, authorId });
 
       broadcast({
         type: 'NEW_POST',

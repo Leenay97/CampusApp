@@ -11,7 +11,7 @@ import { useUser } from '@/contexts/UserContext';
 import { SEND_PUSH_ALL } from '@/graphql/mutations/SendPushAll';
 import { GET_POSTS } from '@/graphql/queries/GetPosts';
 import { useQuery, useMutation } from '@apollo/client';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function InfoPage() {
   const { user } = useUser();
@@ -45,6 +45,11 @@ export default function InfoPage() {
     }
   };
 
+  const sortedPosts = useMemo(() => {
+    if (!data?.posts) return [];
+    return [...data.posts].sort((a, b) => b.createdAt - a.createdAt);
+  }, [data]);
+
   if (loading) {
     return (
       <CenteredContainer>
@@ -60,13 +65,14 @@ export default function InfoPage() {
       {user?.userLevel !== 'STUDENT' && (
         <PrimaryButton onClick={() => setShowCreator(true)}>Добавить пост</PrimaryButton>
       )}
-      {data?.posts?.map((post: PostType) => (
+      {sortedPosts.map((post: PostType) => (
         <Post key={post?.id} post={post} />
       ))}
       {showCreator && (
         <CreatePostModal
           text={text}
           title={title}
+          userId={user?.id ?? ''}
           onTextChange={handleChangeText}
           onTitleChange={handleChangeTitle}
           onSubmit={handlePostCreated}

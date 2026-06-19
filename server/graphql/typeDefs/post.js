@@ -5,6 +5,9 @@ export const postTypeDefs = gql`
     id: ID!
     title: String!
     text: String!
+    createdAt: String!
+    author: User
+    authorId: ID!
   }
 
   extend type Query {
@@ -12,7 +15,7 @@ export const postTypeDefs = gql`
   }
 
   extend type Mutation {
-    createPost(title: String!, text: String!): Post
+    createPost(title: String!, text: String!, authorId: ID!): Post
     updatePost(id: ID!, title: String, text: String): Post
     deletePost(id: ID!): Post
   }

@@ -6,6 +6,11 @@ export const GET_POSTS = gql`
       id
       title
       text
+      createdAt
+      author {
+        name
+        photoUrl
+      }
     }
   }
 `;
