@@ -4,7 +4,6 @@ import styles from './CreatePostModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import { InputField } from '../InputField/InputField';
-import SimpleMdeReact from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { CREATE_POST } from '@/graphql/mutations/CreatePost';
@@ -13,6 +12,7 @@ import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
 import ModalFooter from '../Modal/ModalFooter';
 import { UPDATE_POST } from '@/graphql/mutations/UpdatePost';
+import TiptapEditor from '../TiptapEditor/TiptapEditor';
 
 type ModalProps = {
   title: string;
@@ -74,15 +74,7 @@ function CreatePostModal({
       <ModalHeader title={editMode ? 'Редактировать пост' : 'Добавить пост'} onClose={onClose} />
       <ModalBody>
         <InputField placeholder="Название" value={title} onChange={onTitleChange} />
-        <SimpleMdeReact
-          value={text}
-          onChange={onTextChange}
-          options={{
-            spellChecker: false,
-            placeholder: 'Текст',
-            toolbar: ['bold', 'italic'],
-          }}
-        />
+        <TiptapEditor value={text} onChange={onTextChange} />
       </ModalBody>
       <ModalFooter>
         <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>

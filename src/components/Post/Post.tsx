@@ -1,5 +1,5 @@
 import { Post as PostType } from '@/app/types';
-import ReactMarkdown from 'react-markdown';
+import DOMPurify from 'dompurify';
 import styles from './Post.module.scss';
 import EditButton from '../EditButton/EditButton';
 
@@ -25,9 +25,12 @@ export default function Post({ post, onEdit }: PostProps) {
         {post.title}
         <EditButton className={styles['post__edit']} onClick={() => onEdit?.(post)} />
       </div>
-      <div className={styles['post__body']}>
-        <ReactMarkdown>{post.text}</ReactMarkdown>
-      </div>
+      <div
+        className={styles['post__body']}
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(post.text),
+        }}
+      />
       <div className={styles['post__footer']}>
         {post.author?.photoUrl && (
           <div className={styles['post__author']}>

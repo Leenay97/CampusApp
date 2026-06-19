@@ -18,6 +18,15 @@
         word-wrap: break-word;
         list-style-position: inside;
         padding: 10px 0;
+        
+        p {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        p:empty::before {
+            content: '\00a0';
+        }
     }
 
     &__footer {
