@@ -42,5 +42,5 @@ self.addEventListener('install', function (event) {
 
 self.addEventListener('activate', function (event) {
   console.log('[SW] Активирован');
-  // event.waitUntil(clients.claim());
+  event.waitUntil(clients.claim());
 });

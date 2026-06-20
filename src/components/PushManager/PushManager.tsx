@@ -36,8 +36,7 @@ export default function PushManager() {
 
         try {
           const registration = await navigator.serviceWorker.register('/sw.js', {
-            scope: '/',
-            updateViaCache: 'none',
+            scope: '/push/',
           });
           console.log('SW зарегистрирован:', registration);
           setSwReady(true);
