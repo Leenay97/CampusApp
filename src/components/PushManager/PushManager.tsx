@@ -29,25 +29,26 @@ export default function PushManager() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   // Регистрация SW при загрузке
-  useEffect(() => {
-    const init = async () => {
-      if ('serviceWorker' in navigator && 'PushManager' in window) {
-        setIsSupported(true);
+  // useEffect(() => {
+  //   const init = async () => {
+  //     if ('serviceWorker' in navigator && 'PushManager' in window) {
+  //       setIsSupported(true);
 
-        try {
-          const registration = await navigator.serviceWorker.register('/sw.js', {
-            scope: '/push/',
-          });
-          console.log('SW зарегистрирован:', registration);
-          setSwReady(true);
-        } catch (error) {
-          console.error('SW регистрация ошибка:', error);
-        }
-      }
-    };
+  //       try {
+  //         const registration = await navigator.serviceWorker.register('/sw.js', {
+  //           scope: '/',
+  //           updateViaCache: 'none',
+  //         });
+  //         console.log('SW зарегистрирован:', registration);
+  //         setSwReady(true);
+  //       } catch (error) {
+  //         console.error('SW регистрация ошибка:', error);
+  //       }
+  //     }
+  //   };
 
-    init();
-  }, []);
+  //   init();
+  // }, []);
 
   // Проверка статуса подписки при смене пользователя или готовности SW
   useEffect(() => {
