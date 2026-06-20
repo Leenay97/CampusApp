@@ -35,7 +35,7 @@ if (typeof window !== 'undefined' && typeof WebSocket !== 'undefined') {
     const urlObj = new URL(apiUrl);
     const wsProtocol = urlObj.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = urlObj.host;
-    const wsUrl = `${wsProtocol}//${wsHost}/graphql`;
+    const wsUrl = `${wsProtocol}//${wsHost}/api/graphql`;
 
     wsLink = new GraphQLWsLink(
       createClient({
