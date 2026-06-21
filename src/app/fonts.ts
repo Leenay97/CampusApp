@@ -1,6 +1,7 @@
-import localFont from 'next/font/local';
+import { Roboto } from 'next/font/google';
 
-export const chiron = localFont({
-  src: '../assets/fonts/ChironGoRoundTC-VariableFont_wght.ttf',
+export const roboto = Roboto({
+  weight: ['400', '700'],
+  subsets: ['latin', 'cyrillic'],
   display: 'swap',
 });
