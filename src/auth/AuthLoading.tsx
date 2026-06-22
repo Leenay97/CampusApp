@@ -10,9 +10,6 @@ export default function AuthLoading(): JSX.Element {
     <FullscreenContainer>
       <div className={styles['loading-wrapper']}>
         <Image src={Logo} alt="Loading..." width={200} />
-        <div className={styles['progress-bar']}>
-          <div className={styles['progress-fill']} style={{ width: '100%' }} />
-        </div>
       </div>
     </FullscreenContainer>
   );
