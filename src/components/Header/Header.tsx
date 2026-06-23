@@ -80,15 +80,6 @@ function Header() {
 
   return (
     <div className={`${styles['header']} ${!isVisible ? styles['header--hidden'] : ''}`}>
-      {(isBurgerOpen || isProfileOpen) && (
-        <div
-          className={styles['backdrop']}
-          onClick={() => {
-            setIsBurgerOpen(false);
-            setIsProfileOpen(false);
-          }}
-        />
-      )}
       <div
         className={isBurgerOpen ? styles['header__container--white'] : styles['header__container']}
       >
