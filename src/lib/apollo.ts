@@ -30,7 +30,7 @@ const uploadLink = createUploadLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: process.env.NEXT_PUBLIC_API_URL?.replace('http', 'ws') + '/graphql',
+    url: process.env.NEXT_PUBLIC_API_URL?.replace('http', 'ws') + '/ws',
   }),
 );
 
