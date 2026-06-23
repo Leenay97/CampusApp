@@ -40,7 +40,6 @@
 }
 
 body {
-  background-image: url('/img/bg-colored.png');
   background-size: 200px;
   background-repeat: repeat;
   color: var(--foreground);
