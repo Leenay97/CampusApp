@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './Header.module.scss';
 import { Burger } from '../Burger/Burger';
 import BurgerMenu from '../BurgerMenu/BurgerMenu';
@@ -17,6 +17,7 @@ function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const { user } = useUser();
   const { app } = useApp();
+  const headerRef = useRef<HTMLDivElement>(null);
 
   const userLevel = useMemo(() => {
     return user?.userLevel;
@@ -67,6 +68,27 @@ function Header() {
   }, [isBurgerOpen, isProfileOpen]);
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (
+        (isBurgerOpen || isProfileOpen) &&
+        headerRef.current &&
+        !headerRef.current.contains(target)
+      ) {
+        setIsBurgerOpen(false);
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isBurgerOpen, isProfileOpen]);
+
+  useEffect(() => {
     const checkWidth = () => {
       setIsBurgerOpen(false);
       setIsProfileOpen(false);
@@ -81,6 +103,7 @@ function Header() {
   return (
     <div className={`${styles['header']} ${!isVisible ? styles['header--hidden'] : ''}`}>
       <div
+        ref={headerRef}
         className={isBurgerOpen ? styles['header__container--white'] : styles['header__container']}
       >
         {isBurgerOpen && app?.todayPlace?.name ? (
