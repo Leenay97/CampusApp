@@ -193,7 +193,7 @@ const startServer = async () => {
 
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/graphql',
+    path: '/ws',
   });
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
