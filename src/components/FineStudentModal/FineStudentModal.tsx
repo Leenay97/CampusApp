@@ -45,20 +45,20 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
 
   const title = 'Оштрафовать';
 
-  const handleClose = () => {
+  function handleClose() {
     resetState();
     onClose();
-  };
+  }
 
-  const resetState = () => {
+  function resetState() {
     setStudent(null);
     setGroupName('');
     setError('');
     setLoading(false);
     setScanCompleted(false);
-  };
+  }
 
-  const handleScan = async (detectedCodes: IDetectedBarcode[]) => {
+  async function handleScan(detectedCodes: IDetectedBarcode[]) {
     if (detectedCodes.length > 0 && !loading && !userLoading && !student) {
       setLoading(true);
       setError('');
@@ -77,7 +77,7 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
         setLoading(false);
       }
     }
-  };
+  }
 
   async function handleFine() {
     if (!student?.id) return;
@@ -93,14 +93,14 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
     }
   }
 
-  const handleReset = () => {
+  function handleReset() {
     resetState();
-  };
+  }
 
-  const handleError = (error: unknown) => {
+  function handleError(error: unknown) {
     console.error('Ошибка сканера:', error);
     setError('Не удалось получить доступ к камере. Проверьте разрешения.');
-  };
+  }
 
   const showScanner = !student && !userLoading && !scanCompleted;
   const showStudentInfo = student && scanCompleted;

@@ -15,13 +15,15 @@ import ModalFooter from '../Modal/ModalFooter';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
 
+type WorkshopDate = {
+  label: string;
+  value: string;
+  timestamp: number;
+};
+
 type ModalProps = {
   sportTime?: boolean;
-  allDates: {
-    label: string;
-    value: string;
-    timestamp: number;
-  }[];
+  allDates: WorkshopDate[];
   selectedDate: string;
   onDateChange: (e: ChangeEvent<HTMLSelectElement, Element>) => void;
   onClose: () => void;

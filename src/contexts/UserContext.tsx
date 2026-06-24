@@ -8,9 +8,13 @@ interface UserContextType {
   logout: () => void;
 }
 
+type UserProviderProps = {
+  children: ReactNode;
+};
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export function UserProvider({ children }: { children: ReactNode }) {
+export function UserProvider({ children }: UserProviderProps) {
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window === 'undefined') return null;
     const storedToken = localStorage.getItem('token');
@@ -21,11 +25,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return null;
   });
 
-  const logout = () => {
+  function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-  };
+  }
 
   return <UserContext.Provider value={{ user, setUser, logout }}>{children}</UserContext.Provider>;
 }

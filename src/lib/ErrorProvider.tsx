@@ -7,18 +7,22 @@ type ErrorContextType = {
   showError: (message: string) => void;
 };
 
+type ErrorProviderProps = {
+  children: ReactNode;
+};
+
 const ErrorContext = createContext<ErrorContextType | null>(null);
 
-export function ErrorProvider({ children }: { children: ReactNode }) {
+export function ErrorProvider({ children }: ErrorProviderProps) {
   const [error, setError] = useState<string | null>(null);
 
-  const showError = (message: string) => {
+  function showError(message: string) {
     setError(message);
-  };
+  }
 
-  const closeError = () => {
+  function closeError() {
     setError(null);
-  };
+  }
 
   return (
     <ErrorContext.Provider value={{ showError }}>

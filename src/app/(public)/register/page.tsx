@@ -15,7 +15,6 @@ import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { REGISTER_STUDENT } from '@/graphql/mutations/RegisterStudent';
 
-// Компонент, который использует useSearchParams
 function RegisterForm() {
   const [name, setName] = useState<string>('');
   const [login, setLogin] = useState<string>('');

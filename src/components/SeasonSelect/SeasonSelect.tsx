@@ -11,11 +11,11 @@ type CustomSelectProps = {
 export function SeasonSelect({ seasons, value, onChange }: CustomSelectProps) {
   const [showSeasons, setShowSeasons] = useState<boolean>(false);
 
-  const handleSeasonSelect = (season: Season) => {
+  function handleSeasonSelect(season: Season) {
     if (season?.isArchived) return;
     onChange(season);
     setShowSeasons(false);
-  };
+  }
 
   const sortedSeasons = useMemo(() => {
     if (!seasons) return [];

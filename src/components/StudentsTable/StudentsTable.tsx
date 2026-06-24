@@ -7,27 +7,26 @@ import EditStudentModal from '../EditStudentModal/EditStudentModal';
 type SortField = 'name' | 'group' | 'house' | 'coins' | 'class' | 'englishLevel';
 type SortOrder = 'asc' | 'desc';
 
-export default function StudentsTable({
-  students,
-  refetch,
-}: {
+type StudentsTableProps = {
   students: User[];
   refetch: () => void;
-}) {
+};
+
+export default function StudentsTable({ students, refetch }: StudentsTableProps) {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [selectedStudent, setSelectedStudent] = useState<User | null>(null);
 
-  const handleSort = (field: SortField) => {
+  function handleSort(field: SortField) {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
       setSortOrder('asc');
     }
-  };
+  }
 
-  const getSortValue = (student: User, field: SortField): string | number => {
+  function getSortValue(student: User, field: SortField): string | number {
     switch (field) {
       case 'name':
         return student?.name || '';
@@ -44,7 +43,7 @@ export default function StudentsTable({
       default:
         return '';
     }
-  };
+  }
 
   const sortedStudents = useMemo(() => {
     if (!students || students.length === 0) return [];
@@ -68,10 +67,10 @@ export default function StudentsTable({
     });
   }, [students, sortField, sortOrder]);
 
-  const getSortIcon = (field: SortField) => {
+  function getSortIcon(field: SortField) {
     if (sortField !== field) return '';
     return sortOrder === 'asc' ? '↑' : '↓';
-  };
+  }
 
   if (students.length === 0) {
     return (

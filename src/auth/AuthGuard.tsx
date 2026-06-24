@@ -28,14 +28,14 @@ interface GroupPlace {
   placeId: string;
 }
 
-export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) => {
+export function AuthGuard({ allowedRoles, children }: AuthGuardProps) {
   const { user, setUser } = useUser();
   const { app, setApp } = useApp();
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [getPlace, { data: placeData }] = useLazyQuery(queries.GET_PLACE);
 
-  const getUserId = (): string | null => {
+  function getUserId(): string | null {
     if (typeof window === 'undefined') return null;
     const token = localStorage.getItem('token');
     if (!token) return null;
@@ -46,7 +46,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
       localStorage.removeItem('token');
       return null;
     }
-  };
+  }
 
   const userId = getUserId();
 
@@ -105,7 +105,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
   }, [placeData, app, setApp]);
 
   useEffect(() => {
-    const checkAuth = () => {
+    function checkAuth() {
       if (!userId) {
         router.push('/login');
         return;
@@ -119,7 +119,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
       if (user) {
         setIsAuthorized(true);
       }
-    };
+    }
 
     checkAuth();
   }, [user, allowedRoles, router, userId]);
@@ -127,4 +127,4 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles, children }) 
   if (isAuthorized === null || loading) return <AuthLoading />;
 
   return <>{children}</>;
-};
+}

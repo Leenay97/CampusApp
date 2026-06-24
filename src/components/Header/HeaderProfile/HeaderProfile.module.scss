@@ -22,20 +22,4 @@
         border-radius: 20px;
         overflow: hidden;
     }
-    &__info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    &__balance {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        font-size: 14px;
-        gap: 5px;
-        img {
-            height: 12px;
-            width: 12px;
-        }
-    }
 }

@@ -24,7 +24,6 @@ type ResultType = {
   };
 };
 
-// Компонент, который использует useSearchParams
 function RegisterTeacherForm() {
   const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
   const [login, setLogin] = useState<string>('');
@@ -93,7 +92,6 @@ function RegisterTeacherForm() {
   );
 }
 
-// Основной компонент страницы с Suspense
 function RegisterTeacherPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

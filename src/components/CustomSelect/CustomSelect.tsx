@@ -26,11 +26,11 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
   const selectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    function handleClickOutside(event: MouseEvent) {
       if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
         setShowItems(false);
       }
-    };
+    }
 
     document.addEventListener('mousedown', handleClickOutside);
 
@@ -52,21 +52,21 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
       item?.russianName?.toLowerCase().includes(filterValue.toLowerCase()),
   );
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setFilterValue(event.target.value);
-  };
+  }
 
-  const handleItemSelect = (item: T) => {
+  function handleItemSelect(item: T) {
     onChange(item);
     setValue(item?.name ?? item?.russianName ?? '');
     setShowItems(false);
-  };
+  }
 
-  const handleClean = () => {
+  function handleClean() {
     const emptyItem = items.find((item) => item.id === '') ?? ({ id: '', name: '' } as T);
     onChange(emptyItem);
     setValue('');
-  };
+  }
 
   return (
     <div ref={selectRef} className={styles['custom-select']} style={{ width }}>

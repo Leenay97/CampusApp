@@ -27,6 +27,11 @@ type EnglishLevelOption = {
   name: EnglishLevel;
 };
 
+type SelectOption = {
+  id: string;
+  name: string;
+};
+
 function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
   const [name, setName] = useState<string>('');
   const [coins, setCoins] = useState<string>(student.coins ? String(student.coins) : '0');
@@ -60,18 +65,18 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
     setName(value);
   }
 
-  function handleChangeGroup({ id, name }: { id: string; name: string }) {
+  function handleChangeGroup({ id, name }: SelectOption) {
     setGroup({ id, name });
   }
 
-  function handleChangeClass({ id, name }: { id: string; name: string }) {
+  function handleChangeClass({ id, name }: SelectOption) {
     setEnglishClass({ id, name });
   }
 
   function handleChangeCoins(value: string) {
     setCoins(value);
   }
-  function handleChangeHouse({ id, name }: { id: string; name: string }) {
+  function handleChangeHouse({ id, name }: SelectOption) {
     setHouse({ id, name });
   }
 

@@ -10,21 +10,29 @@ type LoadingContextType = {
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
-export const LoadingProvider = ({ children }: { children: ReactNode }) => {
+type LoadingProviderProps = {
+  children: ReactNode;
+};
+
+export function LoadingProvider({ children }: LoadingProviderProps) {
   const [loadingState, setLoadingState] = useState<LoadingType | null>(null);
 
-  const showLoading = (state: LoadingType = 'LOADING') => setLoadingState(state);
-  const hideLoading = () => setLoadingState(null);
+  function showLoading(state: LoadingType = 'LOADING') {
+    setLoadingState(state);
+  }
+  function hideLoading() {
+    setLoadingState(null);
+  }
 
   return (
     <LoadingContext.Provider value={{ showLoading, hideLoading, loadingState }}>
       {children}
     </LoadingContext.Provider>
   );
-};
+}
 
-export const useLoading = () => {
+export function useLoading() {
   const context = useContext(LoadingContext);
   if (!context) throw new Error('useLoading must be used within LoadingProvider');
   return context;
-};
+}

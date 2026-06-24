@@ -32,7 +32,7 @@
     }
 
     &__search {
-        height: var(--input-button-height);;
+        height: var(--input-button-height);
         width: 100%;
         border: 0;
         padding: 0 10px;
@@ -44,7 +44,7 @@
         &:focus {
         outline: none !important;
         box-shadow: none !important;
-        border-color: #ccc !important; /* цвет как у обычного состояния */
+        border-color: #ccc !important;
 }
     }
 

@@ -65,32 +65,4 @@
         height: auto;
         object-fit: contain;
     }
-    
-    &__menu {
-        display: flex;
-        height: 100%;
-        width: 800px;
-        justify-content: space-between;
-    }
-    &__menu-option {
-        padding: 10px 20px;
-        width: 100%;
-        color: var(--text-primary);
-        cursor: pointer;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        // &:hover {
-        //     background-color: #8dd0e1;
-        // }
-    }
-}
-
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: transparent;
-  z-index: 150;
 }

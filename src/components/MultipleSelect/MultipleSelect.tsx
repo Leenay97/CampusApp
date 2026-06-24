@@ -14,9 +14,9 @@ export function MultipleSelect<
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setFilterValue(event.target.value);
-  };
+  }
 
   const availableItems = useMemo(() => {
     return items
@@ -27,16 +27,16 @@ export function MultipleSelect<
       .sort((a, b) => (a.russianName ?? a.name).localeCompare(b.russianName ?? b.name));
   }, [items, value, filterValue]);
 
-  const handleSelect = (item: T) => {
+  function handleSelect(item: T) {
     onChange([...value, item]);
     setFilterValue('');
 
     inputRef.current?.focus();
-  };
+  }
 
-  const handleRemove = (item: T) => {
+  function handleRemove(item: T) {
     onChange(value.filter((v) => v.id !== item.id));
-  };
+  }
 
   return (
     <div className={styles['multiple-select']}>

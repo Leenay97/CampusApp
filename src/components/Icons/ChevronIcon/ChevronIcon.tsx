@@ -1,4 +1,8 @@
-export default function ChevronIcon({ isOpen }: { isOpen: boolean }) {
+type ChevronIconProps = {
+  isOpen: boolean;
+};
+
+export default function ChevronIcon({ isOpen }: ChevronIconProps) {
   return (
     <svg
       width="16"

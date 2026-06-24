@@ -1,39 +1,38 @@
 import { useState, useRef, useEffect } from 'react';
 
-const colors = [
-  '#EF4444', // red
-  '#F97316', // orange
-  '#F59E0B', // amber
-  '#84CC16', // lime
-  '#22C55E', // green
-  '#10B981', // emerald
-  '#14B8A6', // teal
-  '#06B6D4', // cyan
-  '#0EA5E9', // sky
-  '#3B82F6', // blue
-  '#6366F1', // indigo
-  '#8B5CF6', // violet
-  '#A855F7', // purple
-  '#D946EF', // fuchsia
-  '#EC4899', // pink
-];
-
-export default function ColorPicker({
-  value,
-  onChange,
-}: {
+type ColorPickerProps = {
   value: string;
   onChange: (color: string) => void;
-}) {
+};
+
+const colors = [
+  '#EF4444',
+  '#F97316',
+  '#F59E0B',
+  '#84CC16',
+  '#22C55E',
+  '#10B981',
+  '#14B8A6',
+  '#06B6D4',
+  '#0EA5E9',
+  '#3B82F6',
+  '#6366F1',
+  '#8B5CF6',
+  '#A855F7',
+  '#D946EF',
+  '#EC4899',
+];
+
+export default function ColorPicker({ value, onChange }: ColorPickerProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    function handleClick(e: MouseEvent) {
       if (!ref.current?.contains(e.target as Node)) {
         setOpen(false);
       }
-    };
+    }
 
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -41,7 +40,6 @@ export default function ColorPicker({
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      {/* current color */}
       <div
         onClick={() => setOpen(!open)}
         style={{

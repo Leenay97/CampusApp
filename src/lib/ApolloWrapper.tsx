@@ -5,7 +5,11 @@ import { ApolloProvider } from '@apollo/client';
 import { client, setGlobalErrorHandler } from './apollo';
 import { ErrorProvider, useGlobalError } from './ErrorProvider';
 
-function ApolloWithError({ children }: { children: ReactNode }) {
+type ApolloWrapperProps = {
+  children: ReactNode;
+};
+
+function ApolloWithError({ children }: ApolloWrapperProps) {
   const { showError } = useGlobalError();
 
   useEffect(() => {
@@ -15,7 +19,7 @@ function ApolloWithError({ children }: { children: ReactNode }) {
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
 
-export function ApolloWrapper({ children }: { children: ReactNode }) {
+export function ApolloWrapper({ children }: ApolloWrapperProps) {
   return (
     <ErrorProvider>
       <ApolloWithError>{children}</ApolloWithError>

@@ -1,5 +1,4 @@
 .map-wrapper {
-  margin-top: 20px;
   width: 100%;
   height: auto;
   border: 1px solid #ccc;
@@ -7,8 +6,7 @@
   overflow: hidden;
   background-color: #f5f5f5;
   margin-top: -10px;
-  
-  // Отключаем pointer-events для дочерних элементов
+
   * {
     pointer-events: auto;
   }

@@ -60,7 +60,7 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
     [],
   );
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
@@ -77,9 +77,9 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
     setOriginalFile(selectedFile);
     const imageUrl = URL.createObjectURL(selectedFile);
     setImage(imageUrl);
-  };
+  }
 
-  const getCroppedBlob = async (): Promise<Blob> => {
+  async function getCroppedBlob(): Promise<Blob> {
     if (!image || !croppedAreaPixels) {
       throw new Error('No image or crop area');
     }
@@ -128,9 +128,9 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
         0.9,
       );
     });
-  };
+  }
 
-  const handleSaveAvatar = async () => {
+  async function handleSaveAvatar() {
     if (!originalFile || !userId) return;
 
     try {
@@ -160,12 +160,12 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
       console.error('Upload error:', error);
       alert('Ошибка при загрузке изображения');
     }
-  };
+  }
 
-  const handleCancelCrop = () => {
+  function handleCancelCrop() {
     setImage(null);
     setOriginalFile(null);
-  };
+  }
 
   return (
     <Modal onClose={onClose} className={styles['modal-content']}>

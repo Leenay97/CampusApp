@@ -25,6 +25,11 @@ type ModalProps = {
   onClose: () => void;
 };
 
+type GroupSelection = {
+  id: string;
+  name: string;
+};
+
 function TransferCoinsModal({ onClose }: ModalProps) {
   const [selectedGroup, setSelectedGroup] = useState({ id: '', name: '' });
   const [selectedStudent, setSelectedStudent] = useState({ id: '', name: '' });
@@ -71,7 +76,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     }
   }, [showScanner]);
 
-  function handleChangeGroup({ id, name }: { id: string; name: string }) {
+  function handleChangeGroup({ id, name }: GroupSelection) {
     setSelectedGroup({ id, name });
     setSelectedStudent({ id: '', name: '' });
     setCoins('');
@@ -123,20 +128,19 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     }
   }
 
-  const handleError = (error: unknown) => {
+  function handleError(error: unknown) {
     console.error('Ошибка сканера:', error);
     setError('Не удалось получить доступ к камере. Проверьте разрешения.');
     setShowScanner(false);
-  };
+  }
 
-  const toggleScanner = () => {
+  function toggleScanner() {
     setShowScanner((prev) => !prev);
     setError('');
-  };
+  }
 
   const showLoader = userLoading || groupsLoading || loading;
 
-  // Если открыт сканер — показываем только его
   if (showScanner) {
     return (
       <Modal onClose={onClose}>
@@ -164,7 +168,6 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     );
   }
 
-  // Если сканер закрыт — показываем форму
   return (
     <Modal onClose={onClose}>
       <ModalHeader title="Перевести Coins" onClose={onClose} />
