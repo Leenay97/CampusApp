@@ -1,9 +1,9 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import styles from './ChatButton.module.scss';
+import styles from './StaffChatButton.module.scss';
 
-export default function ChatButton() {
+export default function StaffChatButton() {
   const pathname = usePathname();
 
   if (pathname === '/chat' || pathname === '/staff-chat') {
@@ -11,7 +11,7 @@ export default function ChatButton() {
   }
 
   function handleOpenChat() {
-    window.location.href = '/chat';
+    window.location.href = '/staff-chat';
   }
 
   return (
@@ -26,7 +26,13 @@ export default function ChatButton() {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        <rect x="3" y="4" width="18" height="12" rx="2"></rect>
+
+        <path d="M8 20h8"></path>
+        <path d="M12 16v4"></path>
+
+        <path d="M7 8h10"></path>
+        <path d="M7 12h6"></path>
       </svg>
     </div>
   );

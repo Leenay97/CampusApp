@@ -4,6 +4,12 @@ import { createUploadLink } from 'apollo-upload-client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { loadErrorMessages, loadDevMessages } from '@apollo/client/dev';
+
+if (process.env.NODE_ENV !== 'production') {
+  loadDevMessages();
+  loadErrorMessages();
+}
 
 let globalErrorHandler: ((message: string) => void) | null = null;
 

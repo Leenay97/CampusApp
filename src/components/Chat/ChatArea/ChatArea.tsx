@@ -33,7 +33,7 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
 
       const isFirstInGroup = !prevMsg || prevMsg.author.id !== msg.author.id;
       const isLastInGroup = !nextMsg || nextMsg.author.id !== msg.author.id;
-      const showAvatar = isLastInGroup;
+      const showAvatar = isLastInGroup && msg.author.id !== userId;
 
       return {
         ...msg,
@@ -42,7 +42,7 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
         isLastInGroup,
       };
     });
-  }, [sortedMessages]);
+  }, [sortedMessages, userId]);
 
   return (
     <div className={styles['chat-area']} ref={containerRef}>

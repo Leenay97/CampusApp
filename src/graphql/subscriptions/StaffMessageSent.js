@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
-export const MESSAGE_SENT = gql`
-  subscription OnMessageSent($groupId: ID!) {
-    messageSent(groupId: $groupId) {
+export const STAFF_MESSAGE_SENT = gql`
+  subscription OnStaffMessageSent {
+    staffMessageSent {
       id
       text
       createdAt

@@ -20,13 +20,14 @@ export default function Chat({ messages, userId, groupId, loading }: ChatProps) 
   const [sendMessage] = useMutation(SEND_MESSAGE);
 
   const handleSendMessage = useCallback(() => {
-    if (!message.trim() || !userId || !groupId) return;
+    if (!message.trim() || !userId) return;
 
     sendMessage({
       variables: {
         authorId: userId,
         text: message.trim(),
         groupId: groupId,
+        isStaffChat: true,
       },
     });
     setMessage('');
