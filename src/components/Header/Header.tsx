@@ -50,7 +50,7 @@ function Header() {
   useEffect(() => {
     let lastY = window.scrollY;
 
-    const handleScroll = () => {
+    function handleScroll() {
       const currentY = window.scrollY;
 
       if (!isBurgerOpen && !isProfileOpen) {
@@ -58,7 +58,7 @@ function Header() {
       }
 
       lastY = currentY;
-    };
+    }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
@@ -68,7 +68,7 @@ function Header() {
   }, [isBurgerOpen, isProfileOpen]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
 
       if (
@@ -79,7 +79,7 @@ function Header() {
         setIsBurgerOpen(false);
         setIsProfileOpen(false);
       }
-    };
+    }
 
     document.addEventListener('mousedown', handleClickOutside);
 
@@ -89,10 +89,10 @@ function Header() {
   }, [isBurgerOpen, isProfileOpen]);
 
   useEffect(() => {
-    const checkWidth = () => {
+    function checkWidth() {
       setIsBurgerOpen(false);
       setIsProfileOpen(false);
-    };
+    }
 
     checkWidth();
     window.addEventListener('resize', checkWidth);

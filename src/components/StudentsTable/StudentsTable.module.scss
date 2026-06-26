@@ -25,10 +25,6 @@
     border-bottom: 1px solid #e0e0e0;
     transition: background-color 0.2s;
 
-    // &:hover {
-    //   background-color: #f9f9f9;
-    // }
-
     &:last-child {
       border-bottom: none;
     }
@@ -46,10 +42,6 @@
     cursor: pointer;
     user-select: none;
     transition: background-color 0.2s;
-
-    // &:hover {
-    //   background-color: #e8e8e837;
-    // }
 
     &:active {
       background-color: #e0e0e0;

@@ -36,14 +36,14 @@ function Team({ team, place, changedPoints, hidden, mode }: TeamProps) {
     '🌺🌸🌺🌸🌺🌸🌺',
   ];
 
-  const getEmojisByTeamId = (teamId: string) => {
+  function getEmojisByTeamId(teamId: string) {
     let index = 0;
     if (teamId) {
       index = teamId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
       index = index % emojiSets.length;
     }
     return emojiSets[index];
-  };
+  }
 
   if (hidden && !changedPoints) {
     const emojis = getEmojisByTeamId(String((place ?? 1) - 1));

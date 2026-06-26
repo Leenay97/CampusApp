@@ -13,9 +13,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 let globalErrorHandler: ((message: string) => void) | null = null;
 
-export const setGlobalErrorHandler = (handler: (message: string) => void) => {
+export function setGlobalErrorHandler(handler: (message: string) => void) {
   globalErrorHandler = handler;
-};
+}
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {

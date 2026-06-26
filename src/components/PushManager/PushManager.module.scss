@@ -1,18 +1,16 @@
 .push-manager {
     font-size: 14px;
     border: 0;
-    background-color: transparent;
     font-weight: inherit;
     font-family: inherit;
     padding: 15px 0;
-    color: inherit;
     background-color: red;
     color: white;
     width: 96%;
     border-radius: 4px;
 
     &_enabled {
-        background-color: var(--color-red);        
+        background-color: var(--color-red);
     }
 
     &_disabled {

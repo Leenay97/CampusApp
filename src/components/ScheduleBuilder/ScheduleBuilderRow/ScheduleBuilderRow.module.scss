@@ -44,26 +44,12 @@
         right: 20px;
     }
 
-    &__add {
-        background-image: url('/img/plus.png');
-        background-size: 20px;
-    }
-
-    &__delete {
-        background-image: url('/img/delete.png');
-        background-size: 20px;
-    }
-
     button {
         width: 20px;
         height: 20px;
         border: 0;
         background-color: transparent;
         cursor: pointer;
-
-        // &:hover {
-        //     transform: scale(108%);
-        // }
     }
 
     &::after {

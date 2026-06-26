@@ -24,10 +24,10 @@ function SeasonRow({ season, onRefetchSeason, onActivate, onArchive }: SeasonRow
 
   console.log(season);
 
-  const handleGroupClick = (group?: Group) => {
+  function handleGroupClick(group?: Group) {
     setSelectedGroup(group);
     setIsCreateGroupModalOpen(true);
-  };
+  }
 
   function handleCloseGroupModal() {
     setSelectedGroup(undefined);

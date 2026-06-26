@@ -1,8 +1,6 @@
 @import '@app/globals.css';
 
-
 .primary-button {
-  border: 2px solid var(--primary-button-color);
   background-color: var(--primary-button-color);
   color: white;
   border: none;
@@ -17,15 +15,5 @@
 
   &:disabled {
     background-color: var(--primary-button-disabled);
-
-    // &:hover {
-    //   background-color: var(--primary-button-disabled);
-    //   color: white;
-    // }
   }
-
-  // &:hover {
-  //   background-color: var(--primary-button-disabled);
-  //   color: white;
-  // }
 }

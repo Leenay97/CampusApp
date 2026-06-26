@@ -8,11 +8,11 @@ import { useLoading } from '@/contexts/LoadingContext';
 import { LoadingProvider } from '@/contexts/LoadingContext';
 import { roboto } from './fonts';
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+type RootLayoutProps = Readonly<{
   children: React.ReactNode;
-}>) {
+}>;
+
+export default function RootLayout({ children }: RootLayoutProps) {
   function ModalLoadingWrapper() {
     const { loadingState, hideLoading } = useLoading();
 

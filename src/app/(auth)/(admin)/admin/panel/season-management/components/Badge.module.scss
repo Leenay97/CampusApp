@@ -1,19 +1,19 @@
 $colors: (
-    '#A855F7', // purple
-    '#0EA5E9', // sky
-    '#EF4444', // red
-    '#F97316', // orange
-    '#F59E0B', // amber
-    '#84CC16', // lime
-    '#22C55E', // green
-    '#10B981', // emerald
-    '#14B8A6', // teal
-    '#06B6D4', // cyan
-    '#3B82F6', // blue
-    '#6366F1', // indigo
-    '#8B5CF6', // violet
-    '#D946EF', // fuchsia
-    '#EC4899'  // pink
+    '#A855F7',
+    '#0EA5E9',
+    '#EF4444',
+    '#F97316',
+    '#F59E0B',
+    '#84CC16',
+    '#22C55E',
+    '#10B981',
+    '#14B8A6',
+    '#06B6D4',
+    '#3B82F6',
+    '#6366F1',
+    '#8B5CF6',
+    '#D946EF',
+    '#EC4899'
 );
 
 .badge {
@@ -53,7 +53,7 @@ $colors: (
 
     @for $i from 1 through length($colors) {
       $color: nth($colors, $i);
-      
+
       &:nth-child(#{$i}) {
         background-color: unquote($color);
       }
@@ -72,13 +72,5 @@ $colors: (
         display: flex;
         align-items: center;
         justify-content: center;
-
-        // &:hover {
-        //     opacity: 0.8;
-        // }
     }
-    
-    // &:hover {
-    //     opacity: 0.8;
-    // }
 }

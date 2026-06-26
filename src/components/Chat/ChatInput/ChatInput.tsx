@@ -8,9 +8,9 @@ type ChatInputProps = {
 };
 
 export default function ChatInput({ message, onChangeMessage, onSend }: ChatInputProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     onChangeMessage(e.target.value);
-  };
+  }
 
   return (
     <div className={styles['chat-input']}>

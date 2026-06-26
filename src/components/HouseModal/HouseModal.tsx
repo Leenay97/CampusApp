@@ -28,6 +28,11 @@ type ModalProps = {
   onClose: () => void;
 };
 
+type GroupSelection = {
+  id: string;
+  name: string;
+};
+
 function HouseModal({ id, number, onClose }: ModalProps) {
   const [selectedGroup, setSelectedGroup] = useState({ id: '', name: '' });
   const [selectedStudent, setSelectedStudent] = useState({ id: '', name: '' });
@@ -52,7 +57,7 @@ function HouseModal({ id, number, onClose }: ModalProps) {
     setAddStudentForm((prev) => !prev);
   }
 
-  function handleChangeGroup({ id, name }: { id: string; name: string }) {
+  function handleChangeGroup({ id, name }: GroupSelection) {
     setSelectedGroup({ id, name });
     setSelectedStudent({ id: '', name: '' });
   }

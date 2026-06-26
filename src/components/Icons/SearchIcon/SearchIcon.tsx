@@ -1,4 +1,8 @@
-export default function SearchIcon({ style }: { style?: React.CSSProperties }) {
+type SearchIconProps = {
+  style?: React.CSSProperties;
+};
+
+export default function SearchIcon({ style }: SearchIconProps) {
   return (
     <svg
       style={style}

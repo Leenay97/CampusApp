@@ -6,12 +6,12 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import styles from './TiptapEditor.module.scss';
 
-type Props = {
+type TiptapEditorProps = {
   value: string;
   onChange: (value: string) => void;
 };
 
-export default function TiptapEditor({ value, onChange }: Props) {
+export default function TiptapEditor({ value, onChange }: TiptapEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
 

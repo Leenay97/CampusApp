@@ -1,5 +1,9 @@
 import Header from '@components/Header/Header';
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+type PublicLayoutProps = {
+  children: React.ReactNode;
+};
+
+export default function PublicLayout({ children }: PublicLayoutProps) {
   return <>{children}</>;
 }

@@ -28,13 +28,13 @@ export default function InfoPage() {
   const [editTitle, setEditTitle] = useState<string>('');
   const [editText, setEditText] = useState<string>('');
 
-  const handleEditPost = (post: PostType) => {
+  function handleEditPost(post: PostType) {
     setEditingPost(post);
     setEditTitle(post.title);
     setEditText(post.text);
-  };
+  }
 
-  const handlePostCreated = async () => {
+  async function handlePostCreated() {
     await refetch();
 
     try {
@@ -51,7 +51,7 @@ export default function InfoPage() {
 
     setCreateTitle('');
     setCreateText('');
-  };
+  }
 
   async function handleEditSubmit() {
     await refetch();

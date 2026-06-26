@@ -1,10 +1,9 @@
-export default function CrossIcon({
-  style,
-  onClick,
-}: {
+type CrossIconProps = {
   style?: React.CSSProperties;
   onClick?: () => void;
-}) {
+};
+
+export default function CrossIcon({ style, onClick }: CrossIconProps) {
   return (
     <svg
       style={style}

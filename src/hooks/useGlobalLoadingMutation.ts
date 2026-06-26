@@ -28,11 +28,11 @@ export function useGlobalLoadingMutation<TData, TVariables = Record<string, unkn
     },
   });
 
-  const wrappedMutate = async (variables?: TVariables): Promise<TData> => {
+  async function wrappedMutate(variables?: TVariables): Promise<TData> {
     showLoading('LOADING');
     const response = await mutate({ variables });
     return response.data as TData;
-  };
+  }
 
   const extendedResult: GlobalLoadingMutationResult<TData, TVariables> = {
     ...result,

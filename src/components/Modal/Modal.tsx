@@ -16,15 +16,15 @@ function Modal({ onClose, children, className }: ModalProps) {
   const modalRoot = document.getElementById('modal-root');
   if (!modalRoot) return null;
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
+  function handleOverlayClick(e: React.MouseEvent) {
     if (e.target === e.currentTarget) {
       onClose();
     }
-  };
+  }
 
-  const handleContentClick = (e: React.MouseEvent) => {
+  function handleContentClick(e: React.MouseEvent) {
     e.stopPropagation();
-  };
+  }
 
   return createPortal(
     <div className={styles['modal']} onClick={handleOverlayClick}>

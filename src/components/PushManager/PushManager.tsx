@@ -28,9 +28,8 @@ export default function PushManager() {
   const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-  // Регистрация SW при загрузке
   useEffect(() => {
-    const init = async () => {
+    async function init() {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         setIsSupported(true);
 
@@ -45,12 +44,11 @@ export default function PushManager() {
           console.error('SW регистрация ошибка:', error);
         }
       }
-    };
+    }
 
     init();
   }, []);
 
-  // Проверка статуса подписки при смене пользователя или готовности SW
   useEffect(() => {
     if (swReady) {
       checkSubscription();
@@ -63,7 +61,6 @@ export default function PushManager() {
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription && user?.id) {
-        // Проверяем, есть ли эта подписка в базе для текущего пользователя
         const response = await fetch(`${apiUrl}/api/push/check?userId=${user.id}`);
         const data = await response.json();
         setIsSubscribed(data.hasSubscription);

@@ -26,9 +26,13 @@ interface AppContextType {
   setApp: (app: AppValueContextType | null) => void;
 }
 
+type AppProviderProps = {
+  children: ReactNode;
+};
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: ReactNode }) {
+export function AppProvider({ children }: AppProviderProps) {
   const [app, setApp] = useState<AppValueContextType | null>(null);
 
   const tokenProcessed = useRef(false);
@@ -38,7 +42,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const [getPlace, { data: placeData }] = useLazyQuery(queries.GET_PLACE);
 
-  const getUserId = (): string | null => {
+  function getUserId(): string | null {
     if (typeof window === 'undefined') return null;
     const token = localStorage.getItem('token');
     if (!token) return null;
@@ -50,7 +54,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('token');
       return null;
     }
-  };
+  }
 
   const userId = getUserId();
 

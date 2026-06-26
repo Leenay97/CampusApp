@@ -6,7 +6,11 @@ import Link from 'next/link';
 import styles from './Panel.module.scss';
 import { ReactNode } from 'react';
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+type AdminLayoutProps = {
+  children: ReactNode;
+};
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <CenteredContainer wide>
       <Section>

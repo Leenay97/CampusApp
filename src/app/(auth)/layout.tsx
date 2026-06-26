@@ -7,7 +7,9 @@ import ChatButton from '@/components/Chat/ChatButton/ChatButton';
 import StaffChatButton from '@/components/Chat/StaffChatButton/StaffChatButton';
 import { useUser } from '@/contexts/UserContext';
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+type AuthLayoutProps = { children: React.ReactNode };
+
+export default function AuthLayout({ children }: AuthLayoutProps) {
   const { user } = useUser();
 
   return (
