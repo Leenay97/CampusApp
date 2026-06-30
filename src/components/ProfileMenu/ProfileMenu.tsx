@@ -8,6 +8,7 @@ import QRModal from '../QRModal/QRModal';
 import FineStudentModal from '../FineStudentModal/FineStudentModal';
 import { ChangeAvatarModal } from '../ChangeAvatarModal/ChangeAvatarModal';
 import PushManager from '../PushManager/PushManager';
+import { wsClient, client } from '@/lib/apollo';
 
 type ProfileMenuProps = {
   isOpen: boolean;
@@ -21,10 +22,48 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
   const [avatarModal, setAvatarModal] = useState(false);
   const { user, setUser } = useUser();
 
-  function handleLogout() {
+  async function handleLogout() {
     onClose();
-    setUser(null);
+
+    // Unsubscribe push with the current userId *before* clearing user state,
+    // so the server-side subscription record is actually removed and the push
+    // endpoint can't deliver messages to the next user on this device.
+    if (user?.id && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      const userId = user.id;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
+      const pushCleanup = async () => {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+          await fetch(`${apiUrl}/api/push/unsubscribe`, {
+            method: 'POST',
+            headers: { 'X-User-Id': userId },
+          });
+        }
+      };
+      // 3-second timeout so a hanging serviceWorker.ready doesn't block logout.
+      try {
+        await Promise.race([pushCleanup(), new Promise((_, r) => setTimeout(r, 3000))]);
+      } catch {
+        // non-fatal — proceed with logout regardless
+      }
+    }
+
+    // Dispose the WebSocket before navigating. iOS WKWebView can block navigation
+    // completion when a WebSocket connection is open at the moment of redirect.
+    try {
+      await wsClient.dispose();
+    } catch {
+      // ignore
+    }
+
+    // Clear Apollo cache so stale data from this user isn't served to the next.
+    await client.clearStore();
+
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
     window.location.href = '/login';
   }
 

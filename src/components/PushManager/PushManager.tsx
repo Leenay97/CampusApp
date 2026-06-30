@@ -60,15 +60,30 @@ export default function PushManager() {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
 
-      if (subscription && user?.id) {
-        const response = await fetch(`${apiUrl}/api/push/check?userId=${user.id}`);
-        const data = await response.json();
-        setIsSubscribed(data.hasSubscription);
-      } else {
+      setPermission(Notification.permission);
+
+      if (!subscription) {
         setIsSubscribed(false);
+        return;
       }
 
-      setPermission(Notification.permission);
+      if (!user?.id) {
+        setIsSubscribed(false);
+        return;
+      }
+
+      const response = await fetch(`${apiUrl}/api/push/check?userId=${user.id}`);
+      const data = await response.json();
+
+      if (data.hasSubscription) {
+        setIsSubscribed(true);
+      } else {
+        // A push subscription exists in the browser but belongs to a different
+        // user (e.g. a teacher logged out without cleanup). Destroy it immediately
+        // so that messages sent to the previous user cannot reach this device.
+        await subscription.unsubscribe();
+        setIsSubscribed(false);
+      }
     } catch (error) {
       console.error('Ошибка проверки подписки:', error);
     }
@@ -147,13 +162,16 @@ export default function PushManager() {
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription) {
+        // Capture userId before any async work in case user state changes mid-flight.
+        const userId = user?.id;
         await subscription.unsubscribe();
-        if (!user?.id) return;
 
-        await fetch(`${apiUrl}/api/push/unsubscribe`, {
-          method: 'POST',
-          headers: { 'X-User-Id': user.id },
-        });
+        if (userId) {
+          await fetch(`${apiUrl}/api/push/unsubscribe`, {
+            method: 'POST',
+            headers: { 'X-User-Id': userId },
+          });
+        }
 
         setIsSubscribed(false);
         alert('❌ Уведомления отключены');

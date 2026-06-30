@@ -34,11 +34,26 @@ const uploadLink = createUploadLink({
   credentials: 'same-origin',
 });
 
-const wsLink = new GraphQLWsLink(
-  createClient({
-    url: process.env.NEXT_PUBLIC_API_URL?.replace('http', 'ws') + '/ws',
-  }),
-);
+// Replace http→ws and https→wss so both dev (http) and prod (https) work correctly.
+const wsUrl =
+  (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/^https/, 'wss').replace(/^http/, 'ws') + '/ws';
+
+export const wsClient = createClient({
+  url: wsUrl,
+  // Only connect when there's an active subscription — prevents a WS handshake
+  // on every page load and avoids iOS PWA blocking navigation with an open socket.
+  lazy: true,
+  connectionParams: () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    return token ? { authorization: `Bearer ${token}` } : {};
+  },
+  // Ping every 25s so Nginx's 30s proxy_read_timeout doesn't kill the connection.
+  keepAlive: 25_000,
+  retryAttempts: 5,
+  shouldRetry: () => true,
+});
+
+const wsLink = new GraphQLWsLink(wsClient);
 
 const splitLink = split(
   ({ query }) => {
