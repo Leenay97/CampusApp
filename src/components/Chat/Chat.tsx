@@ -13,9 +13,16 @@ type ChatProps = {
   userId: string;
   groupId: string;
   loading: boolean;
+  isStaffChat?: boolean;
 };
 
-export default function Chat({ messages, userId, groupId, loading }: ChatProps) {
+export default function Chat({
+  messages,
+  userId,
+  groupId,
+  loading,
+  isStaffChat = false,
+}: ChatProps) {
   const [message, setMessage] = useState('');
   const [sendMessage] = useMutation(SEND_MESSAGE);
 
@@ -27,11 +34,11 @@ export default function Chat({ messages, userId, groupId, loading }: ChatProps) 
         authorId: userId,
         text: message.trim(),
         groupId: groupId,
-        isStaffChat: true,
+        isStaffChat,
       },
     });
     setMessage('');
-  }, [userId, message, groupId, sendMessage]);
+  }, [userId, message, groupId, isStaffChat, sendMessage]);
 
   return (
     <div className={styles['chat']}>

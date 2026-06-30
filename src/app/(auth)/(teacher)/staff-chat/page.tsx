@@ -52,6 +52,7 @@ export default function StaffChat() {
       loading={loading}
       userId={user?.id ?? ''}
       groupId={process.env.NEXT_PUBLIC_TEACHERS_CHAT_KEY ?? ''}
+      isStaffChat
     />
   );
 }
