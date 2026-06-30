@@ -14,4 +14,13 @@
             background-image: url('/img/delete.png');
             background-size: 20px;
         }   
+        
+        &__titled {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
 }

@@ -12,4 +12,6 @@ export const User = sequelize.define('User', {
   isActive: { type: DataTypes.BOOLEAN, defaultValue: false },
   lives: { type: DataTypes.INTEGER, allowNull: true },
   englishLevel: { type: DataTypes.STRING, allowNull: true },
+  votes: { type: DataTypes.JSONB, allowNull: true },
+  gotWorkshopCoins: { type: DataTypes.BOOLEAN, allowNull: true },
 });

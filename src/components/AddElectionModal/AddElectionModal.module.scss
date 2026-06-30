@@ -1,0 +1,25 @@
+.modal {
+    min-width: 280px;
+    width: max-content; 
+
+    &__options {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 285px;
+        overflow-y: scroll;
+        padding-right: 10px;
+    }
+
+    &__add {
+        display: flex;
+        gap: 6px;
+        margin-left: auto;
+    }
+}
+
+.option {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}

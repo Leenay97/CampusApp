@@ -121,4 +121,17 @@ export type Message = {
   createdAt: string;
 };
 
+export type Vote = {
+  id: string;
+  title: string;
+  options: VoteOption[];
+  votedOptionId?: string | null;
+};
+
+export type VoteOption = {
+  id: string;
+  name: string;
+  votesNumber: number;
+};
+
 export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';

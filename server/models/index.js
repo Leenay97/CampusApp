@@ -13,6 +13,8 @@ import { Post } from './Post.js';
 import { Class } from './Class.js';
 import { PushSubscription } from './PushSubscription.js';
 import { Message } from './Message.js';
+import { Vote } from './Vote.js';
+import { VoteOption } from './VoteOption.js';
 
 // Сначала определите все ассоциации
 // Ассоциации Season
@@ -69,12 +71,9 @@ IpodGroup.belongsToMany(IpodMatch, {
   foreignKey: 'ipodMatch',
 });
 
-// Ассоциации House
 House.hasMany(User, { foreignKey: 'houseId', as: 'users' });
 User.belongsTo(House, { foreignKey: 'houseId', as: 'house' });
 
-// Ассоциации Class - ВАЖНО: порядок имеет значение!
-// Сначала связь Teacher <-> Class (many-to-many)
 User.belongsToMany(Class, {
   through: 'TeacherClasses',
   as: 'taughtClasses',
@@ -89,11 +88,9 @@ Class.belongsToMany(User, {
   otherKey: 'userId',
 });
 
-// Затем связь Student -> Class (many-to-one)
 User.belongsTo(Class, { foreignKey: 'classId', as: 'class' });
 Class.hasMany(User, { foreignKey: 'classId', as: 'students' });
 
-// Ассоциация Class-Place
 Class.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
 
 Message.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
@@ -109,6 +106,12 @@ Post.belongsTo(User, {
   as: 'author',
 });
 
+Vote.hasMany(VoteOption, { foreignKey: 'voteId', as: 'options' });
+VoteOption.belongsTo(Vote, { foreignKey: 'voteId', as: 'vote' });
+
+Season.hasMany(Vote, { foreignKey: 'seasonId', as: 'votes' });
+Vote.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
+
 export {
   sequelize,
   User,
@@ -123,4 +126,6 @@ export {
   Class,
   PushSubscription,
   Message,
+  Vote,
+  VoteOption,
 };

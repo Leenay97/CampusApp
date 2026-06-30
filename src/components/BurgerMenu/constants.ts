@@ -12,6 +12,7 @@ export const StudentHeaderMenuOptions: MenuOption[] = [
   { name: 'Домики', link: '/houses' },
   { name: 'Расписание', link: '/schedule' },
   { name: 'Информация', link: '/information' },
+  { name: 'Голосование', link: '/election' },
 ];
 
 export const TeacherHeaderMenuOptions: MenuOption[] = [
@@ -23,6 +24,7 @@ export const TeacherHeaderMenuOptions: MenuOption[] = [
   { name: 'Моя группа', link: '/teacher/group' },
   { name: 'Расписание', link: '/schedule' },
   { name: 'Информация', link: '/information' },
+  { name: 'Голосование', link: '/election' },
 
   { name: '[QR группы]', link: '/teacher/group/qr' },
 ];

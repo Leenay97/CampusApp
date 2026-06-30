@@ -28,6 +28,8 @@ import { SEND_PUSH_ALL } from './SendPushAll';
 import { SEND_MESSAGE } from './SendMessage';
 import { UPDATE_POST } from './UpdatePost';
 import { DELETE_POST } from './DeletePost';
+import { CREATE_VOTE } from './CreateVote';
+import { CAST_VOTE } from './CastVote';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -60,5 +62,7 @@ export const mutations = {
   SEND_PUSH_ALL,
   SEND_MESSAGE,
   DELETE_POST,
+  CREATE_VOTE,
+  CAST_VOTE,
 };
 export default mutations;

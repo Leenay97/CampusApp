@@ -11,6 +11,7 @@ import { postTypeDefs } from './post.js';
 import { classTypeDefs } from './class.js';
 import { pushTypeDefs } from './pushNotifications.js';
 import { messageTypeDefs } from './message.js';
+import { voteTypeDefs } from './vote.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -26,4 +27,5 @@ export const typeDefs = [
   classTypeDefs,
   pushTypeDefs,
   messageTypeDefs,
+  voteTypeDefs,
 ];

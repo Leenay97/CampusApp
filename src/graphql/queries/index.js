@@ -19,6 +19,7 @@ import { GET_POSTS } from './GetPosts';
 import { GET_CLASSES } from './GetClasses';
 import { GET_SEASON_GROUPS } from './GetSeasonGroups';
 import { GET_MESSAGES } from './GetMessages';
+import { GET_VOTES, GET_VOTES_FOR_VOTING } from './GetVote';
 
 export const queries = {
   GET_GROUPS,
@@ -42,5 +43,7 @@ export const queries = {
   GET_CLASSES,
   GET_SEASON_GROUPS,
   GET_MESSAGES,
+  GET_VOTES,
+  GET_VOTES_FOR_VOTING,
 };
 export default queries;
