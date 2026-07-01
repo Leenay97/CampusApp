@@ -13,6 +13,7 @@ import { useQuery } from '@apollo/client';
 import { GET_TEACHERS } from '@/graphql/queries/GetTeachers';
 import { InputField } from '../InputField/InputField';
 import Subtitle from '../Subtitle/Subtitle';
+import Loader from '../Loader/Loaader';
 import { List } from '../List/List';
 import { CustomSelect } from '../CustomSelect/CustomSelect';
 
@@ -34,7 +35,11 @@ export function CreateGroupModal({
   const [groupName, setGroupName] = useState<string>(group?.name ?? '');
   const [createGroup] = useGlobalLoadingMutation(CREATE_GROUP);
   const [editGroup] = useGlobalLoadingMutation(UPDATE_GROUP);
-  const { data: teachersData, refetch: refetchTeachers } = useQuery(GET_TEACHERS);
+  const {
+    data: teachersData,
+    loading: teachersLoading,
+    refetch: refetchTeachers,
+  } = useQuery(GET_TEACHERS);
 
   console.log(group);
 
@@ -77,17 +82,22 @@ export function CreateGroupModal({
     <Modal onClose={onClose}>
       <ModalHeader title={group ? 'Редактировать группу' : 'Создать группу'} onClose={onClose} />
       <ModalBody>
-        <InputField value={groupName} onChange={setGroupName} placeholder="Название группы" />
-        {Boolean(groupTeachers.length) && (
-          <List title="Учителя" items={groupTeachers} onDelete={handleRemoveTeacher} />
-        )}
-        {teachersData?.teachers.length ? (
+        {teachersLoading && <Loader />}
+        {!teachersLoading && (
           <>
-            <CustomSelect items={teachersData?.teachers} onChange={handleChangeTeacher} />
-            <PrimaryButton onClick={handleAddTeacher}>Добавить</PrimaryButton>
+            <InputField value={groupName} onChange={setGroupName} placeholder="Название группы" />
+            {Boolean(groupTeachers.length) && (
+              <List title="Учителя" items={groupTeachers} onDelete={handleRemoveTeacher} />
+            )}
+            {teachersData?.teachers.length ? (
+              <>
+                <CustomSelect items={teachersData?.teachers} onChange={handleChangeTeacher} />
+                <PrimaryButton onClick={handleAddTeacher}>Добавить</PrimaryButton>
+              </>
+            ) : (
+              <Subtitle>У всех учителей есть группа</Subtitle>
+            )}
           </>
-        ) : (
-          <Subtitle>У всех учителей есть группа</Subtitle>
         )}
       </ModalBody>
       <ModalFooter>

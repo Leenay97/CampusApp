@@ -1,5 +1,6 @@
 import { Message as MessageType } from '@/app/types';
 import Message from '../../Message/Message';
+import Loader from '../../Loader/Loaader';
 import styles from './ChatArea.module.scss';
 import { useEffect, useMemo, useRef } from 'react';
 
@@ -46,7 +47,7 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
 
   return (
     <div className={styles['chat-area']} ref={containerRef}>
-      {loading && <div className={styles['loading']}>Загрузка</div>}
+      {loading && <Loader />}
       {groupedMessages.map((msg) => (
         <Message
           key={msg.id}

@@ -17,6 +17,7 @@ import { User } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import GradeSection from '../GradeSection/GradeSection';
 import { UPDATE_HOUSE } from '@/graphql/mutations/UpdateHouse';
+import Loader from '../Loader/Loaader';
 import Modal from '../Modal/Modal';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
@@ -39,7 +40,11 @@ function HouseModal({ id, number, onClose }: ModalProps) {
   const [grade, setGrade] = useState(0);
   const [updateUser] = useGlobalLoadingMutation(UPDATE_USER);
   const [updateHouse] = useGlobalLoadingMutation(UPDATE_HOUSE);
-  const { data: houseData, refetch } = useQuery(GET_HOUSE, { variables: { id } });
+  const {
+    data: houseData,
+    loading: houseLoading,
+    refetch,
+  } = useQuery(GET_HOUSE, { variables: { id } });
   const [addStudentForm, setAddStudentForm] = useState<boolean>(false);
   const { data: groupsData } = useQuery(GET_ACTIVE_SEASON);
   const { data: studentsData } = useQuery(GET_STUDENTS_BY_GROUP_ID, {
@@ -85,46 +90,51 @@ function HouseModal({ id, number, onClose }: ModalProps) {
     <Modal onClose={onClose} className={styles['house-modal__content']}>
       <ModalHeader onClose={onClose} title={`Домик #${number}`} />
       <ModalBody>
-        {user?.userLevel === 'ADMIN' && (
-          <GradeSection onChange={handleGrade} selectedGrade={grade} />
-        )}
-        <div className={styles['house-modal__row']}>
-          <Subtitle noMargin>Студенты</Subtitle>
-          {(user?.userLevel === 'ADMIN' || user?.userLevel === 'TEACHER') && (
-            <ActionButton type="ADD" onClick={handleToggleEditForm} />
-          )}
-        </div>
-        {!addStudentForm && houseData?.house?.users.length > 0 && (
-          <div className={styles['house-modal__students']}>
-            {houseData.house.users.map((user: User) => (
-              <UserBadge key={user.id} name={user.name} group={user?.group?.name || ''} />
-            ))}
-          </div>
-        )}
-        {houseData?.house?.users.length === 0 && <Subtitle>Пусто</Subtitle>}
-        {addStudentForm && (
+        {houseLoading && <Loader />}
+        {!houseLoading && (
           <>
-            <div>
-              <Subtitle>Группа</Subtitle>
-              <CustomSelect
-                key={`group-select-${selectedGroup.id}`}
-                items={groupsData?.activeSeason?.groups || []}
-                onChange={handleChangeGroup}
-                initValue={selectedGroup.name}
-              />
+            {user?.userLevel === 'ADMIN' && (
+              <GradeSection onChange={handleGrade} selectedGrade={grade} />
+            )}
+            <div className={styles['house-modal__row']}>
+              <Subtitle noMargin>Студенты</Subtitle>
+              {(user?.userLevel === 'ADMIN' || user?.userLevel === 'TEACHER') && (
+                <ActionButton type="ADD" onClick={handleToggleEditForm} />
+              )}
             </div>
-            {studentsData?.usersByGroup?.length > 0 ? (
-              <div>
-                <Subtitle>Студент</Subtitle>
-                <CustomSelect
-                  key={`student-select-${selectedStudent.id}`}
-                  items={studentsData?.usersByGroup || []}
-                  onChange={setSelectedStudent}
-                  initValue={selectedStudent.name}
-                />
+            {!addStudentForm && houseData?.house?.users.length > 0 && (
+              <div className={styles['house-modal__students']}>
+                {houseData.house.users.map((user: User) => (
+                  <UserBadge key={user.id} name={user.name} group={user?.group?.name || ''} />
+                ))}
               </div>
-            ) : (
-              <Subtitle>Студентов нет</Subtitle>
+            )}
+            {houseData?.house?.users.length === 0 && <Subtitle>Пусто</Subtitle>}
+            {addStudentForm && (
+              <>
+                <div>
+                  <Subtitle>Группа</Subtitle>
+                  <CustomSelect
+                    key={`group-select-${selectedGroup.id}`}
+                    items={groupsData?.activeSeason?.groups || []}
+                    onChange={handleChangeGroup}
+                    initValue={selectedGroup.name}
+                  />
+                </div>
+                {studentsData?.usersByGroup?.length > 0 ? (
+                  <div>
+                    <Subtitle>Студент</Subtitle>
+                    <CustomSelect
+                      key={`student-select-${selectedStudent.id}`}
+                      items={studentsData?.usersByGroup || []}
+                      onChange={setSelectedStudent}
+                      initValue={selectedStudent.name}
+                    />
+                  </div>
+                ) : (
+                  <Subtitle>Студентов нет</Subtitle>
+                )}
+              </>
             )}
           </>
         )}

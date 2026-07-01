@@ -11,6 +11,7 @@ import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { Place, User } from '@/app/types';
 import { CustomSelect } from '@components/CustomSelect/CustomSelect';
 import Subtitle from '../Subtitle/Subtitle';
+import Loader from '../Loader/Loaader';
 import Modal from '../Modal/Modal';
 import ModalFooter from '../Modal/ModalFooter';
 import ModalHeader from '../Modal/ModalHeader';
@@ -45,11 +46,13 @@ function CreateWorkshopModal({
   const [maxAge, setMaxAge] = useState<string>('');
   const [capacity, setCapacity] = useState<string>('');
 
-  const { data: teachersData } = useQuery(queries.GET_TEACHERS);
+  const { data: teachersData, loading: teachersLoading } = useQuery(queries.GET_TEACHERS);
 
-  const { data: placesData } = useQuery(queries.GET_PLACES);
+  const { data: placesData, loading: placesLoading } = useQuery(queries.GET_PLACES);
 
   const [createWorkshop] = useGlobalLoadingMutation(mutations.CREATE_WORKSHOP);
+
+  const loading = teachersLoading || placesLoading;
 
   const teachers = teachersData?.teachers ?? [];
 
@@ -96,52 +99,57 @@ function CreateWorkshopModal({
         onClose={onClose}
       />
       <ModalBody>
-        {allDates.length > 0 && (
-          <div>
-            <Subtitle>Дата</Subtitle>
-            <select
-              value={selectedDate}
-              onChange={onDateChange}
-              style={{
-                width: '100%',
-                padding: '6px',
-                fontSize: '14px',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-                backgroundColor: 'white',
-                cursor: 'pointer',
-              }}
-            >
-              {allDates.map((date) => (
-                <option key={date.value} value={date.value}>
-                  {date.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        {loading && <Loader />}
+        {!loading && (
+          <>
+            {allDates.length > 0 && (
+              <div>
+                <Subtitle>Дата</Subtitle>
+                <select
+                  value={selectedDate}
+                  onChange={onDateChange}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    fontSize: '14px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd',
+                    backgroundColor: 'white',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {allDates.map((date) => (
+                    <option key={date.value} value={date.value}>
+                      {date.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <div>
+              <Subtitle>Название</Subtitle>
+              <InputField value={name} onChange={setName} />
+            </div>
+            <div>
+              <Subtitle>Учитель</Subtitle>
+              <CustomSelect items={teachers} onChange={handleChangeTeacher} />
+            </div>
+            <div>
+              <Subtitle>Место</Subtitle>
+              <CustomSelect items={places} onChange={handleChangePlace} />
+            </div>
+            <div>
+              <Subtitle>Количество человек</Subtitle>
+              <InputField value={capacity} onChange={setCapacity} />
+            </div>
+            <div>
+              <Subtitle>Минимальный возраст</Subtitle>
+              <div className={styles['modal__age']}>
+                <InputField maxLength={2} width="40px" value={maxAge} onChange={setMaxAge} />+
+              </div>
+            </div>
+          </>
         )}
-        <div>
-          <Subtitle>Название</Subtitle>
-          <InputField value={name} onChange={setName} />
-        </div>
-        <div>
-          <Subtitle>Учитель</Subtitle>
-          <CustomSelect items={teachers} onChange={handleChangeTeacher} />
-        </div>
-        <div>
-          <Subtitle>Место</Subtitle>
-          <CustomSelect items={places} onChange={handleChangePlace} />
-        </div>
-        <div>
-          <Subtitle>Количество человек</Subtitle>
-          <InputField value={capacity} onChange={setCapacity} />
-        </div>
-        <div>
-          <Subtitle>Минимальный возраст</Subtitle>
-          <div className={styles['modal__age']}>
-            <InputField maxLength={2} width="40px" value={maxAge} onChange={setMaxAge} />+
-          </div>
-        </div>
       </ModalBody>
       <ModalFooter>
         <SecondaryButton onClick={handleClose}>Отмена</SecondaryButton>

@@ -17,6 +17,7 @@ import { REGISTER_STUDENT } from '@/graphql/mutations/RegisterStudent';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect';
+import Loader from '@/components/Loader/Loaader';
 
 function RegisterForm() {
   const [selectedStudent, setSelectedStudent] = useState<User>({} as User);
@@ -30,7 +31,7 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
 
-  const { data } = useQuery(queries.GET_STUDENTS_BY_GROUP, {
+  const { data, loading } = useQuery(queries.GET_STUDENTS_BY_GROUP, {
     variables: { groupId: token },
     skip: !token,
   });
@@ -73,7 +74,11 @@ function RegisterForm() {
       <Section>
         <div className={styles['prohibited-section__content']}>
           <Subtitle noMargin>Найди себя*</Subtitle>
-          <CustomSelect items={unregisteredStudents} onChange={handleSelectStudent} />
+          {loading ? (
+            <Loader />
+          ) : (
+            <CustomSelect items={unregisteredStudents} onChange={handleSelectStudent} />
+          )}
         </div>
       </Section>
       {selectedStudent.id && (

@@ -11,6 +11,7 @@ import { useQuery } from '@apollo/client';
 import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 import { GET_CLASSES } from '@/graphql/queries/GetClasses';
 import { GET_HOUSES } from '@/graphql/queries/GetHouses';
+import Loader from '../Loader/Loaader';
 import Modal from '../Modal/Modal';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
@@ -43,9 +44,11 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
   const [englishClass, setEnglishClass] = useState({ id: '', name: '' });
   const [house, setHouse] = useState({ id: student.house?.id, name: student.house?.number });
   const [updateUser] = useGlobalLoadingMutation(UPDATE_USER);
-  const { data } = useQuery(GET_ACTIVE_SEASON);
-  const { data: classesData } = useQuery(GET_CLASSES);
-  const { data: housesData } = useQuery(GET_HOUSES);
+  const { data, loading: seasonLoading } = useQuery(GET_ACTIVE_SEASON);
+  const { data: classesData, loading: classesLoading } = useQuery(GET_CLASSES);
+  const { data: housesData, loading: housesLoading } = useQuery(GET_HOUSES);
+
+  const loading = seasonLoading || classesLoading || housesLoading;
 
   const transformedHouses =
     housesData?.houses?.map((house: House) => ({
@@ -114,46 +117,51 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
     <Modal onClose={onClose}>
       <ModalHeader title={`Изменить студента: ${student?.name}`} onClose={onClose} />
       <ModalBody>
-        <div>
-          <Subtitle>Имя</Subtitle>
-          <InputField value={name} onChange={handleChangeName} />
-        </div>
-        <div>
-          <Subtitle>Группа</Subtitle>
-          <CustomSelect
-            items={data?.activeSeason?.groups}
-            onChange={handleChangeGroup}
-            initValue={student.group ? student?.group.name : ''}
-          />
-        </div>
-        <div>
-          <Subtitle>Класс</Subtitle>
-          <CustomSelect
-            items={classesData?.classes}
-            onChange={handleChangeClass}
-            initValue={student.class ? student?.class.name : ''}
-          />
-        </div>
-        <div>
-          <Subtitle>Домик</Subtitle>
-          <CustomSelect
-            items={transformedHouses}
-            onChange={handleChangeHouse}
-            initValue={student.house?.number ? student?.house.number : ''}
-          />
-        </div>
-        <div>
-          <Subtitle>Уровень английского</Subtitle>
-          <CustomSelect
-            items={englishLevelOptions}
-            onChange={handleChangeEnglishLevel}
-            initValue={student.englishLevel ? student.englishLevel : ''}
-          />
-        </div>
-        <div>
-          <Subtitle>Coins</Subtitle>
-          <InputField value={coins} onChange={handleChangeCoins} />
-        </div>
+        {loading && <Loader />}
+        {!loading && (
+          <>
+            <div>
+              <Subtitle>Имя</Subtitle>
+              <InputField value={name} onChange={handleChangeName} />
+            </div>
+            <div>
+              <Subtitle>Группа</Subtitle>
+              <CustomSelect
+                items={data?.activeSeason?.groups}
+                onChange={handleChangeGroup}
+                initValue={student.group ? student?.group.name : ''}
+              />
+            </div>
+            <div>
+              <Subtitle>Класс</Subtitle>
+              <CustomSelect
+                items={classesData?.classes}
+                onChange={handleChangeClass}
+                initValue={student.class ? student?.class.name : ''}
+              />
+            </div>
+            <div>
+              <Subtitle>Домик</Subtitle>
+              <CustomSelect
+                items={transformedHouses}
+                onChange={handleChangeHouse}
+                initValue={student.house?.number ? student?.house.number : ''}
+              />
+            </div>
+            <div>
+              <Subtitle>Уровень английского</Subtitle>
+              <CustomSelect
+                items={englishLevelOptions}
+                onChange={handleChangeEnglishLevel}
+                initValue={student.englishLevel ? student.englishLevel : ''}
+              />
+            </div>
+            <div>
+              <Subtitle>Coins</Subtitle>
+              <InputField value={coins} onChange={handleChangeCoins} />
+            </div>
+          </>
+        )}
       </ModalBody>
       <ModalFooter>
         <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>

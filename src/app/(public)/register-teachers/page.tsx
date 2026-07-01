@@ -16,6 +16,7 @@ import { REGISTER_TEACHER } from '@/graphql/mutations/RegisterTeacher';
 import { useQuery } from '@apollo/client';
 import { GET_TEACHERS } from '@/graphql/queries/GetTeachers';
 import { useUser } from '@/contexts/UserContext';
+import Loader from '@/components/Loader/Loaader';
 
 type ResultType = {
   registerTeacher: {
@@ -35,7 +36,7 @@ function RegisterTeacherForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
 
-  const { data: teachers } = useQuery(GET_TEACHERS);
+  const { data: teachers, loading } = useQuery(GET_TEACHERS);
   const [registerTeacher] = useGlobalLoadingMutation(REGISTER_TEACHER);
 
   function handleAddTeacher(value: User) {
@@ -65,7 +66,11 @@ function RegisterTeacherForm() {
         <div className={styles['prohibited-section__content']}>
           <Title>Ну привет, училка</Title>
           <Subtitle>Найди себя</Subtitle>
-          <CustomSelect items={teachers?.teachers} onChange={handleAddTeacher} />
+          {loading ? (
+            <Loader />
+          ) : (
+            <CustomSelect items={teachers?.teachers} onChange={handleAddTeacher} />
+          )}
         </div>
       </Section>
       {selectedTeacher.id && (

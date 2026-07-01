@@ -11,6 +11,7 @@ import { useQuery } from '@apollo/client';
 import { UPDATE_SCHEDULE } from '@/graphql/mutations/UpdateSchedule';
 import { GET_SCHEDULE } from '@/graphql/queries/GetSchedule';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import Loader from '../Loader/Loaader';
 import Section from '../Section/Section';
 
 export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
@@ -18,7 +19,7 @@ export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
   const [name, setName] = useState(DEFAULT_SCHEDULE.name);
 
   const [updateSchedule] = useGlobalLoadingMutation(UPDATE_SCHEDULE);
-  const { data } = useQuery(GET_SCHEDULE);
+  const { data, loading } = useQuery(GET_SCHEDULE);
 
   useEffect(() => {
     if (!data?.schedule) return;
@@ -64,6 +65,14 @@ export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  if (loading) {
+    return (
+      <Section>
+        <Loader />
+      </Section>
+    );
   }
 
   return (

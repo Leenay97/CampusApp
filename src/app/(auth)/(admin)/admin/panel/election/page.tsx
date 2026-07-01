@@ -10,6 +10,8 @@ import { useApp } from '@/contexts/AppContext';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { CREATE_VOTE } from '@/graphql/mutations/CreateVote';
 import Election from '@/components/Election/Election';
+import Loader from '@/components/Loader/Loaader';
+import Section from '@/components/Section/Section';
 import { Vote } from '@/app/types';
 
 export default function ElectionPage(): JSX.Element {
@@ -35,7 +37,14 @@ export default function ElectionPage(): JSX.Element {
     setIsOpenModal(false);
   }
 
-  if (loading) return <div>Загрузка...</div>;
+  if (loading)
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
   if (error) return <div>Ошибка: {error.message}</div>;
 
   return (

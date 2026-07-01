@@ -11,6 +11,7 @@ import Subtitle from '../Subtitle/Subtitle';
 import { MultipleSelect } from '../MultipleSelect/MultipleSelect';
 import { CREATE_CLASS } from '@/graphql/mutations/CreateClass';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import Loader from '../Loader/Loaader';
 import Modal from '../Modal/Modal';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
@@ -27,11 +28,13 @@ function CreateClassModal({ onClose, onSubmit }: ModalProps) {
   const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
   const [name, setName] = useState<string>('');
 
-  const { data: teachersData } = useQuery(queries.GET_TEACHERS);
+  const { data: teachersData, loading: teachersLoading } = useQuery(queries.GET_TEACHERS);
 
-  const { data: placesData } = useQuery(queries.GET_PLACES);
+  const { data: placesData, loading: placesLoading } = useQuery(queries.GET_PLACES);
 
   const [createClass] = useGlobalLoadingMutation(CREATE_CLASS);
+
+  const loading = teachersLoading || placesLoading;
 
   const teachers = teachersData?.teachers ?? [];
 
@@ -69,22 +72,27 @@ function CreateClassModal({ onClose, onSubmit }: ModalProps) {
     <Modal onClose={onClose}>
       <ModalHeader title="Создать класс" onClose={onClose} />
       <ModalBody>
-        <div>
-          <Subtitle>Название</Subtitle>
-          <InputField value={name} onChange={setName} />
-        </div>
-        <div>
-          <Subtitle>Учитель</Subtitle>
-          <MultipleSelect
-            value={selectedTeachers}
-            items={teachers}
-            onChange={handleChangeTeacher}
-          />
-        </div>
-        <div>
-          <Subtitle>Место</Subtitle>
-          <CustomSelect items={places} onChange={handleChangePlace} />
-        </div>
+        {loading && <Loader />}
+        {!loading && (
+          <>
+            <div>
+              <Subtitle>Название</Subtitle>
+              <InputField value={name} onChange={setName} />
+            </div>
+            <div>
+              <Subtitle>Учитель</Subtitle>
+              <MultipleSelect
+                value={selectedTeachers}
+                items={teachers}
+                onChange={handleChangeTeacher}
+              />
+            </div>
+            <div>
+              <Subtitle>Место</Subtitle>
+              <CustomSelect items={places} onChange={handleChangePlace} />
+            </div>
+          </>
+        )}
       </ModalBody>
       <ModalFooter>
         <SecondaryButton onClick={handleClose}>Отмена</SecondaryButton>

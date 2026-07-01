@@ -11,6 +11,7 @@ import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Modal from '@/components/Modal/Modal';
 import ModalHeader from '@/components/Modal/ModalHeader';
 import ModalBody from '@/components/Modal/ModalBody';
+import Loader from '@/components/Loader/Loaader';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
@@ -25,7 +26,7 @@ export default function PasswordResetPage() {
   const [search, setSearch] = useState('');
   const [links, setLinks] = useState<Record<string, string>>({});
   const [qrStudentId, setQrStudentId] = useState<string | null>(null);
-  const { data } = useQuery(queries.GET_ALL_STUDENTS);
+  const { data, loading } = useQuery(queries.GET_ALL_STUDENTS);
   const [generateLink] = useGlobalLoadingMutation<
     GeneratePasswordResetLinkResponse,
     { userId: string }
@@ -56,6 +57,16 @@ export default function PasswordResetPage() {
       await generateResetLink(studentId);
     }
     setQrStudentId(studentId);
+  }
+
+  if (loading) {
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
   }
 
   return (

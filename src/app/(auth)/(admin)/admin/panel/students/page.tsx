@@ -6,6 +6,7 @@ import styles from './styles.module.scss';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect';
 import { InputField } from '@/components/InputField/InputField';
+import Loader from '@/components/Loader/Loaader';
 import Section from '@/components/Section/Section';
 import StudentsTable from '@/components/StudentsTable/StudentsTable';
 import Title from '@/components/Title/Title';
@@ -39,6 +40,16 @@ export default function StudentsPage() {
 
     return filtered;
   }, [studentsData, name, group]);
+
+  if (groupsLoading || studentsLoading) {
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
+  }
 
   return (
     <CenteredContainer wide noPadding>

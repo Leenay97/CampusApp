@@ -25,7 +25,9 @@ function RubbersPage() {
   if (loading || technicalDataLoading) {
     return (
       <CenteredContainer>
-        <Loader />
+        <Section>
+          <Loader />
+        </Section>
       </CenteredContainer>
     );
   }

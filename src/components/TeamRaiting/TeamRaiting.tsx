@@ -22,8 +22,9 @@ function TeamRaiting() {
   if (loading || technicalDataLoading) {
     return (
       <CenteredContainer noPadding>
-        <Title noMargin>Рейтинг команд</Title>
-        <Loader />
+        <Section>
+          <Loader />
+        </Section>
       </CenteredContainer>
     );
   }

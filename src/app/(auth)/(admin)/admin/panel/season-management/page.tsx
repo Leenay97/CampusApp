@@ -12,10 +12,12 @@ import { useState } from 'react';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { ACTIVATE_SEASON } from '@/graphql/mutations/ActivateSeason';
 import { ARCHIVE_SEASON } from '@/graphql/mutations/ArchiveSeason';
+import Loader from '@/components/Loader/Loaader';
+import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 
 function SeasonManagementPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-  const { data, refetch } = useQuery(GET_SEASONS);
+  const { data, loading, refetch } = useQuery(GET_SEASONS);
   const [activateSeason] = useGlobalLoadingMutation(ACTIVATE_SEASON);
   const [archiveSeason] = useGlobalLoadingMutation(ARCHIVE_SEASON);
 
@@ -39,6 +41,16 @@ function SeasonManagementPage() {
     } catch (error) {
       console.error('Error activating season:', error);
     }
+  }
+
+  if (loading) {
+    return (
+      <CenteredContainer>
+        <Section>
+          <Loader />
+        </Section>
+      </CenteredContainer>
+    );
   }
 
   return (
