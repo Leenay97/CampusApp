@@ -100,6 +100,14 @@ function Header() {
     return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = isBurgerOpen ? 'hidden' : '';
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isBurgerOpen]);
+
   return (
     <div className={`${styles['header']} ${!isVisible ? styles['header--hidden'] : ''}`}>
       <div
@@ -123,7 +131,9 @@ function Header() {
         )}
         <Burger isOpen={isBurgerOpen} onClick={handleBurgerClick} />
         <BurgerMenu userLevel={userLevel} isOpen={isBurgerOpen} onClose={handleBurgerClose} />
-        <HeaderProfile user={user} onClick={handleProfileClick} />
+        <div className={styles['header__actions']}>
+          <HeaderProfile user={user} onClick={handleProfileClick} />
+        </div>
         <ProfileMenu isOpen={isProfileOpen} onClose={handleProfileClose} />
       </div>
     </div>

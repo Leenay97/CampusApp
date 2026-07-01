@@ -2,17 +2,12 @@
 .profile {
     height: 55px;
     cursor: pointer;
-    z-index: 300;
-    right: 0px;
-    top: 0px;
-    position: absolute;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 10px;
     border-radius: 8px;
-    padding: 0 20px;
     color: var(--text-primary);
+    flex-shrink: 0;
 
 
     &__img {

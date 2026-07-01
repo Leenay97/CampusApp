@@ -42,6 +42,18 @@
         }
     }
 
+    &__actions {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 20px;
+        z-index: 300;
+    }
+
     &__logo {
         width: 60px;
         position: absolute;
