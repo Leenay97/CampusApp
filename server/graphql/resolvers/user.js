@@ -126,6 +126,12 @@ export const userResolvers = {
       const group = await Group.findByPk(groupId);
       if (!group) throw new Error('Группы не существует');
       if (!group.seasonId) throw new Error('Группа не принадлежит сезону');
+
+      const existingStudent = await User.findOne({
+        where: { russianName, groupId, userLevel: 'STUDENT' },
+      });
+      if (existingStudent) throw new Error('Студент с таким именем уже есть в группе');
+
       const user = await User.create({
         russianName,
         groupId: group.id,
@@ -184,7 +190,7 @@ export const userResolvers = {
       };
     },
 
-    registerStudent: async (_, { token, name, login, password, confirmPassword }) => {
+    registerStudent: async (_, { token, id, name, login, password, confirmPassword }) => {
       if (!login || !password) throw new Error('Введите пароль и логин');
       if (password !== confirmPassword) throw new Error('Пароли не совпадают');
       if (!name) throw new Error('Введите английское имя');
@@ -192,22 +198,21 @@ export const userResolvers = {
       const group = await Group.findByPk(token);
       if (!group) throw new Error('Группа не существует');
 
+      const student = await User.findByPk(id);
+      if (!student || student.userLevel !== 'STUDENT') throw new Error('Студента не существует');
+      if (student.groupId !== group.id) throw new Error('Студент не принадлежит этой группе');
+      if (student.isActive) throw new Error('Студент уже зарегистрирован');
+
       const existingLogin = await User.findOne({ where: { login } });
       if (existingLogin) throw new Error('Логин уже занят');
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const student = await User.create({
-        login,
-        seasonId: group.seasonId,
-        name,
-        lives: 3,
-        coins: 0,
-        hashedPassword,
-        userLevel: 'STUDENT',
-        isActive: true,
-        groupId: group.id,
-      });
+      student.name = name;
+      student.login = login;
+      student.hashedPassword = hashedPassword;
+      student.isActive = true;
+      await student.save();
 
       const tokenForLogin = jwt.sign(
         {

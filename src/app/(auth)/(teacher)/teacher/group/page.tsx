@@ -9,6 +9,7 @@ import Section from '@/components/Section/Section';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import UserBadge from '@/components/UserBadge/UserBadge';
 import EditStudentModal from '@/components/EditStudentModal/EditStudentModal';
+import { AddStudent } from '@/components/AddStudent/AddStudent';
 import { useState } from 'react';
 import Loader from '@/components/Loader/Loaader';
 
@@ -46,6 +47,7 @@ function TeacherGroupPage() {
         <div className="">
           Твоя группа <span className={styles['group-logo']}>{user?.group?.name}</span>
         </div>
+        <AddStudent groupId={user?.group?.id} onAdd={refetch} />
         {data?.usersByGroup.map((student: User) => (
           <UserBadge
             key={student.id}

@@ -10,12 +10,16 @@ import CenteredContainer from '@/components/CenteredContainer/CenteredContainer'
 import Title from '@/components/Title/Title';
 import Subtitle from '@/components/Subtitle/Subtitle';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
-import { RegisterStudentResponse } from '@/app/types';
+import { RegisterStudentResponse, User } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { REGISTER_STUDENT } from '@/graphql/mutations/RegisterStudent';
+import { useQuery } from '@apollo/client';
+import queries from '@/graphql/queries';
+import { CustomSelect } from '@/components/CustomSelect/CustomSelect';
 
 function RegisterForm() {
+  const [selectedStudent, setSelectedStudent] = useState<User>({} as User);
   const [name, setName] = useState<string>('');
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -26,12 +30,23 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
 
+  const { data } = useQuery(queries.GET_STUDENTS_BY_GROUP, {
+    variables: { groupId: token },
+    skip: !token,
+  });
+  const unregisteredStudents = (data?.students || []).filter((student: User) => !student.isActive);
+
   const [registerStudent] = useGlobalLoadingMutation(REGISTER_STUDENT);
+
+  function handleSelectStudent(student: User) {
+    setSelectedStudent(student);
+  }
 
   async function handleRegister() {
     try {
       const result = (await registerStudent({
         token,
+        id: selectedStudent.id,
         name,
         login,
         password,
@@ -53,39 +68,47 @@ function RegisterForm() {
   return (
     <CenteredContainer>
       <Section>
-        <Title>Hey, campus student!</Title>
+        <Title noMargin>Hey, campus student!</Title>
       </Section>
       <Section>
         <div className={styles['prohibited-section__content']}>
-          <div>
-            <Subtitle>Английское имя*</Subtitle>
-            <InputField width="100%" value={name} onChange={setName} />
-          </div>
-          <div>
-            <Subtitle>Логин*</Subtitle>
-            <InputField width="100%" value={login} onChange={setLogin} />
-          </div>
-
-          <div>
-            <Subtitle>Пароль*</Subtitle>
-            <InputField width="100%" type="password" value={password} onChange={setPassword} />
-          </div>
-
-          <div>
-            <Subtitle>Подтверди пароль*</Subtitle>
-            <InputField
-              width="100%"
-              type="password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-            />
-          </div>
-
-          <PrimaryButton width="100%" onClick={handleRegister}>
-            Зарегистрироваться
-          </PrimaryButton>
+          <Subtitle noMargin>Найди себя*</Subtitle>
+          <CustomSelect items={unregisteredStudents} onChange={handleSelectStudent} />
         </div>
       </Section>
+      {selectedStudent.id && (
+        <Section>
+          <div className={styles['prohibited-section__content']}>
+            <div>
+              <Subtitle>Английское имя*</Subtitle>
+              <InputField width="100%" value={name} onChange={setName} />
+            </div>
+            <div>
+              <Subtitle>Логин*</Subtitle>
+              <InputField width="100%" value={login} onChange={setLogin} />
+            </div>
+
+            <div>
+              <Subtitle>Пароль*</Subtitle>
+              <InputField width="100%" type="password" value={password} onChange={setPassword} />
+            </div>
+
+            <div>
+              <Subtitle>Подтверди пароль*</Subtitle>
+              <InputField
+                width="100%"
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+              />
+            </div>
+
+            <PrimaryButton width="100%" onClick={handleRegister}>
+              Зарегистрироваться
+            </PrimaryButton>
+          </div>
+        </Section>
+      )}
     </CenteredContainer>
   );
 }
