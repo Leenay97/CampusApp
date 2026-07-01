@@ -50,7 +50,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     skip: !selectedGroup.id,
   });
 
-  const [transferCoins] = useGlobalLoadingMutation(TRANSFER_COINS);
+  const [transferCoins, { loading: transferCoinsLoading }] =
+    useGlobalLoadingMutation(TRANSFER_COINS);
 
   useEffect(() => {
     if (userData?.user && !scanCompleted) {
@@ -111,7 +112,6 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     }
 
     try {
-      setLoading(true);
       await transferCoins({
         userId: user?.id,
         recieverId: selectedStudent.id,
@@ -123,8 +123,6 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     } catch (err) {
       console.error(err);
       setError('Ошибка при переводе');
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -139,7 +137,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     setError('');
   }
 
-  const showLoader = userLoading || groupsLoading || loading;
+  const showLoader = userLoading || groupsLoading;
 
   if (showScanner) {
     return (
@@ -219,7 +217,10 @@ function TransferCoinsModal({ onClose }: ModalProps) {
 
       <ModalFooter>
         <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
-        <PrimaryButton onClick={transfer} disabled={!selectedStudent.id || !coins}>
+        <PrimaryButton
+          onClick={transfer}
+          disabled={!selectedStudent.id || !coins || transferCoinsLoading}
+        >
           Перевести
         </PrimaryButton>
       </ModalFooter>

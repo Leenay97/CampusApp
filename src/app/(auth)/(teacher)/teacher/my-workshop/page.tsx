@@ -6,18 +6,19 @@ import Title from '@/components/Title/Title';
 import Workshop from '@components/Workshop/Workshop';
 import { useUser } from '@/contexts/UserContext';
 import { GET_WORKSHOPS_BY_TEACHER } from '@/graphql/queries/GetWorkshopsByTeacher';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Fragment, useState } from 'react';
 import CloseWorkshopModal from '@/components/CloseWorkshopModal/CloseWorkshopModal';
 import Loader from '@/components/Loader/Loaader';
 import { CLOSE_WORKSHOP } from '@/graphql/mutations/CloseWorkshop';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Subtitle from '@/components/Subtitle/Subtitle';
 
 export default function MyWorkshopPage() {
   const [activeWorkshopId, setActiveWorkshopId] = useState<string | null>(null);
   const [showClosed, setShowClosed] = useState<boolean>(false);
-  const [closeWorkshop] = useMutation(CLOSE_WORKSHOP);
+  const [closeWorkshop] = useGlobalLoadingMutation(CLOSE_WORKSHOP);
   const { user } = useUser();
   const { data, loading, refetch } = useQuery(GET_WORKSHOPS_BY_TEACHER, {
     variables: { userId: user?.id },
@@ -25,9 +26,7 @@ export default function MyWorkshopPage() {
 
   async function handleCloseWorkshop(studentIds: string[]) {
     try {
-      await closeWorkshop({
-        variables: { studentIds, workshopId: activeWorkshopId },
-      });
+      await closeWorkshop({ studentIds, workshopId: activeWorkshopId });
       refetch();
       setActiveWorkshopId(null);
     } catch {

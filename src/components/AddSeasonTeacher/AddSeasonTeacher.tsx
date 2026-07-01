@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { InputField } from '@components/InputField/InputField';
 import styles from './AddSeasonTeacher.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
-import { useMutation } from '@apollo/client';
 import { mutations } from '@graphql/mutations';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import Subtitle from '../Subtitle/Subtitle';
 
 type AddTeacherProps = {
@@ -12,13 +12,13 @@ type AddTeacherProps = {
 
 export function AddSeasonTeacher({ onAdd }: AddTeacherProps) {
   const [teacherName, setTeacherName] = useState('');
-  const [createTeacher] = useMutation(mutations.CREATE_TEACHER);
+  const [createTeacher] = useGlobalLoadingMutation(mutations.CREATE_TEACHER);
 
   async function handleCreateTeacher() {
     if (!teacherName) return;
 
     try {
-      await createTeacher({ variables: { name: teacherName } });
+      await createTeacher({ name: teacherName });
       setTeacherName('');
       onAdd?.();
     } catch (err) {

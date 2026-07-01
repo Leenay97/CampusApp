@@ -7,16 +7,17 @@ import ScheduleBuilderRow from './ScheduleBuilderRow/ScheduleBuilderRow';
 import Title from '../Title/Title';
 import { InputField } from '../InputField/InputField';
 import PrimaryButton from '../PrimaryButton/PrimaryButton';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { UPDATE_SCHEDULE } from '@/graphql/mutations/UpdateSchedule';
 import { GET_SCHEDULE } from '@/graphql/queries/GetSchedule';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import Section from '../Section/Section';
 
 export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
   const [schedules, setSchedules] = useState<Schedule[]>(DEFAULT_SCHEDULE.schedule);
   const [name, setName] = useState(DEFAULT_SCHEDULE.name);
 
-  const [updateSchedule] = useMutation(UPDATE_SCHEDULE);
+  const [updateSchedule] = useGlobalLoadingMutation(UPDATE_SCHEDULE);
   const { data } = useQuery(GET_SCHEDULE);
 
   useEffect(() => {
@@ -56,10 +57,10 @@ export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
     });
   }
 
-  function handleSave() {
+  async function handleSave() {
     const schedulesJSON = JSON.stringify(schedules);
     try {
-      updateSchedule({ variables: { dayName: name, schedule: schedulesJSON } });
+      await updateSchedule({ dayName: name, schedule: schedulesJSON });
     } catch (err) {
       console.error(err);
     }

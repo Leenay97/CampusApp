@@ -25,7 +25,7 @@ type FineStudentModalProps = {
 function FineStudentModal({ onClose }: FineStudentModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [fineUser] = useGlobalLoadingMutation(FINE_USER);
+  const [fineUser, { loading: fineUserLoading }] = useGlobalLoadingMutation(FINE_USER);
   const [getUser, { data: userData, loading: userLoading }] = useLazyQuery<
     GetUserResponse,
     GetUserVariables
@@ -83,13 +83,11 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
     if (!student?.id) return;
 
     try {
-      setLoading(true);
       await fineUser({ id: student.id });
       handleClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Произошла ошибка');
       console.error('Ошибка:', err);
-      setLoading(false);
     }
   }
 
@@ -157,7 +155,7 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
         {showStudentInfo ? (
           <>
             <SecondaryButton onClick={handleReset}>Сканировать</SecondaryButton>
-            <PrimaryButton onClick={handleFine} disabled={loading}>
+            <PrimaryButton onClick={handleFine} disabled={fineUserLoading}>
               {title}
             </PrimaryButton>
           </>

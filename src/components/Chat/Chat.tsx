@@ -5,7 +5,7 @@ import ChatArea from './ChatArea/ChatArea';
 import ChatInput from './ChatInput/ChatInput';
 import styles from './Chat.module.scss';
 import { useCallback, useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { SEND_MESSAGE } from '@/graphql/mutations/SendMessage';
 
 type ChatProps = {
@@ -24,18 +24,16 @@ export default function Chat({
   isStaffChat = false,
 }: ChatProps) {
   const [message, setMessage] = useState('');
-  const [sendMessage] = useMutation(SEND_MESSAGE);
+  const [sendMessage] = useGlobalLoadingMutation(SEND_MESSAGE);
 
   const handleSendMessage = useCallback(() => {
     if (!message.trim() || !userId) return;
 
     sendMessage({
-      variables: {
-        authorId: userId,
-        text: message.trim(),
-        groupId: groupId,
-        isStaffChat,
-      },
+      authorId: userId,
+      text: message.trim(),
+      groupId: groupId,
+      isStaffChat,
     });
     setMessage('');
   }, [userId, message, groupId, isStaffChat, sendMessage]);

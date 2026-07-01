@@ -3,7 +3,7 @@ import './globals.css';
 import { ApolloWrapper } from '@/lib/ApolloWrapper';
 import { UserProvider } from '@/contexts/UserContext';
 import { AppProvider } from '@/contexts/AppContext';
-import ModalLoading from '@/components/ModalLoading/ModalLoading';
+import MutationStatusToast from '@/components/MutationStatusToast/MutationStatusToast';
 import { useLoading } from '@/contexts/LoadingContext';
 import { LoadingProvider } from '@/contexts/LoadingContext';
 import { roboto } from './fonts';
@@ -13,12 +13,10 @@ type RootLayoutProps = Readonly<{
 }>;
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  function ModalLoadingWrapper() {
-    const { loadingState, hideLoading } = useLoading();
+  function MutationStatusToastWrapper() {
+    const { loadingState } = useLoading();
 
-    if (!loadingState) return null;
-
-    return <ModalLoading loadingState={loadingState} onClose={hideLoading} />;
+    return <MutationStatusToast loadingState={loadingState} />;
   }
 
   return (
@@ -33,7 +31,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <UserProvider>
               <AppProvider>
                 {children}
-                <ModalLoadingWrapper />
+                <MutationStatusToastWrapper />
                 <div id="modal-root" />
               </AppProvider>
             </UserProvider>

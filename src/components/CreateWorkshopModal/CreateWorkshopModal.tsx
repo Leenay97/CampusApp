@@ -4,9 +4,10 @@ import styles from './CreateWorkshopModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import { InputField } from '../InputField/InputField';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { Place, User } from '@/app/types';
 import { CustomSelect } from '@components/CustomSelect/CustomSelect';
 import Subtitle from '../Subtitle/Subtitle';
@@ -48,7 +49,7 @@ function CreateWorkshopModal({
 
   const { data: placesData } = useQuery(queries.GET_PLACES);
 
-  const [createWorkshop] = useMutation(mutations.CREATE_WORKSHOP);
+  const [createWorkshop] = useGlobalLoadingMutation(mutations.CREATE_WORKSHOP);
 
   const teachers = teachersData?.teachers ?? [];
 
@@ -74,15 +75,13 @@ function CreateWorkshopModal({
   async function handleSubmit() {
     try {
       await createWorkshop({
-        variables: {
-          name,
-          placeId: selectedPlace.id,
-          teacherId: selectedTeacher.id,
-          maxStudents: parseInt(capacity, 10),
-          maxAge: parseInt(maxAge),
-          type: sportTime ? 'SPORT' : 'WORKSHOP',
-          date: selectedDate,
-        },
+        name,
+        placeId: selectedPlace.id,
+        teacherId: selectedTeacher.id,
+        maxStudents: parseInt(capacity, 10),
+        maxAge: parseInt(maxAge),
+        type: sportTime ? 'SPORT' : 'WORKSHOP',
+        date: selectedDate,
       });
       onSubmit();
     } catch (error) {

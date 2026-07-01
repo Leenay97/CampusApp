@@ -12,7 +12,7 @@ import { DELETE_POST } from '@/graphql/mutations/DeletePost';
 import { SEND_PUSH_ALL } from '@/graphql/mutations/SendPushAll';
 import { GET_POSTS } from '@/graphql/queries/GetPosts';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useMemo, useState } from 'react';
 
 export default function InfoPage() {
@@ -20,7 +20,7 @@ export default function InfoPage() {
   const [showCreator, setShowCreator] = useState(false);
   const [editingPost, setEditingPost] = useState<PostType | null>(null);
   const { data, loading, refetch } = useQuery(GET_POSTS);
-  const [sendPushToAll] = useMutation(SEND_PUSH_ALL);
+  const [sendPushToAll] = useGlobalLoadingMutation(SEND_PUSH_ALL);
   const [deletePost] = useGlobalLoadingMutation(DELETE_POST);
 
   const [createTitle, setCreateTitle] = useState<string>('');
@@ -39,11 +39,9 @@ export default function InfoPage() {
 
     try {
       await sendPushToAll({
-        variables: {
-          title: `Новый пост от ${user?.name || 'Easy Campus'}`,
-          body: createText,
-          url: '/information',
-        },
+        title: `Новый пост от ${user?.name || 'Easy Campus'}`,
+        body: createText,
+        url: '/information',
       });
     } catch (error) {
       console.error('❌ Ошибка push:', error);

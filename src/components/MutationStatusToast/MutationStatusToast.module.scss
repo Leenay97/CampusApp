@@ -1,0 +1,41 @@
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 1000;
+
+    opacity: 0;
+    transform: translateX(120%);
+    animation: slideIn 0.3s ease forwards;
+
+    &--action {
+        background: rgba(214, 190, 150, 0.95);
+
+        .toast__text {
+            color: #4a3a20;
+        }
+    }
+
+    &--success {
+        background: rgba(56, 142, 60, 0.85);
+    }
+
+    &--error {
+        background: rgba(202, 25, 25, 0.7);
+    }
+
+    &__text {
+        color: white;
+        font-size: 14px;
+    }
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
