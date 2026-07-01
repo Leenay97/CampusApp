@@ -14,5 +14,6 @@ export const AdminPanelOptions: MenuOption[] = [
   { name: 'Тех. данные', link: '/admin/panel/technical-data' },
   { name: 'Управление домиками', link: '/admin/panel/houses' },
   { name: 'Cтуденты', link: '/admin/panel/students' },
+  { name: 'Восстановление пароля', link: '/admin/panel/password-reset' },
   { name: 'Голосования', link: '/admin/panel/election' },
 ];

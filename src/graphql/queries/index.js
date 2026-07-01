@@ -21,6 +21,7 @@ import { GET_CLASSES } from './GetClasses';
 import { GET_SEASON_GROUPS } from './GetSeasonGroups';
 import { GET_MESSAGES } from './GetMessages';
 import { GET_VOTES, GET_VOTES_FOR_VOTING } from './GetVote';
+import { GET_ALL_STUDENTS } from './GetAllStudents';
 
 export const queries = {
   GET_GROUPS,
@@ -47,5 +48,6 @@ export const queries = {
   GET_MESSAGES,
   GET_VOTES,
   GET_VOTES_FOR_VOTING,
+  GET_ALL_STUDENTS,
 };
 export default queries;

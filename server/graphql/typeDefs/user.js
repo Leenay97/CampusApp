@@ -16,6 +16,7 @@ export const userTypeDefs = gql`
     englishLevel: String
     class: Class
     photoUrl: String
+    login: String
   }
 
   type AuthPayload {
@@ -67,5 +68,7 @@ export const userTypeDefs = gql`
     transferCoins(userId: ID!, recieverId: ID!, amount: Int!): User
     addWorkshop(id: ID!, workshopId: ID!): User
     fineUser(id: ID!): User
+    generatePasswordResetLink(userId: ID!): String!
+    resetPassword(token: String!, password: String!, confirmPassword: String!): Boolean!
   }
 `;

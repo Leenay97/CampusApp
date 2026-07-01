@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache, from, split } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
+import { setContext } from '@apollo/client/link/context';
 import { createUploadLink } from 'apollo-upload-client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
@@ -34,6 +35,16 @@ const uploadLink = createUploadLink({
   credentials: 'same-origin',
 });
 
+const authLink = setContext((_, { headers }) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
 // Replace http→ws and https→wss so both dev (http) and prod (https) work correctly.
 const wsUrl =
   (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/^https/, 'wss').replace(/^http/, 'ws') + '/ws';
@@ -61,7 +72,7 @@ const splitLink = split(
     return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
   },
   wsLink,
-  uploadLink,
+  authLink.concat(uploadLink),
 );
 
 export const client = new ApolloClient({

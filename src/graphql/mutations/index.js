@@ -30,6 +30,8 @@ import { UPDATE_POST } from './UpdatePost';
 import { DELETE_POST } from './DeletePost';
 import { CREATE_VOTE } from './CreateVote';
 import { CAST_VOTE } from './CastVote';
+import { GENERATE_PASSWORD_RESET_LINK } from './GeneratePasswordResetLink';
+import { RESET_PASSWORD } from './ResetPassword';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -64,5 +66,7 @@ export const mutations = {
   DELETE_POST,
   CREATE_VOTE,
   CAST_VOTE,
+  GENERATE_PASSWORD_RESET_LINK,
+  RESET_PASSWORD,
 };
 export default mutations;

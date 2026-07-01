@@ -4,6 +4,22 @@ import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
 
+function requireAdmin(context) {
+  const authHeader = context?.req?.headers?.authorization || '';
+  const token = authHeader.replace('Bearer ', '');
+  if (!token) throw new Error('Не авторизован');
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    throw new Error('Невалидный токен');
+  }
+
+  if (decoded.userLevel !== 'ADMIN') throw new Error('Доступ запрещен');
+  return decoded;
+}
+
 export const userResolvers = {
   Query: {
     students: async (_, { groupId }) => {
@@ -293,6 +309,38 @@ export const userResolvers = {
 
       await user.addWorkshop(workshop);
       return user;
+    },
+
+    generatePasswordResetLink: async (_, { userId }, context) => {
+      requireAdmin(context);
+
+      const user = await User.findByPk(userId);
+      if (!user) throw new Error('Пользователь не найден');
+      if (user.userLevel === 'ADMIN') throw new Error('Нельзя сбросить пароль администратора');
+
+      return jwt.sign({ id: user.id, purpose: 'password-reset' }, process.env.JWT_SECRET, {
+        expiresIn: '2h',
+      });
+    },
+
+    resetPassword: async (_, { token, password, confirmPassword }) => {
+      if (!password || password !== confirmPassword) throw new Error('Пароли не совпадают');
+
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch {
+        throw new Error('Ссылка недействительна или истекла');
+      }
+      if (decoded.purpose !== 'password-reset') throw new Error('Неверная ссылка');
+
+      const user = await User.findByPk(decoded.id);
+      if (!user) throw new Error('Пользователь не найден');
+
+      user.hashedPassword = await bcrypt.hash(password, 10);
+      await user.save();
+
+      return true;
     },
 
     fineUser: async (_, { id }) => {
