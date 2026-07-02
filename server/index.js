@@ -17,6 +17,7 @@ import { sequelize, PushSubscription } from './models/index.js';
 import { typeDefs } from './graphql/typeDefs/index.js';
 import { resolvers } from './graphql/resolvers/index.js';
 import { pubsub } from './graphql/pubsub.js';
+import { scheduleLivesReset } from './jobs/resetLives.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -243,6 +244,8 @@ const startServer = async () => {
     console.log('✅ Database connected');
     await sequelize.sync({ alter: true });
     console.log('✅ Tables synced');
+
+    scheduleLivesReset();
   } catch (error) {
     console.error('❌ Database error:', error);
   }
