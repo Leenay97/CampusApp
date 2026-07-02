@@ -3,6 +3,8 @@ import { getHeaderMenuSections } from './constants';
 import styles from './BurgerMenu.module.scss';
 import Link from 'next/link';
 import { UserLevel } from '@/app/types';
+import GroupChatIcon from '../Icons/GroupChatIcon/GroupChatIcon';
+import StaffChatIcon from '../Icons/StaffChatIcon/StaffChatIcon';
 
 type BurgerMenuProps = {
   isOpen: boolean;
@@ -68,6 +70,20 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
             </div>
           );
         })}
+        <div className={styles['burger-menu__chat']}>
+          {userLevel !== UserLevel.Student && (
+            <Link href="/staff-chat" className={styles['burger-menu__chat-btn']} onClick={onClose}>
+              <StaffChatIcon />
+              <div className="">Staff chat</div>
+            </Link>
+          )}
+          {userLevel !== UserLevel.Admin && (
+            <Link href="/chat" className={styles['burger-menu__chat-btn']} onClick={onClose}>
+              <GroupChatIcon />
+              <div className="">Чат группы</div>
+            </Link>
+          )}
+        </div>
       </nav>
     </div>
   );

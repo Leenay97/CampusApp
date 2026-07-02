@@ -49,35 +49,20 @@ const AdminSection: MenuSection = {
   options: [{ name: 'Панель администратора', link: '/admin/panel' }],
 };
 
-const StaffChatsSection: MenuSection = {
-  title: 'Чаты',
-  options: [
-    { name: 'Чат группы', link: '/chat' },
-    { name: 'Staff chat', link: '/staff-chat' },
-  ],
-};
-
-const StudentChatSection: MenuSection = {
-  options: [{ name: 'Чат группы', link: '/chat' }],
-};
-
 export const StudentHeaderMenuSections: MenuSection[] = [
   NavigationSection,
   StudentActivitiesSection,
-  StudentChatSection,
 ];
 
 export const TeacherHeaderMenuSections: MenuSection[] = [
   NavigationSection,
   StudentActivitiesSection,
   TeacherSection,
-  StaffChatsSection,
 ];
 
 export const AdminHeaderMenuSections: MenuSection[] = [
   NavigationSection,
   AdminActivitiesSection,
-  StaffChatsSection,
   AdminSection,
 ];
 

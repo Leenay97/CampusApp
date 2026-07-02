@@ -109,34 +109,44 @@ function Header() {
   }, [isBurgerOpen]);
 
   return (
-    <div className={`${styles['header']} ${!isVisible ? styles['header--hidden'] : ''}`}>
+    <>
       <div
-        ref={headerRef}
-        className={isBurgerOpen ? styles['header__container--white'] : styles['header__container']}
-      >
-        {isBurgerOpen && app?.todayPlace?.name ? (
-          <div
-            className={styles['header__place']}
-            style={{ backgroundColor: app?.todayPlace?.color }}
-          >
-            {app?.todayPlace?.name}
+        className={`${styles['header__overlay']} ${
+          isBurgerOpen ? '' : styles['header__overlay--hidden']
+        }`}
+        onClick={handleBurgerClose}
+      />
+      <div className={`${styles['header']} ${!isVisible ? styles['header--hidden'] : ''}`}>
+        <div
+          ref={headerRef}
+          className={
+            isBurgerOpen ? styles['header__container--white'] : styles['header__container']
+          }
+        >
+          {isBurgerOpen && app?.todayPlace?.name ? (
+            <div
+              className={styles['header__place']}
+              style={{ backgroundColor: app?.todayPlace?.color }}
+            >
+              {app?.todayPlace?.name}
+            </div>
+          ) : (
+            <Image
+              className={styles['header__logo']}
+              src={Logo}
+              alt="Logo"
+              onClick={handleLogoClick}
+            />
+          )}
+          <Burger isOpen={isBurgerOpen} onClick={handleBurgerClick} />
+          <BurgerMenu userLevel={userLevel} isOpen={isBurgerOpen} onClose={handleBurgerClose} />
+          <div className={styles['header__actions']}>
+            <HeaderProfile user={user} onClick={handleProfileClick} />
           </div>
-        ) : (
-          <Image
-            className={styles['header__logo']}
-            src={Logo}
-            alt="Logo"
-            onClick={handleLogoClick}
-          />
-        )}
-        <Burger isOpen={isBurgerOpen} onClick={handleBurgerClick} />
-        <BurgerMenu userLevel={userLevel} isOpen={isBurgerOpen} onClose={handleBurgerClose} />
-        <div className={styles['header__actions']}>
-          <HeaderProfile user={user} onClick={handleProfileClick} />
+          <ProfileMenu isOpen={isProfileOpen} onClose={handleProfileClose} />
         </div>
-        <ProfileMenu isOpen={isProfileOpen} onClose={handleProfileClose} />
       </div>
-    </div>
+    </>
   );
 }
 
