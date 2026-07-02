@@ -20,7 +20,14 @@ export const groupTypeDefs = gql`
 
   extend type Mutation {
     createGroup(name: String!, userIds: [ID!]!, seasonId: ID!): Group
-    updateGroup(id: ID!, amount: Int, places: String, teacherIds: [ID], name: String): Group
+    updateGroup(
+      id: ID!
+      amount: Int
+      rubbersAmount: Int
+      places: String
+      teacherIds: [ID]
+      name: String
+    ): Group
     deleteGroup(id: ID!): Group
   }
 `;

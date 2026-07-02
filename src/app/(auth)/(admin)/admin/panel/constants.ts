@@ -7,6 +7,7 @@ export const AdminPanelOptions: MenuOption[] = [
   { name: 'Управление сезонами', link: '/admin/panel/season-management' },
   { name: 'Учителя', link: '/admin/panel/teachers' },
   { name: 'Points', link: '/admin/panel/points' },
+  { name: 'Резиночки', link: '/admin/panel/rubbers' },
   { name: 'Места', link: '/admin/panel/places' },
   { name: 'Мастерклассы', link: '/admin/panel/workshops' },
   { name: 'Sport Time', link: '/admin/panel/sporttime' },

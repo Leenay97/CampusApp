@@ -106,7 +106,7 @@ export const groupResolvers = {
       });
     },
 
-    updateGroup: async (_, { id, amount, places, name, teacherIds }) => {
+    updateGroup: async (_, { id, amount, rubbersAmount, places, name, teacherIds }) => {
       console.log('teacherIds:', teacherIds);
       const group = await Group.findByPk(id);
       if (!group) throw new Error('Группа не найдена');
@@ -121,6 +121,10 @@ export const groupResolvers = {
 
       if (amount !== undefined && amount !== null) {
         group.points += amount;
+      }
+
+      if (rubbersAmount !== undefined && rubbersAmount !== null) {
+        group.rubbers = Math.max(0, (group.rubbers ?? 0) + rubbersAmount);
       }
 
       if (teacherIds && Array.isArray(teacherIds)) {

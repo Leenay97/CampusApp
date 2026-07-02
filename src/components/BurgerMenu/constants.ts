@@ -16,6 +16,7 @@ const NavigationSection: MenuSection = {
     { name: 'Расписание', link: '/schedule' },
     { name: 'Лента', link: '/information' },
     { name: 'Домики', link: '/houses' },
+    { name: 'Резиночки', link: '/rubbers' },
     { name: 'Голосование', link: '/election' },
   ],
 };
