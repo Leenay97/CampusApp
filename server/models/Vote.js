@@ -6,4 +6,9 @@ export const Vote = sequelize.define('Vote', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  status: {
+    type: DataTypes.ENUM('DRAFT', 'ACTIVE', 'FINISHED'),
+    allowNull: false,
+    defaultValue: 'DRAFT',
+  },
 });

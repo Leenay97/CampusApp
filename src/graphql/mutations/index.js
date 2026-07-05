@@ -30,6 +30,8 @@ import { UPDATE_POST } from './UpdatePost';
 import { DELETE_POST } from './DeletePost';
 import { CREATE_VOTE } from './CreateVote';
 import { CAST_VOTE } from './CastVote';
+import { SET_VOTE_STATUS } from './SetVoteStatus';
+import { DELETE_VOTE } from './DeleteVote';
 import { GENERATE_PASSWORD_RESET_LINK } from './GeneratePasswordResetLink';
 import { RESET_PASSWORD } from './ResetPassword';
 
@@ -66,6 +68,8 @@ export const mutations = {
   DELETE_POST,
   CREATE_VOTE,
   CAST_VOTE,
+  SET_VOTE_STATUS,
+  DELETE_VOTE,
   GENERATE_PASSWORD_RESET_LINK,
   RESET_PASSWORD,
 };

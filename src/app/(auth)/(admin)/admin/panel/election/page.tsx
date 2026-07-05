@@ -9,6 +9,8 @@ import { GET_VOTES } from '@/graphql/queries/GetVote';
 import { useApp } from '@/contexts/AppContext';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { CREATE_VOTE } from '@/graphql/mutations/CreateVote';
+import { SET_VOTE_STATUS } from '@/graphql/mutations/SetVoteStatus';
+import { DELETE_VOTE } from '@/graphql/mutations/DeleteVote';
 import Election from '@/components/Election/Election';
 import Loader from '@/components/Loader/Loaader';
 import Section from '@/components/Section/Section';
@@ -28,6 +30,24 @@ export default function ElectionPage(): JSX.Element {
       refetch();
     },
   });
+
+  const [setVoteStatus] = useGlobalLoadingMutation(SET_VOTE_STATUS, {
+    onCompleted: () => {
+      refetch();
+    },
+  });
+
+  const [deleteVote] = useGlobalLoadingMutation(DELETE_VOTE, {
+    onCompleted: () => {
+      refetch();
+    },
+  });
+
+  function handleDelete(vote: Vote) {
+    if (window.confirm(`Удалить голосование «${vote.title}»?`)) {
+      deleteVote({ id: vote.id });
+    }
+  }
 
   function handleOpenModal() {
     setIsOpenModal(true);
@@ -52,7 +72,14 @@ export default function ElectionPage(): JSX.Element {
       <PrimaryButton onClick={handleOpenModal}>Добавить</PrimaryButton>
 
       {data?.getVotes?.map((vote: Vote) => (
-        <Election key={vote.id} election={vote} adminMode />
+        <Election
+          key={vote.id}
+          election={vote}
+          adminMode
+          onStart={() => setVoteStatus({ id: vote.id, status: 'ACTIVE' })}
+          onFinish={() => setVoteStatus({ id: vote.id, status: 'FINISHED' })}
+          onDelete={() => handleDelete(vote)}
+        />
       ))}
 
       {openModal && <AddElectionModal onClose={handleCloseModal} onCreate={createVote} />}

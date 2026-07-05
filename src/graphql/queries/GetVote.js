@@ -5,6 +5,7 @@ export const GET_VOTES = gql`
     getVotes(seasonId: $seasonId) {
       id
       title
+      status
       options {
         id
         name
@@ -19,10 +20,12 @@ export const GET_VOTES_FOR_VOTING = gql`
     getVotes(seasonId: $seasonId, userId: $userId) {
       id
       title
+      status
       votedOptionId
       options {
         id
         name
+        votesNumber
       }
     }
   }

@@ -122,9 +122,12 @@ export type Message = {
   createdAt: string;
 };
 
+export type VoteStatus = 'DRAFT' | 'ACTIVE' | 'FINISHED';
+
 export type Vote = {
   id: string;
   title: string;
+  status: VoteStatus;
   options: VoteOption[];
   votedOptionId?: string | null;
 };

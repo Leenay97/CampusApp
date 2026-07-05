@@ -5,8 +5,13 @@ const OPTIONS_ORDER = [['createdAt', 'ASC']];
 export const voteResolvers = {
   Query: {
     getVotes: async (_, { seasonId, userId }) => {
+      const where = { seasonId };
+      if (userId) {
+        where.status = ['ACTIVE', 'FINISHED'];
+      }
+
       const votes = await Vote.findAll({
-        where: { seasonId },
+        where,
         include: [{ model: VoteOption, as: 'options' }],
         order: [[{ model: VoteOption, as: 'options' }, 'createdAt', 'ASC']],
       });
@@ -84,6 +89,23 @@ export const voteResolvers = {
       };
     },
 
+    setVoteStatus: async (_, { id, status }) => {
+      const vote = await Vote.findByPk(id);
+      if (!vote) throw new Error('Vote not found');
+
+      await vote.update({ status });
+
+      const options = await VoteOption.findAll({
+        where: { voteId: id },
+        order: OPTIONS_ORDER,
+      });
+
+      return {
+        ...vote.toJSON(),
+        options,
+      };
+    },
+
     deleteVote: async (_, { id }) => {
       const vote = await Vote.findByPk(id);
       if (!vote) throw new Error('Vote not found');
@@ -95,6 +117,10 @@ export const voteResolvers = {
     },
 
     castVote: async (_, { voteId, optionId, userId }) => {
+      const currentVote = await Vote.findByPk(voteId);
+      if (!currentVote) throw new Error('Голосование не найдено');
+      if (currentVote.status !== 'ACTIVE') throw new Error('Голосование не активно');
+
       const user = await User.findByPk(userId);
       if (!user) throw new Error('Пользователь не найден');
 
