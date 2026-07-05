@@ -5,6 +5,7 @@ export const FINE_USER = gql`
     fineUser(id: $id) {
       id
       name
+      lives
     }
   }
 `;

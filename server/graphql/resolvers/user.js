@@ -345,6 +345,7 @@ export const userResolvers = {
 
     fineUser: async (_, { id }) => {
       const user = await User.findByPk(id);
+      if (!user) throw new Error('Студент не найден');
       const group = await Group.findOne({ where: { id: user.groupId } });
 
       if (!user.lives || user.lives === 0) {
@@ -352,10 +353,12 @@ export const userResolvers = {
       }
       user.lives -= 1;
 
-      group.rubbers += 1;
+      if (group) {
+        group.rubbers += 1;
+        await group.save();
+      }
 
-      user.save();
-      group.save();
+      await user.save();
 
       return user;
     },

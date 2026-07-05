@@ -1,17 +1,18 @@
 'use client';
-
-import { memo, useState, useEffect } from 'react';
-import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
+import { memo, useEffect, useState } from 'react';
 import styles from './FineStudentModal.module.scss';
+import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { CustomSelect } from '../CustomSelect/CustomSelect';
+import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 import Subtitle from '../Subtitle/Subtitle';
+import { GET_STUDENTS_BY_GROUP_ID } from '@/graphql/queries/GetStudentsByGroupId';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { FINE_USER } from '@/graphql/mutations/FineUser';
-import { User } from '@/app/types';
-import { GET_USER } from '@/graphql/queries/GetUser';
-import { useLazyQuery } from '@apollo/client';
+import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import { GetUserResponse, GetUserVariables } from '@/graphql/types';
-import PrimaryButton from '../PrimaryButton/PrimaryButton';
+import { GET_USER } from '@/graphql/queries/GetUser';
 import Loader from '../Loader/Loaader';
 import Modal from '../Modal/Modal';
 import ModalHeader from '../Modal/ModalHeader';
@@ -22,44 +23,61 @@ type FineStudentModalProps = {
   onClose: () => void;
 };
 
+type GroupSelection = {
+  id: string;
+  name: string;
+};
+
 function FineStudentModal({ onClose }: FineStudentModalProps) {
+  const [selectedGroup, setSelectedGroup] = useState({ id: '', name: '' });
+  const [selectedStudent, setSelectedStudent] = useState({ id: '', name: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [fineUser, { loading: fineUserLoading }] = useGlobalLoadingMutation(FINE_USER);
+  const [showScanner, setShowScanner] = useState(false);
+  const [scanCompleted, setScanCompleted] = useState(false);
+  const { data: groupsData, loading: groupsLoading } = useQuery(GET_ACTIVE_SEASON);
   const [getUser, { data: userData, loading: userLoading }] = useLazyQuery<
     GetUserResponse,
     GetUserVariables
   >(GET_USER);
-  const [student, setStudent] = useState<Partial<User> | null>(null);
-  const [groupName, setGroupName] = useState<string>('');
-  const [scanCompleted, setScanCompleted] = useState(false);
+
+  const { data: studentsData } = useQuery(GET_STUDENTS_BY_GROUP_ID, {
+    variables: { groupId: selectedGroup.id },
+    skip: !selectedGroup.id,
+  });
+
+  const [fineUser, { loading: fineUserLoading }] = useGlobalLoadingMutation(FINE_USER);
 
   useEffect(() => {
     if (userData?.user && !scanCompleted) {
-      setStudent({ id: userData.user.id, name: userData.user.name });
-      setGroupName(userData.user.group?.name || '');
+      setSelectedStudent({ id: userData.user.id, name: userData.user.name });
+      setSelectedGroup({
+        id: userData.user.group?.id || '',
+        name: userData.user.group?.name || '',
+      });
       setScanCompleted(true);
       setLoading(false);
+      setShowScanner(false);
+      setError('');
     }
   }, [userData, scanCompleted]);
 
-  const title = 'Оштрафовать';
+  useEffect(() => {
+    if (!showScanner) {
+      setScanCompleted(false);
+      setError('');
+      setSelectedStudent({ id: '', name: '' });
+      setSelectedGroup({ id: '', name: '' });
+    }
+  }, [showScanner]);
 
-  function handleClose() {
-    resetState();
-    onClose();
-  }
-
-  function resetState() {
-    setStudent(null);
-    setGroupName('');
-    setError('');
-    setLoading(false);
-    setScanCompleted(false);
+  function handleChangeGroup({ id, name }: GroupSelection) {
+    setSelectedGroup({ id, name });
+    setSelectedStudent({ id: '', name: '' });
   }
 
   async function handleScan(detectedCodes: IDetectedBarcode[]) {
-    if (detectedCodes.length > 0 && !loading && !userLoading && !student) {
+    if (detectedCodes.length > 0 && !loading && !userLoading) {
       setLoading(true);
       setError('');
 
@@ -75,48 +93,49 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
         setError(err instanceof Error ? err.message : 'Ошибка сканирования');
         console.error('Ошибка:', err);
         setLoading(false);
+        setScanCompleted(false);
       }
     }
   }
 
   async function handleFine() {
-    if (!student?.id) return;
+    if (!selectedStudent.id) {
+      setError('Выберите студента');
+      return;
+    }
 
     try {
-      await fineUser({ id: student.id });
-      handleClose();
+      await fineUser({ id: selectedStudent.id });
+      setError('');
+      onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Произошла ошибка');
-      console.error('Ошибка:', err);
+      console.error(err);
+      setError(err instanceof Error ? err.message : 'Ошибка при штрафе');
     }
-  }
-
-  function handleReset() {
-    resetState();
   }
 
   function handleError(error: unknown) {
     console.error('Ошибка сканера:', error);
     setError('Не удалось получить доступ к камере. Проверьте разрешения.');
+    setShowScanner(false);
   }
 
-  const showScanner = !student && !userLoading && !scanCompleted;
-  const showStudentInfo = student && scanCompleted;
-  const showLoading = userLoading || loading;
+  function toggleScanner() {
+    setShowScanner((prev) => !prev);
+    setError('');
+  }
 
-  return (
-    <Modal onClose={onClose}>
-      <ModalHeader title={title} onClose={onClose} />
+  const showLoader = userLoading || groupsLoading;
 
-      {showLoading && <Loader />}
-
-      {showScanner && !showLoading && (
+  if (showScanner) {
+    return (
+      <Modal onClose={onClose}>
+        <ModalHeader title="Оштрафовать" onClose={onClose} />
         <ModalBody>
-          <Subtitle>Наведите камеру на QR-код</Subtitle>
-
+          <PrimaryButton onClick={toggleScanner}>Закрыть сканер</PrimaryButton>
           <div className={styles['scanner']}>
             <Scanner
-              key="qr-scanner"
+              key="scanner"
               sound={false}
               onScan={handleScan}
               onError={handleError}
@@ -126,42 +145,57 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
               scanDelay={500}
             />
           </div>
-
-          {error && (
-            <div>
-              <p>{error}</p>
-            </div>
-          )}
+          {error && <div className={styles['error']}>{error}</div>}
         </ModalBody>
-      )}
+        <ModalFooter>
+          <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
+        </ModalFooter>
+      </Modal>
+    );
+  }
 
-      {showStudentInfo && !showLoading && (
-        <div className={styles['fine-modal__student-info']}>
-          <div className={styles['fine-modal__info-item']}>
-            Имя: <span>{student.name}</span>
-          </div>
-          <div className={styles['fine-modal__info-item']}>
-            Группа: <span>{groupName}</span>
-          </div>
-          {error && (
-            <div className={styles['fine-modal__error']}>
-              <p>{error}</p>
+  return (
+    <Modal onClose={onClose}>
+      <ModalHeader title="Оштрафовать" onClose={onClose} />
+
+      <ModalBody>
+        {showLoader && <Loader />}
+
+        {!showLoader && (
+          <>
+            <PrimaryButton onClick={toggleScanner}>Оштрафовать по QR</PrimaryButton>
+            <div>
+              <Subtitle>Группа</Subtitle>
+              <CustomSelect
+                key={`group-select-${selectedGroup.id}`}
+                items={groupsData?.activeSeason?.groups || []}
+                onChange={handleChangeGroup}
+                initValue={selectedGroup.name}
+              />
             </div>
-          )}
-        </div>
-      )}
+
+            {studentsData?.usersByGroup?.length > 0 && (
+              <div>
+                <Subtitle>Студент</Subtitle>
+                <CustomSelect
+                  key={`student-select-${selectedStudent.id}`}
+                  items={studentsData?.usersByGroup || []}
+                  onChange={setSelectedStudent}
+                  initValue={selectedStudent.name}
+                />
+              </div>
+            )}
+
+            {error && <div className={styles['error']}>{error}</div>}
+          </>
+        )}
+      </ModalBody>
 
       <ModalFooter>
-        {showStudentInfo ? (
-          <>
-            <SecondaryButton onClick={handleReset}>Сканировать</SecondaryButton>
-            <PrimaryButton onClick={handleFine} disabled={fineUserLoading}>
-              {title}
-            </PrimaryButton>
-          </>
-        ) : (
-          <SecondaryButton onClick={handleClose}>Закрыть</SecondaryButton>
-        )}
+        <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
+        <PrimaryButton onClick={handleFine} disabled={!selectedStudent.id || fineUserLoading}>
+          Оштрафовать
+        </PrimaryButton>
       </ModalFooter>
     </Modal>
   );
