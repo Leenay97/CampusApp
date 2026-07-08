@@ -22,6 +22,8 @@ import { GET_SEASON_GROUPS } from './GetSeasonGroups';
 import { GET_MESSAGES } from './GetMessages';
 import { GET_VOTES, GET_VOTES_FOR_VOTING } from './GetVote';
 import { GET_ALL_STUDENTS } from './GetAllStudents';
+import { GET_ARCHIVED_SEASONS } from './GetArchivedSeasons';
+import { GET_ARCHIVED_SEASON } from './GetArchivedSeason';
 
 export const queries = {
   GET_GROUPS,
@@ -49,5 +51,7 @@ export const queries = {
   GET_VOTES,
   GET_VOTES_FOR_VOTING,
   GET_ALL_STUDENTS,
+  GET_ARCHIVED_SEASONS,
+  GET_ARCHIVED_SEASON,
 };
 export default queries;

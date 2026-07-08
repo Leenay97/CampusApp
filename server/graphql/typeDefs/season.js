@@ -17,10 +17,44 @@ export const seasonTypeDefs = gql`
     teacherIds: [ID!]!
   }
 
+  type ArchivedPerson {
+    id: ID
+    name: String
+    russianName: String
+    photoUrl: String
+  }
+
+  type ArchivedGroup {
+    id: ID!
+    name: String!
+    teachers: [ArchivedPerson!]!
+    students: [ArchivedPerson!]!
+  }
+
+  type ArchivedWorkshop {
+    id: ID!
+    name: String!
+    date: String
+    teacher: String
+  }
+
+  type ArchivedSeason {
+    id: ID!
+    number: String!
+    year: String!
+    startDate: String
+    endDate: String
+    groups: [ArchivedGroup!]!
+    workshops: [ArchivedWorkshop!]!
+    sporttimes: [ArchivedWorkshop!]!
+  }
+
   extend type Query {
     seasons: [Season]!
     season: Season!
     activeSeason: Season!
+    archivedSeasons: [ArchivedSeason!]!
+    archivedSeason(id: ID!): ArchivedSeason
   }
 
   extend type Mutation {

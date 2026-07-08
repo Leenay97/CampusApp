@@ -34,6 +34,39 @@ export const seasonResolvers = {
         },
       });
     },
+    archivedSeasons: async () => {
+      return await ArchivedSeason.findAll({ order: [['createdAt', 'DESC']] });
+    },
+    archivedSeason: async (_, { id }) => {
+      return await ArchivedSeason.findByPk(id, {
+        include: [
+          { model: ArchivedGroup, as: 'groups' },
+          { model: ArchivedWorkshop, as: 'workshops' },
+          { model: ArchivedSporttime, as: 'sporttimes' },
+        ],
+      });
+    },
+  },
+
+  ArchivedGroup: {
+    teachers: (parent) => parent.teachers ?? [],
+    // Снимок хранит только id и имена; аватарки подтягиваем из живых User,
+    // потому что аккаунты после архивации сезона не удаляются
+    students: async (parent) => {
+      const students = parent.students ?? [];
+      if (!students.length) return [];
+
+      const users = await User.findAll({
+        where: { id: students.map((student) => student.id) },
+        attributes: ['id', 'photoUrl'],
+      });
+      const photoById = new Map(users.map((user) => [user.id, user.photoUrl]));
+
+      return students.map((student) => ({
+        ...student,
+        photoUrl: photoById.get(student.id) ?? null,
+      }));
+    },
   },
 
   Group: {

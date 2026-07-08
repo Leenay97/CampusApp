@@ -8,6 +8,7 @@ type CustomSelectProps<T> = {
   items: T[];
   initValue?: string;
   width?: string;
+  placeholder?: string;
   hasCleanButton?: boolean;
   onChange: (value: T) => void;
 };
@@ -16,6 +17,7 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
   items,
   initValue,
   width,
+  placeholder,
   hasCleanButton,
   onChange,
 }: CustomSelectProps<T>) {
@@ -71,7 +73,9 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
   return (
     <div ref={selectRef} className={styles['custom-select']} style={{ width }}>
       <div className={styles['custom-select__input']} onClick={() => setShowItems(true)}>
-        <span>{value}</span>
+        <span className={!value && placeholder ? styles['custom-select__placeholder'] : undefined}>
+          {value || placeholder}
+        </span>
         <ChevronIcon isOpen={showItems} />
       </div>
 
