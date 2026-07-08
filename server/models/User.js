@@ -13,5 +13,8 @@ export const User = sequelize.define('User', {
   lives: { type: DataTypes.INTEGER, allowNull: true },
   englishLevel: { type: DataTypes.STRING, allowNull: true },
   votes: { type: DataTypes.JSONB, allowNull: true },
-  gotWorkshopCoins: { type: DataTypes.BOOLEAN, allowNull: true },
+  // Дата последнего начисления коинов за мастеркласс / спорттайм:
+  // коины за каждый тип активности можно получить не чаще раза в день
+  workshopCoinsDate: { type: DataTypes.DATEONLY, allowNull: true },
+  sportCoinsDate: { type: DataTypes.DATEONLY, allowNull: true },
 });

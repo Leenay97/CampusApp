@@ -33,6 +33,17 @@ export const workshopResolvers = {
       });
     },
     todayWorkshops: async (_, { isSport }) => {
+      // Список открывается не раньше времени, указанного в тех. данных
+      const techData = await TechnicalData.findOne();
+      const startTime = isSport ? techData?.sportTimeStart : techData?.workshopStart;
+
+      if (startTime) {
+        const [hours, minutes] = startTime.split(':').map(Number);
+        const opensAt = new Date();
+        opensAt.setHours(hours, minutes || 0, 0, 0);
+        if (new Date() < opensAt) return [];
+      }
+
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
 
@@ -190,14 +201,24 @@ export const workshopResolvers = {
 
       const techData = await TechnicalData.findOne();
 
-      const coinsValue =
-        workshop.type === 'WORKSHOP' ? techData.workshopValue : techData.sportTimeValue;
+      const isSport = workshop.type === 'SPORT';
+      const coinsValue = isSport ? techData.sportTimeValue : techData.workshopValue;
+      const coinsDateField = isSport ? 'sportCoinsDate' : 'workshopCoinsDate';
+
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+        now.getDate(),
+      ).padStart(2, '0')}`;
 
       const students = await User.findAll({ where: { id: studentIds } });
 
       await Promise.all(
         students.map((student) => {
+          // Коины за каждый тип активности начисляются не чаще раза в день
+          if (student[coinsDateField] === today) return null;
+
           student.coins += coinsValue;
+          student[coinsDateField] = today;
           return student.save();
         }),
       );
