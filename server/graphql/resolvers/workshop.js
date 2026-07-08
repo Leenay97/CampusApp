@@ -6,9 +6,13 @@ const UserWorkshop = sequelize.models.UserWorkshop;
 export const workshopResolvers = {
   Query: {
     workshops: async (_, { isSport }) => {
+      const activeSeason = await Season.findOne({ where: { isActive: true } });
+      if (!activeSeason) return [];
+
       return await Workshop.findAll({
         where: {
           type: isSport === true ? 'SPORT' : 'WORKSHOP',
+          seasonId: activeSeason.id,
         },
         include: [
           { model: User, as: 'teacher' },

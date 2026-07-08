@@ -94,10 +94,6 @@ export default function SportTimePage(): JSX.Element {
   const closedWorkshops = [...(data?.workshops ?? [])].filter((w) => w.isClosed);
 
   function handleOpenModal() {
-    if (!selectedDate) {
-      alert('Пожалуйста, выберите дату мастеркласса');
-      return;
-    }
     setIsModalOpen(true);
   }
 
@@ -167,7 +163,7 @@ export default function SportTimePage(): JSX.Element {
               maxStudentAmount={workshop.maxStudents}
               place={workshop.place?.name}
               teacher={workshop.teacher?.name}
-              avatar={workshop.teacher.photoUrl}
+              avatar={workshop.teacher?.photoUrl}
               maxAge={workshop.maxAge}
               toClose
               isClosed={workshop.isClosed}
