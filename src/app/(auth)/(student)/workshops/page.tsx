@@ -11,7 +11,7 @@ import { JOIN_WORKSHOP } from '@/graphql/mutations/JoinWorkshop';
 import Section from '@/components/Section/Section';
 import Loader from '@/components/Loader/Loaader';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
-import Title from '@/components/Title/Title';
+import EmptyState from '@/components/EmptyState/EmptyState';
 
 export default function WorkShopsPage(): JSX.Element {
   const { data, loading, refetch } = useQuery(queries.GET_TODAY_WORKSHOPS);
@@ -46,9 +46,11 @@ export default function WorkShopsPage(): JSX.Element {
   if (!workshopsToShow?.length) {
     return (
       <CenteredContainer>
-        <Section>
-          <Title noMargin>Мастерклассов еще нет</Title>
-        </Section>
+        <EmptyState
+          image="/img/workshop.png"
+          title="Мастерклассов еще нет"
+          subtitle="Загляни сюда чуть позже"
+        />
       </CenteredContainer>
     );
   }
