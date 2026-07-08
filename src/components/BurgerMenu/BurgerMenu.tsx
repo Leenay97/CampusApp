@@ -39,7 +39,9 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
               {section.title && (
                 <button
                   type="button"
-                  className={styles['burger-menu__section-title']}
+                  className={`${styles['burger-menu__section-title']} ${
+                    isSectionOpen ? styles['burger-menu__section-title--open'] : ''
+                  }`}
                   onClick={() => handleSectionToggle(section.title as string)}
                   aria-expanded={isSectionOpen}
                 >
