@@ -11,6 +11,7 @@ import { REGISTER_TEACHER } from './RegisterTeacher';
 import { LOGIN } from './Login';
 import { CREATE_STUDENT } from './CreateStudent';
 import { REGISTER_STUDENT } from './RegisterStudent';
+import { REGISTER_STUDENT_WITH_EXISTING_ACCOUNT } from './RegisterStudentWithExistingAccount';
 import { CREATE_PLACE } from './CreatePlace';
 import { UPDATE_SCHEDULE } from './UpdateSchedule';
 import { JOIN_WORKSHOP } from './JoinWorkshop';
@@ -49,6 +50,7 @@ export const mutations = {
   LOGIN,
   CREATE_STUDENT,
   REGISTER_STUDENT,
+  REGISTER_STUDENT_WITH_EXISTING_ACCOUNT,
   CREATE_PLACE,
   UPDATE_SCHEDULE,
   JOIN_WORKSHOP,

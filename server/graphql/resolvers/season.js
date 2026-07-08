@@ -1,4 +1,13 @@
-import { Group, Season, User } from '../../models/index.js';
+import {
+  Group,
+  Season,
+  User,
+  Workshop,
+  ArchivedSeason,
+  ArchivedGroup,
+  ArchivedWorkshop,
+  ArchivedSporttime,
+} from '../../models/index.js';
 
 export const seasonResolvers = {
   Query: {
@@ -106,22 +115,81 @@ export const seasonResolvers = {
       if (!season) throw new Error('Сезон не найден');
       if (season.isArchived) throw new Error('Сезон уже архивирован');
 
-      season.isActive = false;
-      season.isArchived = true;
-      await season.save();
+      // Снимок сезона в архив: составы групп, мастерские и спорттаймы
+      const archivedSeason = await ArchivedSeason.create({
+        number: season.number,
+        year: season.year,
+        startDate: season.startDate,
+        endDate: season.endDate,
+      });
 
       const groups = await Group.findAll({ where: { seasonId: id } });
 
       for (const group of groups) {
-        const teacherIds = group.teacherIds;
+        const teachers =
+          group.teacherIds && group.teacherIds.length > 0
+            ? await User.findAll({ where: { id: group.teacherIds, userLevel: 'TEACHER' } })
+            : [];
+        const students = await User.findAll({
+          where: { groupId: group.id, userLevel: 'STUDENT' },
+        });
 
-        if (teacherIds && teacherIds.length > 0) {
-          await User.update(
-            { seasonId: null, groupId: null },
-            { where: { id: teacherIds, userLevel: 'TEACHER' } },
-          );
+        await ArchivedGroup.create({
+          archivedSeasonId: archivedSeason.id,
+          name: group.name,
+          teachers: teachers.map((teacher) => ({ id: teacher.id, name: teacher.name })),
+          students: students.map((student) => ({
+            id: student.id,
+            name: student.name,
+            russianName: student.russianName,
+          })),
+        });
+      }
+
+      const workshops = await Workshop.findAll({
+        where: { seasonId: id },
+        include: [{ model: User, as: 'teacher' }],
+      });
+
+      for (const workshop of workshops) {
+        const archivedWorkshop = {
+          archivedSeasonId: archivedSeason.id,
+          name: workshop.name,
+          date: workshop.date,
+          teacher: workshop.teacher ? workshop.teacher.name : null,
+        };
+
+        if (workshop.type === 'SPORT') {
+          await ArchivedSporttime.create(archivedWorkshop);
+        } else {
+          await ArchivedWorkshop.create(archivedWorkshop);
         }
       }
+
+      // Сброс сезонных данных: аккаунты студентов остаются (имена, логин, пароль),
+      // чтобы в следующем сезоне войти через «Уже есть аккаунт»
+      await User.update(
+        {
+          seasonId: null,
+          groupId: null,
+          classId: null,
+          houseId: null,
+          coins: null,
+          lives: null,
+          votes: null,
+          gotWorkshopCoins: null,
+        },
+        { where: { seasonId: id, userLevel: 'STUDENT' } },
+      );
+
+      await User.update(
+        { seasonId: null, groupId: null },
+        { where: { seasonId: id, userLevel: 'TEACHER' } },
+      );
+
+      season.isActive = false;
+      season.isArchived = true;
+      await season.save();
 
       return season;
     },

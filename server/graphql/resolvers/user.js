@@ -246,6 +246,51 @@ export const userResolvers = {
       };
     },
 
+    registerStudentWithExistingAccount: async (_, { token, login, password }) => {
+      if (!login || !password) throw new Error('Введите пароль и логин');
+
+      const group = await Group.findByPk(token);
+      if (!group) throw new Error('Группа не существует');
+      if (!group.seasonId) throw new Error('Группа не принадлежит сезону');
+
+      const student = await User.findOne({ where: { login, userLevel: 'STUDENT' } });
+      if (!student || !student.hashedPassword) throw new Error('Неверный логин или пароль');
+
+      const isPasswordValid = await bcrypt.compare(password, student.hashedPassword);
+      if (!isPasswordValid) throw new Error('Неверный логин или пароль');
+
+      if (student.seasonId === group.seasonId)
+        throw new Error('Студент уже зарегистрирован в этом сезоне');
+
+      // Прикрепляем существующий аккаунт к группе нового сезона,
+      // сезонные поля начинаются с чистого листа
+      student.groupId = group.id;
+      student.seasonId = group.seasonId;
+      student.coins = 0;
+      student.lives = 3;
+      student.votes = null;
+      student.gotWorkshopCoins = null;
+      student.classId = null;
+      student.houseId = null;
+      student.isActive = true;
+      await student.save();
+
+      const tokenForLogin = jwt.sign(
+        {
+          id: student.id,
+          userLevel: student.userLevel,
+          name: student.name,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '30d' },
+      );
+
+      return {
+        token: tokenForLogin,
+        user: student,
+      };
+    },
+
     updateUser: async (
       _,
       { id, name, russianName, groupId, houseId, englishLevel, classId, coins },

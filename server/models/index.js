@@ -15,6 +15,10 @@ import { PushSubscription } from './PushSubscription.js';
 import { Message } from './Message.js';
 import { Vote } from './Vote.js';
 import { VoteOption } from './VoteOption.js';
+import { ArchivedSeason } from './ArchivedSeason.js';
+import { ArchivedGroup } from './ArchivedGroup.js';
+import { ArchivedWorkshop } from './ArchivedWorkshop.js';
+import { ArchivedSporttime } from './ArchivedSporttime.js';
 
 // Сначала определите все ассоциации
 // Ассоциации Season
@@ -112,6 +116,16 @@ VoteOption.belongsTo(Vote, { foreignKey: 'voteId', as: 'vote' });
 Season.hasMany(Vote, { foreignKey: 'seasonId', as: 'votes' });
 Vote.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
 
+// Ассоциации архива сезонов
+ArchivedSeason.hasMany(ArchivedGroup, { foreignKey: 'archivedSeasonId', as: 'groups' });
+ArchivedGroup.belongsTo(ArchivedSeason, { foreignKey: 'archivedSeasonId', as: 'season' });
+
+ArchivedSeason.hasMany(ArchivedWorkshop, { foreignKey: 'archivedSeasonId', as: 'workshops' });
+ArchivedWorkshop.belongsTo(ArchivedSeason, { foreignKey: 'archivedSeasonId', as: 'season' });
+
+ArchivedSeason.hasMany(ArchivedSporttime, { foreignKey: 'archivedSeasonId', as: 'sporttimes' });
+ArchivedSporttime.belongsTo(ArchivedSeason, { foreignKey: 'archivedSeasonId', as: 'season' });
+
 export {
   sequelize,
   User,
@@ -128,4 +142,8 @@ export {
   Message,
   Vote,
   VoteOption,
+  ArchivedSeason,
+  ArchivedGroup,
+  ArchivedWorkshop,
+  ArchivedSporttime,
 };

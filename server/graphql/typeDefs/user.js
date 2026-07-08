@@ -53,6 +53,11 @@ export const userTypeDefs = gql`
       password: String!
       confirmPassword: String!
     ): AuthPayload!
+    registerStudentWithExistingAccount(
+      token: String!
+      login: String!
+      password: String!
+    ): AuthPayload!
     updateUser(
       id: ID!
       name: String

@@ -51,6 +51,14 @@ export type RegisterStudentResponse = {
   errors: string;
 };
 
+export type RegisterStudentWithExistingAccountResponse = {
+  registerStudentWithExistingAccount: {
+    token: string;
+    user: User;
+  };
+  errors: string;
+};
+
 export type Post = {
   id: string;
   text: string;

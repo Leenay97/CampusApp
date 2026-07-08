@@ -10,17 +10,27 @@ import CenteredContainer from '@/components/CenteredContainer/CenteredContainer'
 import Title from '@/components/Title/Title';
 import Subtitle from '@/components/Subtitle/Subtitle';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
-import { RegisterStudentResponse, User } from '@/app/types';
+import {
+  RegisterStudentResponse,
+  RegisterStudentWithExistingAccountResponse,
+  User,
+} from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { REGISTER_STUDENT } from '@/graphql/mutations/RegisterStudent';
+import { REGISTER_STUDENT_WITH_EXISTING_ACCOUNT } from '@/graphql/mutations/RegisterStudentWithExistingAccount';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect';
 import Loader from '@/components/Loader/Loaader';
+import SwitchSelector from '@/components/SwitchSelector/SwitchSelector';
+
+const NEW_ACCOUNT = 'Я тут впервые';
+const EXISTING_ACCOUNT = 'Уже был(а) тут';
 
 function RegisterForm() {
   const [selectedStudent, setSelectedStudent] = useState<User>({} as User);
+  const [accountMode, setAccountMode] = useState<string>(NEW_ACCOUNT);
   const [name, setName] = useState<string>('');
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -38,6 +48,9 @@ function RegisterForm() {
   const unregisteredStudents = (data?.students || []).filter((student: User) => !student.isActive);
 
   const [registerStudent] = useGlobalLoadingMutation(REGISTER_STUDENT);
+  const [registerStudentWithExistingAccount] = useGlobalLoadingMutation(
+    REGISTER_STUDENT_WITH_EXISTING_ACCOUNT,
+  );
 
   function handleSelectStudent(student: User) {
     setSelectedStudent(student);
@@ -66,28 +79,92 @@ function RegisterForm() {
     }
   }
 
+  async function handleRegisterWithExistingAccount() {
+    try {
+      const result = (await registerStudentWithExistingAccount({
+        token,
+        login,
+        password,
+      })) as RegisterStudentWithExistingAccountResponse;
+
+      if (result?.registerStudentWithExistingAccount?.token) {
+        localStorage.setItem('token', result.registerStudentWithExistingAccount.token);
+        setUser(result.registerStudentWithExistingAccount.user);
+        router.push('/');
+      } else if (result.errors) {
+        console.error('Ошибки GraphQL:', result.errors);
+      }
+    } catch (err) {
+      console.error('Неизвестная ошибка:', err);
+    }
+  }
+
   return (
     <CenteredContainer>
       <Section>
         <Title noMargin>Hey, campus student!</Title>
       </Section>
       <Section>
-        <div className={styles['prohibited-section__content']}>
-          <Subtitle noMargin>Найди себя*</Subtitle>
-          {loading ? (
-            <Loader />
-          ) : (
-            <CustomSelect items={unregisteredStudents} onChange={handleSelectStudent} />
-          )}
-        </div>
+        <SwitchSelector
+          value={accountMode}
+          values={[NEW_ACCOUNT, EXISTING_ACCOUNT]}
+          onChange={setAccountMode}
+        />
       </Section>
-      {selectedStudent.id && (
+      {accountMode === NEW_ACCOUNT ? (
+        <>
+          <Section>
+            <div className={styles['prohibited-section__content']}>
+              <Subtitle noMargin>Найди себя*</Subtitle>
+              {loading ? (
+                <Loader />
+              ) : (
+                <CustomSelect items={unregisteredStudents} onChange={handleSelectStudent} />
+              )}
+            </div>
+          </Section>
+          {selectedStudent.id && (
+            <Section>
+              <div className={styles['prohibited-section__content']}>
+                <div>
+                  <Subtitle>Английское имя*</Subtitle>
+                  <InputField width="100%" value={name} onChange={setName} />
+                </div>
+                <div>
+                  <Subtitle>Логин*</Subtitle>
+                  <InputField width="100%" value={login} onChange={setLogin} />
+                </div>
+
+                <div>
+                  <Subtitle>Пароль*</Subtitle>
+                  <InputField
+                    width="100%"
+                    type="password"
+                    value={password}
+                    onChange={setPassword}
+                  />
+                </div>
+
+                <div>
+                  <Subtitle>Подтверди пароль*</Subtitle>
+                  <InputField
+                    width="100%"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={setConfirmPassword}
+                  />
+                </div>
+
+                <PrimaryButton width="100%" onClick={handleRegister}>
+                  Зарегистрироваться
+                </PrimaryButton>
+              </div>
+            </Section>
+          )}
+        </>
+      ) : (
         <Section>
           <div className={styles['prohibited-section__content']}>
-            <div>
-              <Subtitle>Английское имя*</Subtitle>
-              <InputField width="100%" value={name} onChange={setName} />
-            </div>
             <div>
               <Subtitle>Логин*</Subtitle>
               <InputField width="100%" value={login} onChange={setLogin} />
@@ -98,18 +175,8 @@ function RegisterForm() {
               <InputField width="100%" type="password" value={password} onChange={setPassword} />
             </div>
 
-            <div>
-              <Subtitle>Подтверди пароль*</Subtitle>
-              <InputField
-                width="100%"
-                type="password"
-                value={confirmPassword}
-                onChange={setConfirmPassword}
-              />
-            </div>
-
-            <PrimaryButton width="100%" onClick={handleRegister}>
-              Зарегистрироваться
+            <PrimaryButton width="100%" onClick={handleRegisterWithExistingAccount}>
+              Продолжить
             </PrimaryButton>
           </div>
         </Section>
