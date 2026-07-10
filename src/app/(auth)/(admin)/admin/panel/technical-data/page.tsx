@@ -34,7 +34,7 @@ export default function TechnicalData() {
       setLessonValue(technicalData?.lessonValue?.toString() || '');
       setWorkshopStart(technicalData?.workshopStart || '');
       setSportTimeStart(technicalData?.sportTimeStart || '');
-      setShowRating(technicalData?.isRatingShown || '');
+      setShowRating(technicalData?.isRatingShown ?? true);
     }
   }, [
     data,
