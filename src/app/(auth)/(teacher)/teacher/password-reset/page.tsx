@@ -26,6 +26,7 @@ export default function PasswordResetPage() {
   const [search, setSearch] = useState('');
   const [links, setLinks] = useState<Record<string, string>>({});
   const [qrStudentId, setQrStudentId] = useState<string | null>(null);
+  const [copiedStudentId, setCopiedStudentId] = useState<string | null>(null);
   const { data, loading } = useQuery(queries.GET_ALL_STUDENTS);
   const [generateLink] = useGlobalLoadingMutation<
     GeneratePasswordResetLinkResponse,
@@ -59,6 +60,15 @@ export default function PasswordResetPage() {
     setQrStudentId(studentId);
   }
 
+  async function handleCopyLink(studentId: string) {
+    const link = links[studentId] || (await generateResetLink(studentId));
+    await navigator.clipboard.writeText(link);
+    setCopiedStudentId(studentId);
+    setTimeout(() => {
+      setCopiedStudentId((prev) => (prev === studentId ? null : prev));
+    }, 3000);
+  }
+
   if (loading) {
     return (
       <CenteredContainer>
@@ -70,7 +80,7 @@ export default function PasswordResetPage() {
   }
 
   return (
-    <CenteredContainer wide noPadding>
+    <CenteredContainer>
       <Section>
         <Title>Восстановление пароля</Title>
         <div className={styles['row']}>
@@ -91,17 +101,18 @@ export default function PasswordResetPage() {
               <div className={styles['list__info']}>
                 <div>{student.name || student.russianName || '—'}</div>
                 <div className={styles['list__meta']}>
-                  {student.login ? `Логин: ${student.login}` : 'Ещё не зарегистрирован'}
-                  {student.group?.name ? ` · Группа: ${student.group.name}` : ' · Без группы'}
+                  {student.login ? `Логин: ${student.login}` : 'Не зарегистрирован'}
                 </div>
+                {student.group?.name ? (
+                  <div className={styles['list__group']}>Группа: {student.group.name}</div>
+                ) : (
+                  <div className={styles['list__meta']}>Без группы</div>
+                )}
               </div>
 
               <div className={styles['list__actions']}>
-                {links[student.id] && (
-                  <InputField value={links[student.id]} onChange={() => {}} width="300px" />
-                )}
-                <PrimaryButton onClick={() => generateResetLink(student.id)}>
-                  {links[student.id] ? 'Обновить ссылку' : 'Сгенерировать ссылку'}
+                <PrimaryButton onClick={() => handleCopyLink(student.id)}>
+                  {copiedStudentId === student.id ? 'Скопировано' : 'Ссылка'}
                 </PrimaryButton>
                 <PrimaryButton onClick={() => handleShowQr(student.id)}>QR</PrimaryButton>
               </div>

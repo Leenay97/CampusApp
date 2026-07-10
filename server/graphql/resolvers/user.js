@@ -1,10 +1,11 @@
 import { User, Workshop, Group, Season, House, Class } from '../../models/index.js';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
 
-function requireAdmin(context) {
+function requireStaff(context) {
   const authHeader = context?.req?.headers?.authorization || '';
   const token = authHeader.replace('Bearer ', '');
   if (!token) throw new Error('Не авторизован');
@@ -16,7 +17,9 @@ function requireAdmin(context) {
     throw new Error('Невалидный токен');
   }
 
-  if (decoded.userLevel !== 'ADMIN') throw new Error('Доступ запрещен');
+  if (decoded.userLevel !== 'ADMIN' && decoded.userLevel !== 'TEACHER') {
+    throw new Error('Доступ запрещен');
+  }
   return decoded;
 }
 
@@ -357,32 +360,40 @@ export const userResolvers = {
     },
 
     generatePasswordResetLink: async (_, { userId }, context) => {
-      requireAdmin(context);
+      requireStaff(context);
 
       const user = await User.findByPk(userId);
       if (!user) throw new Error('Пользователь не найден');
       if (user.userLevel === 'ADMIN') throw new Error('Нельзя сбросить пароль администратора');
 
-      return jwt.sign({ id: user.id, purpose: 'password-reset' }, process.env.JWT_SECRET, {
-        expiresIn: '2h',
-      });
+      // Алфавит без похожих символов (0/O, 1/I/L), чтобы код можно было диктовать
+      const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      let code;
+      do {
+        code = Array.from({ length: 5 }, () => alphabet[crypto.randomInt(alphabet.length)]).join(
+          '',
+        );
+      } while (await User.findOne({ where: { resetCode: code } }));
+
+      user.resetCode = code;
+      user.resetCodeExpiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      await user.save();
+
+      return code;
     },
 
     resetPassword: async (_, { token, password, confirmPassword }) => {
       if (!password || password !== confirmPassword) throw new Error('Пароли не совпадают');
+      if (!token) throw new Error('Неверная ссылка');
 
-      let decoded;
-      try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-      } catch {
+      const user = await User.findOne({ where: { resetCode: token.trim().toUpperCase() } });
+      if (!user || !user.resetCodeExpiresAt || user.resetCodeExpiresAt < new Date()) {
         throw new Error('Ссылка недействительна или истекла');
       }
-      if (decoded.purpose !== 'password-reset') throw new Error('Неверная ссылка');
-
-      const user = await User.findByPk(decoded.id);
-      if (!user) throw new Error('Пользователь не найден');
 
       user.hashedPassword = await bcrypt.hash(password, 10);
+      user.resetCode = null;
+      user.resetCodeExpiresAt = null;
       await user.save();
 
       return true;
