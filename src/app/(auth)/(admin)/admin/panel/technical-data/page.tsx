@@ -19,6 +19,7 @@ export default function TechnicalData() {
 
   const [workshopValue, setWorkshopValue] = useState<string>('');
   const [sportValue, setSportValue] = useState<string>('');
+  const [lessonValue, setLessonValue] = useState<string>('');
   const [workshopStart, setWorkshopStart] = useState<string>('');
   const [sportTimeStart, setSportTimeStart] = useState<string>('');
   const [showRating, setShowRating] = useState<boolean>(true);
@@ -30,6 +31,7 @@ export default function TechnicalData() {
       /*eslint-disable react-hooks/set-state-in-effect*/
       setWorkshopValue(technicalData?.workshopValue?.toString() || '');
       setSportValue(technicalData?.sportTimeValue?.toString() || '');
+      setLessonValue(technicalData?.lessonValue?.toString() || '');
       setWorkshopStart(technicalData?.workshopStart || '');
       setSportTimeStart(technicalData?.sportTimeStart || '');
       setShowRating(technicalData?.isRatingShown || '');
@@ -38,6 +40,7 @@ export default function TechnicalData() {
     data,
     technicalData?.sportTimeStart,
     technicalData?.sportTimeValue,
+    technicalData?.lessonValue,
     technicalData?.workshopStart,
     technicalData?.workshopValue,
     technicalData?.isRatingShown,
@@ -48,6 +51,7 @@ export default function TechnicalData() {
       await updateData({
         workshopValue: Number(workshopValue),
         sportTimeValue: Number(sportValue),
+        lessonValue: Number(lessonValue),
         workshopStart: workshopStart.length ? workshopStart : null,
         sportTimeStart: sportTimeStart.length ? sportTimeStart : null,
         isRatingShown: showRating,
@@ -83,6 +87,10 @@ export default function TechnicalData() {
         <div>
           <Subtitle>Coins за Sport Time</Subtitle>
           <InputField width="80px" maxLength={3} value={sportValue} onChange={setSportValue} />
+        </div>
+        <div>
+          <Subtitle>Coins за урок английского</Subtitle>
+          <InputField width="80px" maxLength={3} value={lessonValue} onChange={setLessonValue} />
         </div>
         <div>
           <Subtitle>Начало записи на мастеркласс</Subtitle>

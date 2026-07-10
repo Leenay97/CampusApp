@@ -5,6 +5,7 @@ export const GET_TECHICAL_DATA = gql`
     technicalData {
       workshopValue
       sportTimeValue
+      lessonValue
       workshopStart
       sportTimeStart
       isRatingShown

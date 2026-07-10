@@ -23,25 +23,32 @@ type ModalProps = {
   onSubmit: () => void;
 };
 
+const MAX_TEACHERS = 3;
+
 function CreateClassModal({ onClose, onSubmit }: ModalProps) {
   const [selectedTeachers, setSelectedTeachers] = useState<User[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<User[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
   const [name, setName] = useState<string>('');
 
   const { data: teachersData, loading: teachersLoading } = useQuery(queries.GET_TEACHERS);
 
+  const { data: studentsData, loading: studentsLoading } = useQuery(queries.GET_SEASON_STUDENTS);
+
   const { data: placesData, loading: placesLoading } = useQuery(queries.GET_PLACES);
 
   const [createClass] = useGlobalLoadingMutation(CREATE_CLASS);
 
-  const loading = teachersLoading || placesLoading;
+  const loading = teachersLoading || studentsLoading || placesLoading;
 
   const teachers = teachersData?.teachers ?? [];
+
+  const students = studentsData?.seasonStudents ?? [];
 
   const places = placesData?.places ?? [];
 
   function handleChangeTeacher(teachers: User[]) {
-    setSelectedTeachers(teachers);
+    setSelectedTeachers(teachers.slice(0, MAX_TEACHERS));
   }
 
   function handleChangePlace(place: Place) {
@@ -51,6 +58,7 @@ function CreateClassModal({ onClose, onSubmit }: ModalProps) {
   function handleClose() {
     onClose();
     setSelectedTeachers([]);
+    setSelectedStudents([]);
     setSelectedPlace({} as Place);
     setName('');
   }
@@ -61,6 +69,7 @@ function CreateClassModal({ onClose, onSubmit }: ModalProps) {
         name,
         placeId: selectedPlace.id,
         teacherIds: selectedTeachers.map((teacher) => teacher.id),
+        studentIds: selectedStudents.map((student) => student.id),
       });
       onSubmit();
     } catch (error) {
@@ -80,11 +89,19 @@ function CreateClassModal({ onClose, onSubmit }: ModalProps) {
               <InputField value={name} onChange={setName} />
             </div>
             <div>
-              <Subtitle>Учитель</Subtitle>
+              <Subtitle>Учителя (1–3)</Subtitle>
               <MultipleSelect
                 value={selectedTeachers}
                 items={teachers}
                 onChange={handleChangeTeacher}
+              />
+            </div>
+            <div>
+              <Subtitle>Студенты</Subtitle>
+              <MultipleSelect
+                value={selectedStudents}
+                items={students}
+                onChange={setSelectedStudents}
               />
             </div>
             <div>

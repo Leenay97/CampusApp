@@ -32,6 +32,10 @@ export const GET_ARCHIVED_SEASON = gql`
         date
         teacher
       }
+      lessonCounts {
+        name
+        count
+      }
     }
   }
 `;

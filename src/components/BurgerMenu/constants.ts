@@ -41,6 +41,7 @@ const TeacherSection: MenuSection = {
   title: "Teachers' stuff",
   options: [
     { name: 'Мой мастеркласс', link: '/teacher/my-workshop' },
+    { name: 'Lessons', link: '/teacher/lessons' },
     { name: 'My team', link: '/teacher/group' },
     { name: 'QR группы', link: '/teacher/group/qr' },
     { name: 'Восстановление пароля', link: '/teacher/password-reset' },

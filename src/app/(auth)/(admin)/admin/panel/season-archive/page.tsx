@@ -38,6 +38,11 @@ type ArchivedWorkshop = {
   teacher?: string;
 };
 
+type ArchivedLessonCount = {
+  name: string;
+  count: number;
+};
+
 type ArchivedSeason = {
   id: string;
   number: string;
@@ -45,6 +50,7 @@ type ArchivedSeason = {
   groups: ArchivedGroup[];
   workshops: ArchivedWorkshop[];
   sporttimes: ArchivedWorkshop[];
+  lessonCounts: ArchivedLessonCount[];
 };
 
 type StudentRow = {
@@ -123,6 +129,40 @@ function WorkshopsTable({ workshops }: { workshops: ArchivedWorkshop[] }) {
             <td>{workshop.name}</td>
             <td>{formatDate(workshop.date)}</td>
             <td>{workshop.teacher ?? '—'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function LessonCountsTable({ lessonCounts }: { lessonCounts: ArchivedLessonCount[] }) {
+  const { direction, handleSort, arrow, sortKey } = useSort<'name' | 'count'>('name');
+
+  if (!lessonCounts.length) return <p className={styles['empty']}>Ничего не найдено</p>;
+
+  const sorted = [...lessonCounts].sort((a, b) => {
+    const result = sortKey === 'count' ? a.count - b.count : compareStrings(a.name, b.name);
+    return direction === 'asc' ? result : -result;
+  });
+
+  return (
+    <table className={styles['table']}>
+      <thead>
+        <tr>
+          <th className={styles['sortable']} onClick={() => handleSort('name')}>
+            Учитель{arrow('name')}
+          </th>
+          <th className={styles['sortable']} onClick={() => handleSort('count')}>
+            Проведено уроков{arrow('count')}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {sorted.map((row) => (
+          <tr key={row.name}>
+            <td>{row.name}</td>
+            <td>{row.count}</td>
           </tr>
         ))}
       </tbody>
@@ -318,6 +358,9 @@ export default function SeasonArchivePage() {
 
               <Subtitle>Sport Time</Subtitle>
               <WorkshopsTable workshops={filteredSporttimes} />
+
+              <Subtitle>Уроки английского</Subtitle>
+              <LessonCountsTable lessonCounts={season.lessonCounts ?? []} />
 
               <div>
                 <Subtitle>Студенты</Subtitle>

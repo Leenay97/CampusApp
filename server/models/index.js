@@ -11,6 +11,7 @@ import { IpodMatch } from './IpodMatch.js';
 import { House } from './House.js';
 import { Post } from './Post.js';
 import { Class } from './Class.js';
+import { Lesson } from './Lesson.js';
 import { PushSubscription } from './PushSubscription.js';
 import { Message } from './Message.js';
 import { Vote } from './Vote.js';
@@ -97,6 +98,17 @@ Class.hasMany(User, { foreignKey: 'classId', as: 'students' });
 
 Class.belongsTo(Place, { foreignKey: 'placeId', as: 'place' });
 
+// Ассоциации Lesson
+Class.hasMany(Lesson, { foreignKey: 'classId', as: 'lessons' });
+Lesson.belongsTo(Class, { foreignKey: 'classId', as: 'class' });
+
+// Учитель урока — тот, кто его закрыл
+Lesson.belongsTo(User, { foreignKey: 'teacherId', as: 'teacher' });
+User.hasMany(Lesson, { foreignKey: 'teacherId', as: 'taughtLessons' });
+
+Season.hasMany(Lesson, { foreignKey: 'seasonId', as: 'lessons' });
+Lesson.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
+
 Message.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
 User.hasMany(Message, { foreignKey: 'authorId', as: 'messages' });
 
@@ -138,6 +150,7 @@ export {
   House,
   Post,
   Class,
+  Lesson,
   PushSubscription,
   Message,
   Vote,

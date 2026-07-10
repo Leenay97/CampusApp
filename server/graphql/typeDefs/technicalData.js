@@ -4,6 +4,7 @@ export const technicalDataTypeDefs = gql`
   type TechnicalData {
     workshopValue: Int
     sportTimeValue: Int
+    lessonValue: Int
     sportTimeStart: String
     workshopStart: String
     isRatingShown: Boolean
@@ -17,6 +18,7 @@ export const technicalDataTypeDefs = gql`
     updateTechnicalData(
       workshopValue: Int
       sportTimeValue: Int
+      lessonValue: Int
       sportTimeStart: String
       workshopStart: String
       isRatingShown: Boolean

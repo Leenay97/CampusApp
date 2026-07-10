@@ -38,6 +38,11 @@ export const seasonTypeDefs = gql`
     teacher: String
   }
 
+  type ArchivedLessonCount {
+    name: String!
+    count: Int!
+  }
+
   type ArchivedSeason {
     id: ID!
     number: String!
@@ -47,6 +52,7 @@ export const seasonTypeDefs = gql`
     groups: [ArchivedGroup!]!
     workshops: [ArchivedWorkshop!]!
     sporttimes: [ArchivedWorkshop!]!
+    lessonCounts: [ArchivedLessonCount!]!
   }
 
   extend type Query {

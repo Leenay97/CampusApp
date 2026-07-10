@@ -7,17 +7,20 @@ export const classTypeDefs = gql`
     students: [User]
     teachers: [User]
     place: Place
+    isClosedToday: Boolean!
   }
 
   extend type Query {
     classes: [Class]
     class(id: ID!): Class
     classByUserId(userId: ID!): Class
+    classesByTeacher(teacherId: ID!): [Class!]!
   }
 
   extend type Mutation {
-    createClass(name: String!, placeId: ID!, teacherIds: [ID!]!): Class
+    createClass(name: String!, placeId: ID!, teacherIds: [ID!]!, studentIds: [ID!]): Class
     updateClass(id: ID!, name: String, place: String): Class
     deleteClass(id: ID!): Class
+    closeLesson(classId: ID!, teacherId: ID!, studentIds: [ID!]!): Class
   }
 `;

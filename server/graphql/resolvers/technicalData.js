@@ -9,13 +9,14 @@ export const technicalDataResolvers = {
   Mutation: {
     updateTechnicalData: async (
       _,
-      { workshopValue, sportTimeValue, workshopStart, sportTimeStart, isRatingShown },
+      { workshopValue, sportTimeValue, lessonValue, workshopStart, sportTimeStart, isRatingShown },
     ) => {
       const existingTechData = await TechnicalData.findOne();
       if (!existingTechData) {
         const techData = await TechnicalData.create({
           workshopValue,
           sportTimeValue,
+          lessonValue,
           workshopStart,
           sportTimeStart,
         });
@@ -26,6 +27,9 @@ export const technicalDataResolvers = {
       }
       if (sportTimeValue) {
         existingTechData.sportTimeValue = sportTimeValue;
+      }
+      if (lessonValue) {
+        existingTechData.lessonValue = lessonValue;
       }
 
       if (workshopStart) {

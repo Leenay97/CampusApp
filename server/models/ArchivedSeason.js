@@ -8,4 +8,6 @@ export const ArchivedSeason = sequelize.define('ArchivedSeason', {
   year: { type: DataTypes.STRING, allowNull: false },
   startDate: { type: DataTypes.DATE, allowNull: true },
   endDate: { type: DataTypes.DATE, allowNull: true },
+  // Кол-во проведённых уроков английского по учителям: [{ name, count }]
+  lessonCounts: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] },
 });

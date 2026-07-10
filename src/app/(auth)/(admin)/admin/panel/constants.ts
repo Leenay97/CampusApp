@@ -11,6 +11,7 @@ export const AdminPanelOptions: MenuOption[] = [
   { name: 'Резиночки', link: '/admin/panel/rubbers' },
   { name: 'Места', link: '/admin/panel/places' },
   { name: 'Мастерклассы', link: '/admin/panel/workshops' },
+  { name: 'Языковые группы', link: '/admin/panel/classes' },
   { name: 'Sport Time', link: '/admin/panel/sporttime' },
   { name: 'Распорядок дня', link: '/admin/panel/schedule' },
   { name: 'Тех. данные', link: '/admin/panel/technical-data' },

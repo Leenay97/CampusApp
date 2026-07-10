@@ -1,0 +1,10 @@
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lesson-card__row {
+  font-size: 14px;
+  opacity: 0.8;
+}

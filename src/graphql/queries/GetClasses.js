@@ -9,6 +9,11 @@ export const GET_CLASSES = gql`
         id
         name
       }
+      students {
+        id
+        name
+        russianName
+      }
       place {
         name
       }

@@ -1,5 +1,6 @@
 import {
   Group,
+  Lesson,
   Season,
   User,
   Workshop,
@@ -46,6 +47,10 @@ export const seasonResolvers = {
         ],
       });
     },
+  },
+
+  ArchivedSeason: {
+    lessonCounts: (parent) => parent.lessonCounts ?? [],
   },
 
   ArchivedGroup: {
@@ -148,12 +153,24 @@ export const seasonResolvers = {
       if (!season) throw new Error('Сезон не найден');
       if (season.isArchived) throw new Error('Сезон уже архивирован');
 
-      // Снимок сезона в архив: составы групп, мастерские и спорттаймы
+      // Кол-во проведённых уроков английского по каждому учителю — просто цифры
+      const lessons = await Lesson.findAll({
+        where: { seasonId: id },
+        include: [{ model: User, as: 'teacher' }],
+      });
+      const lessonCountByTeacher = new Map();
+      for (const lesson of lessons) {
+        const teacherName = lesson.teacher?.name ?? '—';
+        lessonCountByTeacher.set(teacherName, (lessonCountByTeacher.get(teacherName) ?? 0) + 1);
+      }
+
+      // Снимок сезона в архив: составы групп, мастерские, спорттаймы и уроки
       const archivedSeason = await ArchivedSeason.create({
         number: season.number,
         year: season.year,
         startDate: season.startDate,
         endDate: season.endDate,
+        lessonCounts: [...lessonCountByTeacher].map(([name, count]) => ({ name, count })),
       });
 
       const groups = await Group.findAll({ where: { seasonId: id } });

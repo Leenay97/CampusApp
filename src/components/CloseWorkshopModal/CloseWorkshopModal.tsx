@@ -11,11 +11,12 @@ import ModalFooter from '../Modal/ModalFooter';
 
 type ModalProps = {
   students: User[];
+  title?: string;
   onSubmit: (studentIds: string[]) => void;
   onClose: () => void;
 };
 
-function CloseWorkshopModal({ students, onSubmit, onClose }: ModalProps) {
+function CloseWorkshopModal({ students, title = 'Закрыть МК', onSubmit, onClose }: ModalProps) {
   const [checkedStudents, setCheckedStudents] = useState<string[]>(students.map((s) => s.id));
 
   function handleCheck(id: string) {
@@ -34,7 +35,7 @@ function CloseWorkshopModal({ students, onSubmit, onClose }: ModalProps) {
 
   return (
     <Modal onClose={onClose}>
-      <ModalHeader onClose={onClose} title="Закрыть МК" />
+      <ModalHeader onClose={onClose} title={title} />
       <ModalBody className={styles['close-workshop-modal']}>
         {students?.map((student) => (
           <div key={student.id} className={styles['close-workshop-modal__row']}>
