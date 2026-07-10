@@ -1,6 +1,6 @@
 'use client';
 import { Schedule } from '@/app/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DEFAULT_SCHEDULE } from './constants';
 import styles from './ScheduleBuilder.module.scss';
 import ScheduleBuilderRow from './ScheduleBuilderRow/ScheduleBuilderRow';
@@ -17,6 +17,27 @@ import Section from '../Section/Section';
 export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
   const [schedules, setSchedules] = useState<Schedule[]>(DEFAULT_SCHEDULE.schedule);
   const [name, setName] = useState(DEFAULT_SCHEDULE.name);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // Индекс последней начавшейся активности — она считается текущей
+  const currentIndex = useMemo(() => {
+    if (editMode) return -1;
+
+    let index = -1;
+    schedules.forEach((schedule, i) => {
+      if (!schedule.time) return;
+      const [hours, minutes] = schedule.time.split(':').map(Number);
+      if (hours * 60 + (minutes || 0) <= nowMinutes) index = i;
+    });
+    return index;
+  }, [schedules, nowMinutes, editMode]);
 
   const [updateSchedule] = useGlobalLoadingMutation(UPDATE_SCHEDULE);
   const { data, loading } = useQuery(GET_SCHEDULE);
@@ -98,6 +119,15 @@ export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
             onAdd={() => handleAddRow(index)}
             onDelete={() => handleDeleteRow(index)}
             editMode={editMode}
+            state={
+              editMode || currentIndex === -1
+                ? undefined
+                : index < currentIndex
+                  ? 'past'
+                  : index === currentIndex
+                    ? 'now'
+                    : 'future'
+            }
           />
         ))}
       </Section>

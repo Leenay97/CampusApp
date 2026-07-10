@@ -1,11 +1,16 @@
 import { Schedule } from '@/app/types';
+import { useEffect, useRef, useState } from 'react';
 import styles from './ScheduleBuilderRow.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import ActionButton from '@/components/ActionButton/ActionButton';
+import { EMOJI_CHOICES, getActivityIcon } from '../constants';
+
+export type ScheduleRowState = 'past' | 'now' | 'future';
 
 type Props = {
   schedule: Schedule;
   editMode?: boolean;
+  state?: ScheduleRowState;
   onChange?: (data: Partial<Schedule>) => void;
   onAdd?: () => void;
   onDelete?: () => void;
@@ -14,13 +19,38 @@ type Props = {
 export default function ScheduleBuilderRow({
   schedule,
   editMode,
+  state,
   onChange,
   onAdd,
   onDelete,
 }: Props) {
+  const [showPicker, setShowPicker] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  const icon = schedule.icon || getActivityIcon(schedule.activity);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setShowPicker(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  function handlePickIcon(emoji: string) {
+    onChange?.({ icon: emoji });
+    setShowPicker(false);
+  }
+
   if (editMode && onAdd && onDelete) {
     return (
-      <div className={styles['schedule-row']}>
+      <div className={`${styles['schedule-row']} ${styles['schedule-row--edit']}`}>
         <InputField
           width="95px"
           type="time"
@@ -28,7 +58,36 @@ export default function ScheduleBuilderRow({
           onChange={(value) => onChange?.({ time: value })}
           style={{ fontSize: '16px', color: '#f46767', fontWeight: 'bold' }}
         />
-        <div></div>
+        <div ref={pickerRef} className={styles['schedule-row__picker-wrapper']}>
+          <button
+            type="button"
+            className={styles['schedule-row__icon-button']}
+            onClick={() => setShowPicker((prev) => !prev)}
+          >
+            {icon}
+          </button>
+          {showPicker && (
+            <div className={styles['schedule-row__picker']}>
+              <button
+                type="button"
+                className={`${styles['schedule-row__picker-item']} ${styles['schedule-row__picker-item--auto']}`}
+                onClick={() => handlePickIcon('')}
+              >
+                авто
+              </button>
+              {EMOJI_CHOICES.map((emoji) => (
+                <button
+                  type="button"
+                  key={emoji}
+                  className={styles['schedule-row__picker-item']}
+                  onClick={() => handlePickIcon(emoji)}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <InputField
           value={schedule.activity}
           onChange={(value) => onChange?.({ activity: value })}
@@ -44,10 +103,16 @@ export default function ScheduleBuilderRow({
   }
 
   return (
-    <div className={styles['schedule-row']}>
+    <div className={`${styles['schedule-row']} ${state ? styles[`schedule-row--${state}`] : ''}`}>
       <div className={styles['schedule-row__time']}>{schedule.time}</div>
-      <div className={styles['schedule-row__dot']}></div>
-      <div className={styles['schedule-row__activity']}>{schedule.activity}</div>
+      <div className={styles['schedule-row__rail']}>
+        <div className={styles['schedule-row__dot']}></div>
+      </div>
+      <div className={styles['schedule-row__card']}>
+        <div className={styles['schedule-row__emoji']}>{icon}</div>
+        <div className={styles['schedule-row__activity']}>{schedule.activity}</div>
+        {state === 'now' && <div className={styles['schedule-row__badge']}>Now</div>}
+      </div>
     </div>
   );
 }

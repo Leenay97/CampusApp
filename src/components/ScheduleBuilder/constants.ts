@@ -1,3 +1,57 @@
+const ACTIVITY_ICONS: [RegExp, string][] = [
+  [/breakfast|завтрак/i, '🍳'],
+  [/lunch|обед/i, '🍝'],
+  [/dinner|ужин/i, '🍽️'],
+  [/snack|перекус/i, '🍎'],
+  [/sport/i, '🏐'],
+  [/workshop|мастер/i, '🎨'],
+  [/powernap|тихий час/i, '💤'],
+  [/sleep|сон|отбой/i, '😴'],
+  [/team/i, '🤝'],
+  [/chat/i, '💬'],
+  [/show|шоу/i, '🎤'],
+  [/ipod|battle|батл/i, '🎧'],
+  [/game|игра/i, '🎲'],
+];
+
+export function getActivityIcon(activity: string): string {
+  const match = ACTIVITY_ICONS.find(([pattern]) => pattern.test(activity ?? ''));
+  return match ? match[1] : '📍';
+}
+
+// Выбор иконки при составлении расписания; пустая строка = автоподбор по названию
+export const EMOJI_CHOICES = [
+  '🍳',
+  '🍝',
+  '🍽️',
+  '🍎',
+  '🏐',
+  '⚽',
+  '🏀',
+  '🏊',
+  '🎨',
+  '🤝',
+  '💬',
+  '🎤',
+  '🎧',
+  '🎲',
+  '🎬',
+  '🎭',
+  '🎸',
+  '🎉',
+  '📚',
+  '🧩',
+  '🧘',
+  '🏖️',
+  '🚌',
+  '🔥',
+  '💤',
+  '😴',
+  '📍',
+  '❗',
+  '🔥',
+];
+
 export const DEFAULT_SCHEDULE = {
   name: 'DAY 1....',
   schedule: [

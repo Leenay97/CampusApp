@@ -108,6 +108,7 @@ export enum UserLevel {
 export type Schedule = {
   time: string;
   activity: string;
+  icon?: string;
 };
 
 export type ScannerError = Error & {
