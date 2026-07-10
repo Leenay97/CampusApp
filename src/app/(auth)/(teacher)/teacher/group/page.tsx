@@ -51,7 +51,8 @@ function TeacherGroupPage() {
         {data?.usersByGroup.map((student: User) => (
           <UserBadge
             key={student.id}
-            name={student.name}
+            name={student.name || student.russianName || '—'}
+            secondName={student.name ? student.russianName : undefined}
             onClick={() => handleStudentClick(student)}
           />
         ))}

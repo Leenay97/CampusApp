@@ -99,7 +99,10 @@ export default function PasswordResetPage() {
           {filteredStudents.map((student) => (
             <div key={student.id} className={styles['list__row']}>
               <div className={styles['list__info']}>
-                <div>{student.name || student.russianName || '—'}</div>
+                <div className={student.name ? styles['list__name'] : undefined}>
+                  {student.name || student.russianName || '—'}
+                </div>
+                {student.name && student.russianName && <div>{student.russianName}</div>}
                 <div className={styles['list__meta']}>
                   {student.login ? `Логин: ${student.login}` : 'Не зарегистрирован'}
                 </div>
