@@ -28,7 +28,6 @@ import { UPLOAD_AVATAR } from './UploadAvatar';
 import { UPLOAD_POST_IMAGE } from './UploadPostImage';
 import { DELETE_POST_IMAGE } from './DeletePostImage';
 import { SEND_PUSH_ALL } from './SendPushAll';
-import { SEND_PUSH_STAFF } from './SendPushStaff';
 import { SEND_MESSAGE } from './SendMessage';
 import { UPDATE_POST } from './UpdatePost';
 import { DELETE_POST } from './DeletePost';
@@ -71,7 +70,6 @@ export const mutations = {
   UPLOAD_POST_IMAGE,
   DELETE_POST_IMAGE,
   SEND_PUSH_ALL,
-  SEND_PUSH_STAFF,
   SEND_MESSAGE,
   DELETE_POST,
   CREATE_VOTE,

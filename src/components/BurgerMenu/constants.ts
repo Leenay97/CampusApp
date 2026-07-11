@@ -45,6 +45,7 @@ const TeacherSection: MenuSection = {
     { name: 'My team', link: '/teacher/group' },
     { name: 'QR группы', link: '/teacher/group/qr' },
     { name: 'Восстановление пароля', link: '/teacher/password-reset' },
+    { name: 'Пушки', link: '/teacher/push' },
   ],
 };
 
