@@ -116,7 +116,7 @@ export const userResolvers = {
 
       const season = await Season.findOne({ where: { isActive: true } });
 
-      if (!isValid && userLevel == 'STUDENT') throw new Error('Кажется сезон еще не начался');
+      if (!season && userLevel == 'STUDENT') throw new Error('Кажется сезон еще не начался');
 
       let group;
       if (userLevel !== 'ADMIN') {
