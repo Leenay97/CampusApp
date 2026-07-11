@@ -28,8 +28,8 @@ export default function PushPage() {
     <CenteredContainer>
       <Section>
         <Title noMargin>Пушка</Title>
-        <InputField label="Заголовок" value={title} onChange={setTitle} maxLength={100} />
-        <InputField label="Текст" value={body} onChange={setBody} maxLength={300} />
+        <InputField value={title} onChange={setTitle} maxLength={100} placeholder="Заголовок" />
+        <InputField value={body} onChange={setBody} maxLength={300} placeholder="Текст" />
         <PrimaryButton onClick={handleSend} disabled={!title.trim() || !body.trim()}>
           Отправить всем
         </PrimaryButton>

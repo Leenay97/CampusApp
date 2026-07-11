@@ -10,9 +10,12 @@ type MenuSection = {
   options: MenuOption[];
 };
 
+export const DefaultOpenSectionTitle = 'Главное';
+
 const NavigationSection: MenuSection = {
+  title: DefaultOpenSectionTitle,
   options: [
-    { name: 'Главная', link: '/' },
+    { name: 'Рейтинг', link: '/' },
     { name: 'Расписание', link: '/schedule' },
     { name: 'Лента', link: '/information' },
     { name: 'Домики', link: '/houses' },

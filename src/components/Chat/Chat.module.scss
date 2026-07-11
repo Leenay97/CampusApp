@@ -10,5 +10,10 @@
   margin-top: 80px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;  
+  overflow: hidden;
+}
+
+.chat--staff {
+  background-color: rgba(23, 91, 181, 0.175);
+  border-color: rgba(191, 219, 254, 0.5);
 }

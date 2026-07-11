@@ -1,7 +1,7 @@
 import { JSX, memo, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
-import { getHeaderMenuSections } from './constants';
+import { DefaultOpenSectionTitle, getHeaderMenuSections } from './constants';
 import styles from './BurgerMenu.module.scss';
 import Link from 'next/link';
 import { UserLevel } from '@/app/types';
@@ -24,12 +24,12 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
       ? section.options
       : section.options.filter((option) => option.link !== '/election'),
   }));
-  const [openTitle, setOpenTitle] = useState<string | null>(null);
+  const [openTitle, setOpenTitle] = useState<string | null>(DefaultOpenSectionTitle);
 
   useEffect(() => {
     if (!isOpen) {
       /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setOpenTitle(null);
+      setOpenTitle(DefaultOpenSectionTitle);
     }
   }, [isOpen]);
 

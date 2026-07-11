@@ -39,7 +39,7 @@ export default function Chat({
   }, [userId, message, groupId, isStaffChat, sendMessage]);
 
   return (
-    <div className={styles['chat']}>
+    <div className={`${styles['chat']} ${isStaffChat ? styles['chat--staff'] : ''}`}>
       <ChatArea messages={messages} userId={userId} loading={loading} />
       <ChatInput message={message} onChangeMessage={setMessage} onSend={handleSendMessage} />
     </div>
