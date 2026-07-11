@@ -1,6 +1,7 @@
 import { Message, User } from '../../models/index.js';
 import { pubsub } from '../pubsub.js';
 import { Op } from 'sequelize';
+import { withFilter } from 'graphql-subscriptions';
 import { isStaff, requireAuth, requireStaff } from '../auth.js';
 
 // Студент может читать и писать только в чат собственной группы;
@@ -112,9 +113,14 @@ export const messageResolvers = {
   },
   Subscription: {
     messageSent: {
-      subscribe: (_, { groupId }, context) => {
-        requireAuth(context);
-        return pubsub.asyncIterator('MESSAGE_SENT');
+      // Подписчик получает только сообщения запрошенной группы,
+      // а подписаться на чужую группу студент не может.
+      subscribe: async (root, args, context, info) => {
+        await requireGroupAccess(context, args.groupId);
+        return withFilter(
+          () => pubsub.asyncIterator('MESSAGE_SENT'),
+          (payload) => String(payload.messageSent.groupId) === String(args.groupId),
+        )(root, args, context, info);
       },
     },
     staffMessageSent: {
