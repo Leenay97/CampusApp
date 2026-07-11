@@ -1,13 +1,16 @@
 import { Schedule } from '../../models/index.js';
+import { requireAuth, requireAdmin } from '../auth.js';
 
 export const scheduleResolvers = {
   Query: {
-    schedule: async () => {
+    schedule: async (_, __, context) => {
+      requireAuth(context);
       return await Schedule.findOne();
     },
   },
   Mutation: {
-    updateSchedule: async (_, { dayName, schedule }) => {
+    updateSchedule: async (_, { dayName, schedule }, context) => {
+      requireAdmin(context);
       const existingSchedule = await Schedule.findOne();
       if (!existingSchedule) {
         const newSchedule = await Schedule.create({ dayName, schedule });
@@ -19,7 +22,8 @@ export const scheduleResolvers = {
       return existingSchedule;
     },
 
-    deleteSchedule: async () => {
+    deleteSchedule: async (_, __, context) => {
+      requireAdmin(context);
       const schedule = await Schedule.findOne();
       schedule.destroy();
     },

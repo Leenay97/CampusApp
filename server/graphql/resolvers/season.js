@@ -9,10 +9,12 @@ import {
   ArchivedWorkshop,
   ArchivedSporttime,
 } from '../../models/index.js';
+import { requireAuth, requireAdmin } from '../auth.js';
 
 export const seasonResolvers = {
   Query: {
-    seasons: async () => {
+    seasons: async (_, __, context) => {
+      requireAdmin(context);
       const seasons = await Season.findAll({
         include: [
           {
@@ -23,10 +25,12 @@ export const seasonResolvers = {
       });
       return seasons;
     },
-    season: async (_, { id }) => {
+    season: async (_, { id }, context) => {
+      requireAuth(context);
       return await Season.findByPk(id);
     },
-    activeSeason: async () => {
+    activeSeason: async (_, __, context) => {
+      requireAuth(context);
       return await Season.findOne({
         where: { isActive: true },
         include: {
@@ -35,10 +39,12 @@ export const seasonResolvers = {
         },
       });
     },
-    archivedSeasons: async () => {
+    archivedSeasons: async (_, __, context) => {
+      requireAdmin(context);
       return await ArchivedSeason.findAll({ order: [['createdAt', 'DESC']] });
     },
-    archivedSeason: async (_, { id }) => {
+    archivedSeason: async (_, { id }, context) => {
+      requireAdmin(context);
       return await ArchivedSeason.findByPk(id, {
         include: [
           { model: ArchivedGroup, as: 'groups' },
@@ -92,7 +98,8 @@ export const seasonResolvers = {
   },
 
   Mutation: {
-    createSeason: async (_, { number, year, startDate, endDate }) => {
+    createSeason: async (_, { number, year, startDate, endDate }, context) => {
+      requireAdmin(context);
       const existingSeason = await Season.findOne({ where: { number, year } });
       if (existingSeason) {
         throw new Error('Сезон уже существует');
@@ -106,7 +113,8 @@ export const seasonResolvers = {
       return season;
     },
 
-    updateSeason: async (_, { id, number, year }) => {
+    updateSeason: async (_, { id, number, year }, context) => {
+      requireAdmin(context);
       const season = await Season.findByPk(id);
       if (!d) throw new Error('Сезон не найден');
 
@@ -117,7 +125,8 @@ export const seasonResolvers = {
       return season;
     },
 
-    activateSeason: async (_, { id }) => {
+    activateSeason: async (_, { id }, context) => {
+      requireAdmin(context);
       const season = await Season.findByPk(id);
       if (!season) throw new Error('Сезон не найден');
       if (season.isActive) throw new Error('Сезон уже активен');
@@ -148,7 +157,8 @@ export const seasonResolvers = {
       return season;
     },
 
-    archiveSeason: async (_, { id }) => {
+    archiveSeason: async (_, { id }, context) => {
+      requireAdmin(context);
       const season = await Season.findByPk(id);
       if (!season) throw new Error('Сезон не найден');
       if (season.isArchived) throw new Error('Сезон уже архивирован');
@@ -244,7 +254,8 @@ export const seasonResolvers = {
       return season;
     },
 
-    deleteSeason: async (_, { id }) => {
+    deleteSeason: async (_, { id }, context) => {
+      requireAdmin(context);
       const season = await Season.findByPk(id);
       if (!season) throw new Error('Сезон не найден');
 

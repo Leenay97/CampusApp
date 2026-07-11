@@ -1,8 +1,10 @@
 import { Group, House, User } from '../../models/index.js';
+import { requireAuth, requireAdmin } from '../auth.js';
 
 export const houseResolvers = {
   Query: {
-    houses: async () => {
+    houses: async (_, __, context) => {
+      requireAuth(context);
       return await House.findAll({
         include: {
           model: User,
@@ -14,7 +16,8 @@ export const houseResolvers = {
         },
       });
     },
-    house: async (_, { id }) => {
+    house: async (_, { id }, context) => {
+      requireAuth(context);
       return await House.findOne({
         where: { id },
         include: [
@@ -33,7 +36,8 @@ export const houseResolvers = {
     },
   },
   Mutation: {
-    createHouse: async (_, { number }) => {
+    createHouse: async (_, { number }, context) => {
+      requireAdmin(context);
       if (!number) throw new Error('Укажите номер');
       const existingHouse = await House.findOne({ where: { number } });
       if (existingHouse) throw new Error('Домик уже создан');
@@ -42,7 +46,9 @@ export const houseResolvers = {
       });
       return house;
     },
-    updateHouse: async (_, { id, grade }) => {
+    updateHouse: async (_, { id, grade }, context) => {
+      // Оценку домику ставит только админ (в UI GradeSection виден только ему)
+      requireAdmin(context);
       const existingHouse = await House.findByPk(id);
       if (!existingHouse) throw new Error('Домик не найден');
 

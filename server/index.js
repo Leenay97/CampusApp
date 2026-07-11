@@ -17,6 +17,7 @@ import { sequelize, PushSubscription } from './models/index.js';
 import { typeDefs } from './graphql/typeDefs/index.js';
 import { resolvers } from './graphql/resolvers/index.js';
 import { pubsub } from './graphql/pubsub.js';
+import { getAuthFromHeader, isStaff } from './graphql/auth.js';
 import { scheduleLivesReset } from './jobs/resetLives.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -103,20 +104,28 @@ const startServer = async () => {
 
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  app.get('/api/push/check', async (req, res) => {
-    const userId = req.query.userId;
-    if (!userId) {
-      return res.json({ hasSubscription: false });
+  // userId для push-эндпоинтов берём только из проверенного JWT,
+  // заголовок X-User-Id больше не является источником истины.
+  function pushAuth(req, res, next) {
+    const auth = getAuthFromHeader(req.headers.authorization);
+    if (!auth) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
-    const subscription = await PushSubscription.findOne({ where: { userId } });
+    req.auth = auth;
+    next();
+  }
+
+  app.use('/api/push', pushAuth);
+
+  app.get('/api/push/check', async (req, res) => {
+    const subscription = await PushSubscription.findOne({ where: { userId: req.auth.id } });
     res.json({ hasSubscription: !!subscription });
   });
 
   app.post('/api/push/subscribe', async (req, res) => {
     console.log('📥 Получен запрос на подписку');
-    console.log('📦 Тело:', JSON.stringify(req.body, null, 2));
 
-    const userId = req.headers['x-user-id'] || 'anonymous';
+    const userId = req.auth.id;
     const subscription = req.body;
 
     if (
@@ -158,7 +167,7 @@ const startServer = async () => {
   });
 
   app.post('/api/push/unsubscribe', async (req, res) => {
-    const userId = req.headers['x-user-id'] || 'anonymous';
+    const userId = req.auth.id;
 
     try {
       await PushSubscription.destroy({ where: { userId } });
@@ -171,6 +180,10 @@ const startServer = async () => {
   });
 
   app.post('/api/push/test', async (req, res) => {
+    if (!isStaff(req.auth)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
     const { userId, title, body } = req.body;
 
     if (!userId) {
@@ -201,8 +214,9 @@ const startServer = async () => {
   const serverCleanup = useServer(
     {
       schema,
-      context: async () => {
+      context: async (ctx) => {
         return {
+          auth: getAuthFromHeader(ctx.connectionParams?.authorization),
           pubsub,
           broadcast,
           sendPushNotification,
@@ -216,6 +230,7 @@ const startServer = async () => {
     schema,
     context: ({ req }) => ({
       req,
+      auth: getAuthFromHeader(req.headers.authorization),
       pubsub,
       broadcast,
       sendPushNotification,

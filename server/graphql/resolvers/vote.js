@@ -1,10 +1,12 @@
 import { Vote, VoteOption, User } from '../../models/index.js';
+import { requireAuth, requireAdmin, requireSelfOrStaff } from '../auth.js';
 
 const OPTIONS_ORDER = [['createdAt', 'ASC']];
 
 export const voteResolvers = {
   Query: {
-    getVotes: async (_, { seasonId, userId }) => {
+    getVotes: async (_, { seasonId, userId }, context) => {
+      requireAuth(context);
       const where = { seasonId };
       if (userId) {
         where.status = ['ACTIVE', 'FINISHED'];
@@ -29,7 +31,8 @@ export const voteResolvers = {
   },
 
   Mutation: {
-    createVote: async (_, { title, options, seasonId }) => {
+    createVote: async (_, { title, options, seasonId }, context) => {
+      requireAdmin(context);
       const vote = await Vote.create({
         title,
         seasonId,
@@ -51,7 +54,8 @@ export const voteResolvers = {
       };
     },
 
-    updateVote: async (_, { id, title, options }) => {
+    updateVote: async (_, { id, title, options }, context) => {
+      requireAdmin(context);
       const vote = await Vote.findByPk(id);
       if (!vote) throw new Error('Vote not found');
 
@@ -89,7 +93,8 @@ export const voteResolvers = {
       };
     },
 
-    setVoteStatus: async (_, { id, status }) => {
+    setVoteStatus: async (_, { id, status }, context) => {
+      requireAdmin(context);
       const vote = await Vote.findByPk(id);
       if (!vote) throw new Error('Vote not found');
 
@@ -106,7 +111,8 @@ export const voteResolvers = {
       };
     },
 
-    deleteVote: async (_, { id }) => {
+    deleteVote: async (_, { id }, context) => {
+      requireAdmin(context);
       const vote = await Vote.findByPk(id);
       if (!vote) throw new Error('Vote not found');
 
@@ -116,7 +122,9 @@ export const voteResolvers = {
       return vote;
     },
 
-    castVote: async (_, { voteId, optionId, userId }) => {
+    castVote: async (_, { voteId, optionId, userId }, context) => {
+      // Голосовать можно только от собственного имени
+      requireSelfOrStaff(context, userId);
       const currentVote = await Vote.findByPk(voteId);
       if (!currentVote) throw new Error('Голосование не найдено');
       if (currentVote.status !== 'ACTIVE') throw new Error('Голосование не активно');

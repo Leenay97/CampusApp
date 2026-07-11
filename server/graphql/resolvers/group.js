@@ -1,24 +1,29 @@
 import { User, Workshop, Group } from '../../models/index.js';
+import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
 
 export const groupResolvers = {
   Query: {
-    groups: async () => {
+    groups: async (_, __, context) => {
+      requireAuth(context);
       return await Group.findAll();
     },
 
-    seasonGroups: async (_, { seasonId }) => {
+    seasonGroups: async (_, { seasonId }, context) => {
+      requireAuth(context);
       return await Group.findAll({
         where: { seasonId },
       });
     },
 
-    group: async (_, { id }) => {
+    group: async (_, { id }, context) => {
+      requireAuth(context);
       return await Group.findByPk(id, {
         include: [{ model: User, as: 'users' }],
       });
     },
 
-    groupByUserId: async (_, { userId }) => {
+    groupByUserId: async (_, { userId }, context) => {
+      requireAuth(context);
       return await Group.findOne({
         where: { userId },
         include: [
@@ -28,7 +33,8 @@ export const groupResolvers = {
       });
     },
 
-    groupByUserId: async (_, { userId }) => {
+    groupByUserId: async (_, { userId }, context) => {
+      requireAuth(context);
       return await Group.findOne({
         where: { userId },
         include: [{ model: User, as: 'users' }],
@@ -69,7 +75,8 @@ export const groupResolvers = {
   },
 
   Mutation: {
-    createGroup: async (_, { name, userIds, seasonId }) => {
+    createGroup: async (_, { name, userIds, seasonId }, context) => {
+      requireAdmin(context);
       const validUserIds = userIds ? userIds.filter((id) => id != null) : [];
 
       if (validUserIds.length < 2) {
@@ -106,7 +113,8 @@ export const groupResolvers = {
       });
     },
 
-    updateGroup: async (_, { id, amount, rubbersAmount, places, name, teacherIds }) => {
+    updateGroup: async (_, { id, amount, rubbersAmount, places, name, teacherIds }, context) => {
+      requireStaff(context);
       console.log('teacherIds:', teacherIds);
       const group = await Group.findByPk(id);
       if (!group) throw new Error('Группа не найдена');
@@ -136,7 +144,8 @@ export const groupResolvers = {
       return group;
     },
 
-    deleteGroup: async (_, { id }) => {
+    deleteGroup: async (_, { id }, context) => {
+      requireAdmin(context);
       const group = await Group.findByPk(id);
       if (!group) throw new Error('Группа не найдена');
 

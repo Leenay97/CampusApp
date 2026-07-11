@@ -25,11 +25,11 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
   async function handleLogout() {
     onClose();
 
-    // Unsubscribe push with the current userId *before* clearing user state,
-    // so the server-side subscription record is actually removed and the push
-    // endpoint can't deliver messages to the next user on this device.
-    if (user?.id && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      const userId = user.id;
+    // Unsubscribe push *before* clearing the token, so the server-side
+    // subscription record is actually removed and the push endpoint can't
+    // deliver messages to the next user on this device.
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token && 'serviceWorker' in navigator) {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
       const pushCleanup = async () => {
         const registration = await navigator.serviceWorker.ready;
@@ -38,7 +38,7 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
           await subscription.unsubscribe();
           await fetch(`${apiUrl}/api/push/unsubscribe`, {
             method: 'POST',
-            headers: { 'X-User-Id': userId },
+            headers: { Authorization: `Bearer ${token}` },
           });
         }
       };

@@ -4,33 +4,31 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
-
-function requireStaff(context) {
-  const authHeader = context?.req?.headers?.authorization || '';
-  const token = authHeader.replace('Bearer ', '');
-  if (!token) throw new Error('Не авторизован');
-
-  let decoded;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch {
-    throw new Error('Невалидный токен');
-  }
-
-  if (decoded.userLevel !== 'ADMIN' && decoded.userLevel !== 'TEACHER') {
-    throw new Error('Доступ запрещен');
-  }
-  return decoded;
-}
+import { isStaff, requireAuth, requireStaff, requireAdmin, requireSelfOrStaff } from '../auth.js';
 
 export const userResolvers = {
+  User: {
+    // Логин видят только персонал и сам пользователь — публичные запросы
+    // (например, список учителей на странице регистрации) его не получат.
+    login: (parent, _, context) => {
+      const auth = context?.auth;
+      if (isStaff(auth) || String(auth?.id) === String(parent.id)) {
+        return parent.login;
+      }
+      return null;
+    },
+  },
+
   Query: {
-    students: async (_, { groupId }) => {
+    students: async (_, { groupId }, context) => {
+      // С groupId запрос публичный: страница регистрации показывает
+      // состав группы по ссылке-приглашению. Полный список — только персоналу.
       if (groupId) {
         return await User.findAll({
           where: { userLevel: 'STUDENT', groupId },
         });
       }
+      requireStaff(context);
       return await User.findAll({
         where: { userLevel: 'STUDENT' },
         include: [
@@ -39,6 +37,7 @@ export const userResolvers = {
         ],
       });
     },
+    // Публичный: страница регистрации учителей ("Найди себя").
     teachers: async () => {
       return await User.findAll({
         where: { userLevel: 'TEACHER' },
@@ -48,7 +47,8 @@ export const userResolvers = {
         ],
       });
     },
-    user: async (_, { id }) => {
+    user: async (_, { id }, context) => {
+      requireAuth(context);
       return await User.findByPk(id, {
         include: [
           { model: Group, as: 'group' },
@@ -57,7 +57,8 @@ export const userResolvers = {
       });
     },
 
-    usersByGroup: async (_, { groupId }) => {
+    usersByGroup: async (_, { groupId }, context) => {
+      requireAuth(context);
       return await User.findAll({
         where: { groupId, userLevel: 'STUDENT' },
         include: [
@@ -69,7 +70,8 @@ export const userResolvers = {
       });
     },
 
-    usersByWorkshop: async (_, { workshopId }) => {
+    usersByWorkshop: async (_, { workshopId }, context) => {
+      requireAuth(context);
       const workshop = await Workshop.findByPk(workshopId);
       if (!workshop) return [];
       return await User.findAll({
@@ -81,7 +83,8 @@ export const userResolvers = {
       });
     },
 
-    seasonStudents: async () => {
+    seasonStudents: async (_, __, context) => {
+      requireStaff(context);
       const activeSeason = await Season.findOne({ where: { isActive: true } });
       return await User.findAll({
         where: { userLevel: 'STUDENT', seasonId: activeSeason.id },
@@ -141,7 +144,8 @@ export const userResolvers = {
         group,
       };
     },
-    createStudent: async (_, { russianName, groupId }) => {
+    createStudent: async (_, { russianName, groupId }, context) => {
+      requireStaff(context);
       const group = await Group.findByPk(groupId);
       if (!group) throw new Error('Группы не существует');
       if (!group.seasonId) throw new Error('Группа не принадлежит сезону');
@@ -163,7 +167,8 @@ export const userResolvers = {
       return user;
     },
 
-    createTeacher: async (_, { name }) => {
+    createTeacher: async (_, { name }, context) => {
+      requireAdmin(context);
       const existingTeacher = await User.findOne({ where: { name, userLevel: 'TEACHER' } });
       if (existingTeacher) throw new Error('Teacher already exists');
 
@@ -297,7 +302,9 @@ export const userResolvers = {
     updateUser: async (
       _,
       { id, name, russianName, groupId, houseId, englishLevel, classId, coins },
+      context,
     ) => {
+      requireStaff(context);
       const user = await User.findByPk(id);
       if (!user) throw new Error('User not found');
 
@@ -314,7 +321,8 @@ export const userResolvers = {
       return user;
     },
 
-    deleteUser: async (_, { id }) => {
+    deleteUser: async (_, { id }, context) => {
+      requireAdmin(context);
       const user = await User.findByPk(id);
       if (!user) throw new Error('User not found');
 
@@ -326,7 +334,9 @@ export const userResolvers = {
       return user;
     },
 
-    transferCoins: async (_, { userId, recieverId, amount }) => {
+    transferCoins: async (_, { userId, recieverId, amount }, context) => {
+      // Переводить можно только от собственного имени
+      requireSelfOrStaff(context, userId);
       const user = await User.findByPk(userId);
       const reciever = await User.findByPk(recieverId);
       if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
@@ -348,7 +358,8 @@ export const userResolvers = {
       return user;
     },
 
-    addWorkshop: async (_, { id, workshopId }) => {
+    addWorkshop: async (_, { id, workshopId }, context) => {
+      requireSelfOrStaff(context, id);
       const user = await User.findByPk(id);
       if (!user) throw new Error('User not found');
 
@@ -399,7 +410,8 @@ export const userResolvers = {
       return true;
     },
 
-    fineUser: async (_, { id }) => {
+    fineUser: async (_, { id }, context) => {
+      requireStaff(context);
       const user = await User.findByPk(id);
       if (!user) throw new Error('Студент не найден');
       const group = await Group.findOne({ where: { id: user.groupId } });
@@ -419,7 +431,8 @@ export const userResolvers = {
       return user;
     },
 
-    uploadAvatar: async (_, { file, userId }) => {
+    uploadAvatar: async (_, { file, userId }, context) => {
+      requireSelfOrStaff(context, userId);
       try {
         console.log('Starting upload for userId:', userId);
 

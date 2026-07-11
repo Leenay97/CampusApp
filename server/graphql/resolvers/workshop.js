@@ -1,11 +1,13 @@
 import { Op } from 'sequelize';
 import { Place, Season, TechnicalData, User, Workshop, sequelize } from '../../models/index.js';
+import { requireAuth, requireStaff, requireSelfOrStaff } from '../auth.js';
 
 const UserWorkshop = sequelize.models.UserWorkshop;
 
 export const workshopResolvers = {
   Query: {
-    workshops: async (_, { isSport }) => {
+    workshops: async (_, { isSport }, context) => {
+      requireAuth(context);
       const activeSeason = await Season.findOne({ where: { isActive: true } });
       if (!activeSeason) return [];
 
@@ -32,7 +34,8 @@ export const workshopResolvers = {
         ],
       });
     },
-    todayWorkshops: async (_, { isSport }) => {
+    todayWorkshops: async (_, { isSport }, context) => {
+      requireAuth(context);
       // Список открывается не раньше времени, указанного в тех. данных
       const techData = await TechnicalData.findOne();
       const startTime = isSport ? techData?.sportTimeStart : techData?.workshopStart;
@@ -76,7 +79,8 @@ export const workshopResolvers = {
         ],
       });
     },
-    workshopsByTeacher: async (_, { userId }) => {
+    workshopsByTeacher: async (_, { userId }, context) => {
+      requireAuth(context);
       return await Workshop.findAll({
         where: { teacherId: userId },
         include: [
@@ -95,7 +99,9 @@ export const workshopResolvers = {
     createWorkshop: async (
       _,
       { name, description, placeId, teacherId, maxStudents, maxAge, type, date },
+      context,
     ) => {
+      requireStaff(context);
       if (!name) throw new Error('Нет названия');
       if (!teacherId) throw new Error('Не выбран учитель');
       if (!placeId) throw new Error('Не выбрано место');
@@ -119,7 +125,9 @@ export const workshopResolvers = {
       return workshop;
     },
 
-    joinWorkshop: async (_, { studentId, workshopId }) => {
+    joinWorkshop: async (_, { studentId, workshopId }, context) => {
+      // Студент записывает только себя; персонал может записать любого
+      requireSelfOrStaff(context, studentId);
       try {
         const [student, workshop] = await Promise.all([
           User.findByPk(studentId),
@@ -195,7 +203,8 @@ export const workshopResolvers = {
       }
     },
 
-    closeWorkshop: async (_, { studentIds, workshopId }) => {
+    closeWorkshop: async (_, { studentIds, workshopId }, context) => {
+      requireStaff(context);
       const workshop = await Workshop.findByPk(workshopId);
       if (!workshop) throw new Error('Workshop not found');
 

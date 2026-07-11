@@ -1,4 +1,5 @@
 import { Class, Lesson, Place, Season, TechnicalData, User } from '../../models/index.js';
+import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
 
 const classInclude = [
   { model: Place, as: 'place' },
@@ -15,7 +16,8 @@ function todayDate() {
 
 export const classResolvers = {
   Query: {
-    classes: async () => {
+    classes: async (_, __, context) => {
+      requireAuth(context);
       const activeSeason = await Season.findOne({ where: { isActive: true } });
       if (!activeSeason) return [];
 
@@ -24,10 +26,12 @@ export const classResolvers = {
         include: classInclude,
       });
     },
-    class: async (_, { id }) => {
+    class: async (_, { id }, context) => {
+      requireAuth(context);
       return await Class.findByPk(id, { include: classInclude });
     },
-    classByUserId: async (_, { userId }) => {
+    classByUserId: async (_, { userId }, context) => {
+      requireAuth(context);
       const user = await User.findByPk(userId);
       if (!user) throw new Error('Пользователь не найден');
 
@@ -45,7 +49,8 @@ export const classResolvers = {
 
       return null;
     },
-    classesByTeacher: async (_, { teacherId }) => {
+    classesByTeacher: async (_, { teacherId }, context) => {
+      requireAuth(context);
       const teacher = await User.findByPk(teacherId);
       if (!teacher) throw new Error('Учитель не найден');
 
@@ -70,7 +75,8 @@ export const classResolvers = {
   },
 
   Mutation: {
-    createClass: async (_, { name, teacherIds, studentIds, placeId }) => {
+    createClass: async (_, { name, teacherIds, studentIds, placeId }, context) => {
+      requireAdmin(context);
       if (!teacherIds || teacherIds.length === 0) {
         throw new Error('Не указаны учителя');
       }
@@ -94,7 +100,8 @@ export const classResolvers = {
       return await Class.findByPk(newClass.id, { include: classInclude });
     },
 
-    updateClass: async (_, { id, name, place }) => {
+    updateClass: async (_, { id, name, place }, context) => {
+      requireAdmin(context);
       const existingClass = await Class.findByPk(id);
       if (!existingClass) throw new Error('Класс не найден');
 
@@ -106,7 +113,8 @@ export const classResolvers = {
       return await Class.findByPk(id, { include: classInclude });
     },
 
-    deleteClass: async (_, { id }) => {
+    deleteClass: async (_, { id }, context) => {
+      requireAdmin(context);
       const existingClass = await Class.findByPk(id);
       if (!existingClass) throw new Error('Класс не найден');
 
@@ -120,7 +128,8 @@ export const classResolvers = {
       return existingClass;
     },
 
-    closeLesson: async (_, { classId, teacherId, studentIds }) => {
+    closeLesson: async (_, { classId, teacherId, studentIds }, context) => {
+      requireStaff(context);
       const existingClass = await Class.findByPk(classId);
       if (!existingClass) throw new Error('Класс не найден');
 

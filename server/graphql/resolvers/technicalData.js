@@ -1,8 +1,10 @@
 import { TechnicalData } from '../../models/index.js';
+import { requireAuth, requireAdmin } from '../auth.js';
 
 export const technicalDataResolvers = {
   Query: {
-    technicalData: async () => {
+    technicalData: async (_, __, context) => {
+      requireAuth(context);
       return await TechnicalData.findOne();
     },
   },
@@ -10,7 +12,9 @@ export const technicalDataResolvers = {
     updateTechnicalData: async (
       _,
       { workshopValue, sportTimeValue, lessonValue, workshopStart, sportTimeStart, isRatingShown },
+      context,
     ) => {
+      requireAdmin(context);
       const existingTechData = await TechnicalData.findOne();
       if (!existingTechData) {
         const techData = await TechnicalData.create({

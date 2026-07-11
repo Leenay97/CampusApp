@@ -1,10 +1,26 @@
 import { Message, User } from '../../models/index.js';
 import { pubsub } from '../pubsub.js';
 import { Op } from 'sequelize';
+import { isStaff, requireAuth, requireStaff } from '../auth.js';
+
+// Студент может читать и писать только в чат собственной группы;
+// персоналу доступны все чаты, включая учительский.
+// groupId берём из БД, а не из токена: токены регистрации его не содержат.
+async function requireGroupAccess(context, groupId) {
+  const auth = requireAuth(context);
+  if (isStaff(auth)) return auth;
+
+  const me = await User.findByPk(auth.id);
+  if (!me || !me.groupId || String(me.groupId) !== String(groupId)) {
+    throw new Error('Доступ запрещен');
+  }
+  return auth;
+}
 
 export const messageResolvers = {
   Query: {
-    getMessages: async (_, { groupId }) => {
+    getMessages: async (_, { groupId }, context) => {
+      await requireGroupAccess(context, groupId);
       return await Message.findAll({
         where: { groupId },
         include: [
@@ -17,7 +33,18 @@ export const messageResolvers = {
     },
   },
   Mutation: {
-    sendMessage: async (_, { authorId, text, groupId, isStaffChat }, { sendPushNotification }) => {
+    sendMessage: async (_, { authorId, text, groupId, isStaffChat }, context) => {
+      const { sendPushNotification } = context;
+      const auth = requireAuth(context);
+      if (String(auth.id) !== String(authorId)) {
+        throw new Error('Нельзя отправлять сообщения от чужого имени');
+      }
+      if (isStaffChat) {
+        requireStaff(context);
+      } else {
+        await requireGroupAccess(context, groupId);
+      }
+
       if (!text) {
         throw new Error('Сообщение не может быть пустым');
       }
@@ -85,12 +112,14 @@ export const messageResolvers = {
   },
   Subscription: {
     messageSent: {
-      subscribe: (_, { groupId }) => {
+      subscribe: (_, { groupId }, context) => {
+        requireAuth(context);
         return pubsub.asyncIterator('MESSAGE_SENT');
       },
     },
     staffMessageSent: {
-      subscribe: (_) => {
+      subscribe: (_, __, context) => {
+        requireStaff(context);
         return pubsub.asyncIterator('STAFF_MESSAGE_SENT');
       },
     },

@@ -72,7 +72,9 @@ export default function PushManager() {
         return;
       }
 
-      const response = await fetch(`${apiUrl}/api/push/check?userId=${user.id}`);
+      const response = await fetch(`${apiUrl}/api/push/check`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` },
+      });
       const data = await response.json();
 
       if (data.hasSubscription) {
@@ -134,7 +136,7 @@ export default function PushManager() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Id': user.id,
+          Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`,
         },
         body: JSON.stringify(subscription.toJSON()),
       });
@@ -162,14 +164,14 @@ export default function PushManager() {
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription) {
-        // Capture userId before any async work in case user state changes mid-flight.
-        const userId = user?.id;
+        // Capture the token before any async work in case user state changes mid-flight.
+        const token = localStorage.getItem('token');
         await subscription.unsubscribe();
 
-        if (userId) {
+        if (token) {
           await fetch(`${apiUrl}/api/push/unsubscribe`, {
             method: 'POST',
-            headers: { 'X-User-Id': userId },
+            headers: { Authorization: `Bearer ${token}` },
           });
         }
 

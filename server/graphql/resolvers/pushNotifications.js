@@ -1,8 +1,11 @@
 import { User, PushSubscription } from '../../models/index.js';
+import { requireStaff } from '../auth.js';
 
 export const pushResolvers = {
   Mutation: {
-    sendPushToStaff: async (_, { title, body, url }, { sendPushNotification }) => {
+    sendPushToStaff: async (_, { title, body, url }, context) => {
+      const { sendPushNotification } = context;
+      requireStaff(context);
       const staffUsers = await User.findAll({
         where: { accountLevel: ['TEACHER', 'ADMIN'] },
       });
@@ -20,7 +23,9 @@ export const pushResolvers = {
       return successCount > 0;
     },
 
-    sendPushToGroup: async (_, { groupId, title, body, url }, { sendPushNotification }) => {
+    sendPushToGroup: async (_, { groupId, title, body, url }, context) => {
+      const { sendPushNotification } = context;
+      requireStaff(context);
       const usersInGroup = await User.findAll({
         where: { groupId },
       });
@@ -38,7 +43,9 @@ export const pushResolvers = {
       return successCount > 0;
     },
 
-    sendPushToUser: async (_, { userId, title, body, url }, { sendPushNotification }) => {
+    sendPushToUser: async (_, { userId, title, body, url }, context) => {
+      const { sendPushNotification } = context;
+      requireStaff(context);
       const success = await sendPushNotification(userId, title, body, url || '/');
       if (!success) {
         throw new Error(`Не удалось отправить уведомление пользователю ${userId}`);
@@ -46,7 +53,9 @@ export const pushResolvers = {
       return true;
     },
 
-    sendPushToAll: async (_, { title, body, url }, { sendPushNotification }) => {
+    sendPushToAll: async (_, { title, body, url }, context) => {
+      const { sendPushNotification } = context;
+      requireStaff(context);
       const allSubscriptions = await PushSubscription.findAll();
       const userIds = [...new Set(allSubscriptions.map((s) => s.userId))];
 
