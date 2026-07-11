@@ -14,6 +14,7 @@ import { GET_POSTS } from '@/graphql/queries/GetPosts';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { useQuery } from '@apollo/client';
 import { useMemo, useState } from 'react';
+import DOMPurify from 'dompurify';
 
 export default function InfoPage() {
   const { user } = useUser();
@@ -38,9 +39,14 @@ export default function InfoPage() {
     await refetch();
 
     try {
+      // Текст поста — HTML из редактора; в уведомление идёт чистый текст
+      const plainText = DOMPurify.sanitize(createText, { ALLOWED_TAGS: [] })
+        .replace(/\s+/g, ' ')
+        .trim();
+
       await sendPushToAll({
         title: `Новый пост от ${user?.name || 'Easy Campus'}`,
-        body: createText,
+        body: plainText,
         url: '/information',
       });
     } catch (error) {

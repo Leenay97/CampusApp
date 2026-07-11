@@ -22,7 +22,8 @@ export const userTypeDefs = gql`
   type AuthPayload {
     token: String!
     user: User!
-    group: Group!
+    # nullable: у ADMIN нет группы, register-мутации её не возвращают
+    group: Group
   }
 
   extend type Query {

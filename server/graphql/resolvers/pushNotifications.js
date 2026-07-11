@@ -7,20 +7,18 @@ export const pushResolvers = {
       const { sendPushNotification } = context;
       requireStaff(context);
       const staffUsers = await User.findAll({
-        where: { accountLevel: ['TEACHER', 'ADMIN'] },
+        where: { userLevel: ['TEACHER', 'ADMIN'] },
       });
 
       if (!staffUsers.length) {
         throw new Error('Нет пользователей с уровнем TEACHER или ADMIN');
       }
 
-      let successCount = 0;
-      for (const user of staffUsers) {
-        const success = await sendPushNotification(user.id, title, body, url || '/');
-        if (success) successCount++;
-      }
+      const results = await Promise.all(
+        staffUsers.map((user) => sendPushNotification(user.id, title, body, url || '/')),
+      );
 
-      return successCount > 0;
+      return results.some(Boolean);
     },
 
     sendPushToGroup: async (_, { groupId, title, body, url }, context) => {
@@ -34,13 +32,11 @@ export const pushResolvers = {
         throw new Error(`Нет пользователей в группе ${groupId}`);
       }
 
-      let successCount = 0;
-      for (const user of usersInGroup) {
-        const success = await sendPushNotification(user.id, title, body, url || '/');
-        if (success) successCount++;
-      }
+      const results = await Promise.all(
+        usersInGroup.map((user) => sendPushNotification(user.id, title, body, url || '/')),
+      );
 
-      return successCount > 0;
+      return results.some(Boolean);
     },
 
     sendPushToUser: async (_, { userId, title, body, url }, context) => {
@@ -63,13 +59,11 @@ export const pushResolvers = {
         throw new Error('Нет активных подписок');
       }
 
-      let successCount = 0;
-      for (const userId of userIds) {
-        const success = await sendPushNotification(userId, title, body, url || '/');
-        if (success) successCount++;
-      }
+      const results = await Promise.all(
+        userIds.map((userId) => sendPushNotification(userId, title, body, url || '/')),
+      );
 
-      return successCount > 0;
+      return results.some(Boolean);
     },
   },
 };

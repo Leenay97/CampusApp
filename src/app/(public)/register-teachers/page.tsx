@@ -52,9 +52,11 @@ function RegisterTeacherForm() {
         password,
         confirmPassword,
       })) as ResultType;
-      localStorage.setItem('token', result?.registerTeacher?.token);
-      setUser(result.registerTeacher.user);
-      router.push('/');
+      if (result?.registerTeacher?.token) {
+        localStorage.setItem('token', result.registerTeacher.token);
+        setUser(result.registerTeacher.user);
+        router.push('/');
+      }
     } catch (err) {
       console.error(err);
     }

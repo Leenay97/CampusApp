@@ -11,7 +11,16 @@ export const REGISTER_STUDENT_WITH_EXISTING_ACCOUNT = gql`
       user {
         id
         name
+        russianName
+        coins
+        lives
         userLevel
+        photoUrl
+        group {
+          id
+          name
+          places
+        }
       }
     }
   }

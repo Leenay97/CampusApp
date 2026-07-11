@@ -20,6 +20,12 @@ export const REGISTER_TEACHER = gql`
         id
         name
         userLevel
+        photoUrl
+        group {
+          id
+          name
+          places
+        }
       }
     }
   }

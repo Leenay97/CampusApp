@@ -102,11 +102,15 @@ export const messageResolvers = {
         : `💬 ${author.name}`;
       const notificationUrl = isStaffChat ? '/staff-chat' : '/chat';
 
-      for (const recipient of recipients) {
-        if (recipient.id !== authorId) {
-          await sendPushNotification(recipient.id, notificationTitle, text, notificationUrl);
-        }
-      }
+      // Пуши уходят в фоне: ответ мутации не ждёт web-push, иначе отправка
+      // сообщения в большую группу подвисает на секунды
+      Promise.allSettled(
+        recipients
+          .filter((recipient) => recipient.id !== authorId)
+          .map((recipient) =>
+            sendPushNotification(recipient.id, notificationTitle, text, notificationUrl),
+          ),
+      );
 
       return messageWithAuthor;
     },

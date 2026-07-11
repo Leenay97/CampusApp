@@ -17,6 +17,9 @@ function Modal({ onClose, children, className }: ModalProps) {
   if (!modalRoot) return null;
 
   function handleOverlayClick(e: React.MouseEvent) {
+    // stopPropagation: события портала всплывают по React-дереву, и клик по
+    // оверлею иначе доходит до родителя, который открывает модалку (House)
+    e.stopPropagation();
     if (e.target === e.currentTarget) {
       onClose();
     }

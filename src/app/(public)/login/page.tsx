@@ -1,5 +1,5 @@
 'use client';
-import { JSX, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import style from './LoginPage.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
@@ -28,6 +28,13 @@ export default function LoginPage(): JSX.Element {
   const [loginUser] = useGlobalLoadingMutation(LOGIN);
   const router = useRouter();
   const { setUser } = useUser();
+
+  // Уже залогиненного отправляем на главную
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      router.push('/');
+    }
+  }, [router]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();

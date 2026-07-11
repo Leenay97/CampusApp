@@ -21,7 +21,16 @@ export const REGISTER_STUDENT = gql`
       user {
         id
         name
+        russianName
+        coins
+        lives
         userLevel
+        photoUrl
+        group {
+          id
+          name
+          places
+        }
       }
     }
   }

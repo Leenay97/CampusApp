@@ -15,19 +15,12 @@ type UserProviderProps = {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: UserProviderProps) {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (storedToken && storedUser) {
-      return { ...JSON.parse(storedUser), token: storedToken };
-    }
-    return null;
-  });
+  // Пользователь не хранится в localStorage — после перезагрузки страницы
+  // его заново загружает AuthGuard через GET_USER.
+  const [user, setUser] = useState<User | null>(null);
 
   function logout() {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     setUser(null);
   }
 

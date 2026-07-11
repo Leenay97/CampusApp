@@ -14,6 +14,7 @@ export const LOGIN = gql`
           places
         }
         userLevel
+        lives
         photoUrl
         workshops {
           id

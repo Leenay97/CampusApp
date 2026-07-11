@@ -1,6 +1,6 @@
 'use client';
 import { Place } from '@/app/types';
-import { createContext, useContext, useState, ReactNode, useRef, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
@@ -12,7 +12,6 @@ export type AppValueContextType = {
 };
 
 interface JWTPayload {
-  seasonId: string;
   id: string;
 }
 
@@ -35,7 +34,6 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: AppProviderProps) {
   const [app, setApp] = useState<AppValueContextType | null>(null);
 
-  const tokenProcessed = useRef(false);
   const userDataProcessed = useRef(false);
   const placeIdRef = useRef<string | null>(null);
   const todayRef = useRef<number>(Date.now());
@@ -63,23 +61,19 @@ export function AppProvider({ children }: AppProviderProps) {
     skip: !userId,
   });
 
-  if (!tokenProcessed.current && typeof window !== 'undefined' && !app) {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode<JWTPayload>(token);
+  // Сезон берём с сервера, а не из JWT: токен мог быть выдан до смены сезона,
+  // а токены регистрации вообще не содержат seasonId.
+  const { data: seasonData, error: seasonError } = useQuery(queries.GET_ACTIVE_SEASON, {
+    skip: !userId,
+  });
 
-        setApp({
-          seasonId: decoded.seasonId,
-          today: todayRef.current,
-        });
-
-        tokenProcessed.current = true;
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('token');
-      }
-    }
+  // Ошибка запроса (нет активного сезона) тоже завершает инициализацию —
+  // app создаётся с пустым seasonId, зависимые страницы просто скипают запросы.
+  if (!app && userId && (seasonData || seasonError)) {
+    setApp({
+      seasonId: seasonData?.activeSeason?.id ?? '',
+      today: todayRef.current,
+    });
   }
 
   if (userData && !userDataProcessed.current && app) {

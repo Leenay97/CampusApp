@@ -14,9 +14,10 @@ import ModalFooter from '../Modal/ModalFooter';
 
 type ModalProps = {
   onClose: () => void;
+  onSubmit: () => void;
 };
 
-function AddSeasonModal({ onClose }: ModalProps) {
+function AddSeasonModal({ onClose, onSubmit }: ModalProps) {
   const [seasonData, setSeasonData] = useState({
     year: '',
     number: '',
@@ -38,6 +39,7 @@ function AddSeasonModal({ onClose }: ModalProps) {
         startDate: seasonData.startDate,
         endDate: seasonData.endDate,
       });
+      onSubmit();
     } catch (err) {
       console.error(err);
     }

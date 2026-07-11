@@ -53,6 +53,7 @@ export const userResolvers = {
         include: [
           { model: Group, as: 'group' },
           { model: Workshop, as: 'attendingWorkshops' },
+          { model: Class, as: 'class' },
         ],
       });
     },
@@ -339,10 +340,10 @@ export const userResolvers = {
       requireSelfOrStaff(context, userId);
       const user = await User.findByPk(userId);
       const reciever = await User.findByPk(recieverId);
-      if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
-      if (amount <= 0) throw new Error('Некорректная сумма');
       if (!user) throw new Error('Отправитель не найден');
       if (!reciever) throw new Error('Получатель не найден');
+      if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
+      if (amount <= 0) throw new Error('Некорректная сумма');
 
       if (user.userLevel === 'STUDENT') {
         if (user.coins < amount) {

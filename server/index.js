@@ -118,7 +118,13 @@ const startServer = async () => {
   app.use('/api/push', pushAuth);
 
   app.get('/api/push/check', async (req, res) => {
-    const subscription = await PushSubscription.findOne({ where: { userId: req.auth.id } });
+    // С endpoint проверяем подписку именно этого браузера,
+    // без него — наличие хоть одной подписки пользователя
+    const { endpoint } = req.query;
+    const where = { userId: req.auth.id };
+    if (endpoint) where.endpoint = endpoint;
+
+    const subscription = await PushSubscription.findOne({ where });
     res.json({ hasSubscription: !!subscription });
   });
 
@@ -168,10 +174,15 @@ const startServer = async () => {
 
   app.post('/api/push/unsubscribe', async (req, res) => {
     const userId = req.auth.id;
+    // С endpoint отписываем только текущее устройство,
+    // без него (старые клиенты) — все подписки пользователя
+    const endpoint = req.body?.endpoint;
+    const where = { userId };
+    if (endpoint) where.endpoint = endpoint;
 
     try {
-      await PushSubscription.destroy({ where: { userId } });
-      console.log(`❌ Push подписки удалены для ${userId}`);
+      await PushSubscription.destroy({ where });
+      console.log(`❌ Push подписки удалены для ${userId}${endpoint ? ' (одно устройство)' : ''}`);
       res.json({ success: true });
     } catch (error) {
       console.error(`❌ Ошибка удаления подписки:`, error);

@@ -25,6 +25,11 @@ function SeasonManagementPage() {
     setIsCreateModalOpen(true);
   }
 
+  function handleSeasonCreated() {
+    setIsCreateModalOpen(false);
+    refetch();
+  }
+
   async function handleArchiveSeason(seasonId: string) {
     try {
       await archiveSeason({ id: seasonId });
@@ -59,7 +64,12 @@ function SeasonManagementPage() {
       <PrimaryButton className={styles['add-season-btn']} onClick={handleOpenModal}>
         Добавить сезон
       </PrimaryButton>
-      {isCreateModalOpen && <AddSeasonModal onClose={() => setIsCreateModalOpen(false)} />}
+      {isCreateModalOpen && (
+        <AddSeasonModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleSeasonCreated}
+        />
+      )}
       <SeasonsTable
         onRefetchSeason={refetch}
         onArchive={handleArchiveSeason}

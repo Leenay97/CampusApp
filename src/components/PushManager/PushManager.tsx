@@ -72,9 +72,12 @@ export default function PushManager() {
         return;
       }
 
-      const response = await fetch(`${apiUrl}/api/push/check`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` },
-      });
+      const response = await fetch(
+        `${apiUrl}/api/push/check?endpoint=${encodeURIComponent(subscription.endpoint)}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` },
+        },
+      );
       const data = await response.json();
 
       if (data.hasSubscription) {
@@ -164,14 +167,19 @@ export default function PushManager() {
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription) {
-        // Capture the token before any async work in case user state changes mid-flight.
+        // Capture the token and endpoint before unsubscribe() invalidates them.
         const token = localStorage.getItem('token');
+        const endpoint = subscription.endpoint;
         await subscription.unsubscribe();
 
         if (token) {
           await fetch(`${apiUrl}/api/push/unsubscribe`, {
             method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ endpoint }),
           });
         }
 

@@ -40,6 +40,7 @@ function SeasonsPage() {
     refetch: refetchSeasons,
   } = useQuery(queries.GET_SEASONS);
   const [createSeason] = useGlobalLoadingMutation(mutations.CREATE_SEASON);
+  const [createGroup] = useGlobalLoadingMutation(mutations.CREATE_GROUP);
   const [activateSeason] = useGlobalLoadingMutation(mutations.ACTIVATE_SEASON);
 
   const teachers = useMemo(() => teachersData?.teachers ?? [], [teachersData?.teachers]);
@@ -73,13 +74,23 @@ function SeasonsPage() {
 
   async function handleCreateSeason() {
     try {
-      await createSeason({
+      const result = (await createSeason({
         year: seasonData.year,
         number: seasonData.number,
         startDate: seasonData.startDate,
         endDate: seasonData.endDate,
-        groupTeachers: seasonGroups,
-      });
+      })) as { createSeason: { id: string } };
+
+      // Схема createSeason не принимает группы — создаём их отдельной мутацией
+      const seasonId = result?.createSeason?.id;
+      if (seasonId) {
+        for (const group of seasonGroups) {
+          await createGroup({ name: group.name, teacherIds: group.teacherIds, seasonId });
+        }
+      }
+
+      setSeasonGroups([]);
+      setSeasonData({ year: '', number: '', startDate: '', endDate: '' });
       refetchSeasons();
     } catch (err) {
       console.error(err);
@@ -92,6 +103,7 @@ function SeasonsPage() {
         id: selectedSeason.id,
       });
       setIsModalOpen(false);
+      refetchSeasons();
     } catch (err) {
       console.error(err);
     }
@@ -146,7 +158,7 @@ function SeasonsPage() {
           </ModalBody>
           <ModalFooter>
             <SecondaryButton onClick={() => setIsModalOpen(false)}>Отмена</SecondaryButton>
-            <PrimaryButton onClick={handleActivateSeason}>Удалить</PrimaryButton>
+            <PrimaryButton onClick={handleActivateSeason}>Активировать</PrimaryButton>
           </ModalFooter>
         </Modal>
       )}

@@ -8,6 +8,7 @@ import {
   ArchivedGroup,
   ArchivedWorkshop,
   ArchivedSporttime,
+  sequelize,
 } from '../../models/index.js';
 import { requireAuth, requireAdmin } from '../auth.js';
 
@@ -116,7 +117,7 @@ export const seasonResolvers = {
     updateSeason: async (_, { id, number, year }, context) => {
       requireAdmin(context);
       const season = await Season.findByPk(id);
-      if (!d) throw new Error('Сезон не найден');
+      if (!season) throw new Error('Сезон не найден');
 
       season.number = number !== undefined ? number : season.number;
       season.year = year !== undefined ? year : season.year;
@@ -163,93 +164,109 @@ export const seasonResolvers = {
       if (!season) throw new Error('Сезон не найден');
       if (season.isArchived) throw new Error('Сезон уже архивирован');
 
-      // Кол-во проведённых уроков английского по каждому учителю — просто цифры
-      const lessons = await Lesson.findAll({
-        where: { seasonId: id },
-        include: [{ model: User, as: 'teacher' }],
-      });
-      const lessonCountByTeacher = new Map();
-      for (const lesson of lessons) {
-        const teacherName = lesson.teacher?.name ?? '—';
-        lessonCountByTeacher.set(teacherName, (lessonCountByTeacher.get(teacherName) ?? 0) + 1);
-      }
-
-      // Снимок сезона в архив: составы групп, мастерские, спорттаймы и уроки
-      const archivedSeason = await ArchivedSeason.create({
-        number: season.number,
-        year: season.year,
-        startDate: season.startDate,
-        endDate: season.endDate,
-        lessonCounts: [...lessonCountByTeacher].map(([name, count]) => ({ name, count })),
-      });
-
-      const groups = await Group.findAll({ where: { seasonId: id } });
-
-      for (const group of groups) {
-        const teachers =
-          group.teacherIds && group.teacherIds.length > 0
-            ? await User.findAll({ where: { id: group.teacherIds, userLevel: 'TEACHER' } })
-            : [];
-        const students = await User.findAll({
-          where: { groupId: group.id, userLevel: 'STUDENT' },
+      // Архивирование — много шагов; транзакция гарантирует «всё или ничего»,
+      // чтобы сбой на середине не оставил полусозданный архив и несброшенных юзеров
+      await sequelize.transaction(async (t) => {
+        // Кол-во проведённых уроков английского по каждому учителю — просто цифры
+        const lessons = await Lesson.findAll({
+          where: { seasonId: id },
+          include: [{ model: User, as: 'teacher' }],
+          transaction: t,
         });
-
-        await ArchivedGroup.create({
-          archivedSeasonId: archivedSeason.id,
-          name: group.name,
-          teachers: teachers.map((teacher) => ({ id: teacher.id, name: teacher.name })),
-          students: students.map((student) => ({
-            id: student.id,
-            name: student.name,
-            russianName: student.russianName,
-          })),
-        });
-      }
-
-      const workshops = await Workshop.findAll({
-        where: { seasonId: id },
-        include: [{ model: User, as: 'teacher' }],
-      });
-
-      for (const workshop of workshops) {
-        const archivedWorkshop = {
-          archivedSeasonId: archivedSeason.id,
-          name: workshop.name,
-          date: workshop.date,
-          teacher: workshop.teacher ? workshop.teacher.name : null,
-        };
-
-        if (workshop.type === 'SPORT') {
-          await ArchivedSporttime.create(archivedWorkshop);
-        } else {
-          await ArchivedWorkshop.create(archivedWorkshop);
+        const lessonCountByTeacher = new Map();
+        for (const lesson of lessons) {
+          const teacherName = lesson.teacher?.name ?? '—';
+          lessonCountByTeacher.set(teacherName, (lessonCountByTeacher.get(teacherName) ?? 0) + 1);
         }
-      }
 
-      // Сброс сезонных данных: аккаунты студентов остаются (имена, логин, пароль),
-      // чтобы в следующем сезоне войти через «Уже есть аккаунт»
-      await User.update(
-        {
-          seasonId: null,
-          groupId: null,
-          classId: null,
-          houseId: null,
-          coins: null,
-          lives: null,
-          votes: null,
-          gotWorkshopCoins: null,
-        },
-        { where: { seasonId: id, userLevel: 'STUDENT' } },
-      );
+        // Снимок сезона в архив: составы групп, мастерские, спорттаймы и уроки
+        const archivedSeason = await ArchivedSeason.create(
+          {
+            number: season.number,
+            year: season.year,
+            startDate: season.startDate,
+            endDate: season.endDate,
+            lessonCounts: [...lessonCountByTeacher].map(([name, count]) => ({ name, count })),
+          },
+          { transaction: t },
+        );
 
-      await User.update(
-        { seasonId: null, groupId: null },
-        { where: { seasonId: id, userLevel: 'TEACHER' } },
-      );
+        const groups = await Group.findAll({ where: { seasonId: id }, transaction: t });
 
-      season.isActive = false;
-      season.isArchived = true;
-      await season.save();
+        for (const group of groups) {
+          const teachers =
+            group.teacherIds && group.teacherIds.length > 0
+              ? await User.findAll({
+                  where: { id: group.teacherIds, userLevel: 'TEACHER' },
+                  transaction: t,
+                })
+              : [];
+          const students = await User.findAll({
+            where: { groupId: group.id, userLevel: 'STUDENT' },
+            transaction: t,
+          });
+
+          await ArchivedGroup.create(
+            {
+              archivedSeasonId: archivedSeason.id,
+              name: group.name,
+              teachers: teachers.map((teacher) => ({ id: teacher.id, name: teacher.name })),
+              students: students.map((student) => ({
+                id: student.id,
+                name: student.name,
+                russianName: student.russianName,
+              })),
+            },
+            { transaction: t },
+          );
+        }
+
+        const workshops = await Workshop.findAll({
+          where: { seasonId: id },
+          include: [{ model: User, as: 'teacher' }],
+          transaction: t,
+        });
+
+        for (const workshop of workshops) {
+          const archivedWorkshop = {
+            archivedSeasonId: archivedSeason.id,
+            name: workshop.name,
+            date: workshop.date,
+            teacher: workshop.teacher ? workshop.teacher.name : null,
+          };
+
+          if (workshop.type === 'SPORT') {
+            await ArchivedSporttime.create(archivedWorkshop, { transaction: t });
+          } else {
+            await ArchivedWorkshop.create(archivedWorkshop, { transaction: t });
+          }
+        }
+
+        // Сброс сезонных данных: аккаунты студентов остаются (имена, логин, пароль),
+        // чтобы в следующем сезоне войти через «Уже есть аккаунт»
+        await User.update(
+          {
+            seasonId: null,
+            groupId: null,
+            classId: null,
+            houseId: null,
+            coins: null,
+            lives: null,
+            votes: null,
+            gotWorkshopCoins: null,
+          },
+          { where: { seasonId: id, userLevel: 'STUDENT' }, transaction: t },
+        );
+
+        await User.update(
+          { seasonId: null, groupId: null },
+          { where: { seasonId: id, userLevel: 'TEACHER' }, transaction: t },
+        );
+
+        season.isActive = false;
+        season.isArchived = true;
+        await season.save({ transaction: t });
+      });
 
       return season;
     },
@@ -258,6 +275,7 @@ export const seasonResolvers = {
       requireAdmin(context);
       const season = await Season.findByPk(id);
       if (!season) throw new Error('Сезон не найден');
+      if (season.isActive) throw new Error('Нельзя удалить активный сезон — сначала архивируйте');
 
       await season.destroy();
       return season;

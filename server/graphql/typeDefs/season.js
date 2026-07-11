@@ -67,7 +67,7 @@ export const seasonTypeDefs = gql`
     createSeason(year: String!, number: String!, startDate: String!, endDate: String!): Season
     activateSeason(id: ID!): Season
     archiveSeason(id: ID!): Season
-    updateSeason(id: ID!): Season
+    updateSeason(id: ID!, number: String, year: String): Season
     deleteSeason(id: ID!): Season
   }
 `;

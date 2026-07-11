@@ -35,10 +35,17 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) {
+          const endpoint = subscription.endpoint;
           await subscription.unsubscribe();
+          // endpoint ограничивает отписку текущим устройством —
+          // подписки на других устройствах пользователя остаются
           await fetch(`${apiUrl}/api/push/unsubscribe`, {
             method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ endpoint }),
           });
         }
       };

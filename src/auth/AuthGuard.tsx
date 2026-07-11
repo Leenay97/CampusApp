@@ -16,9 +16,6 @@ interface AuthGuardProps {
 interface JWTPayload {
   id: string;
   userLevel: string;
-  seasonId: string;
-  today: number;
-  todayPlace: string;
   iat?: number;
   exp?: number;
 }
@@ -50,31 +47,34 @@ export function AuthGuard({ allowedRoles, children }: AuthGuardProps) {
 
   const userId = getUserId();
 
-  const { data, loading } = useQuery(queries.GET_USER, {
+  const { data, loading, error } = useQuery(queries.GET_USER, {
     variables: { id: userId },
     skip: !userId,
   });
 
+  // Синхронизируем контекст при каждом обновлении данных (не только при первом):
+  // так монеты/жизни в шапке подхватывают изменения кэша после мутаций.
   useEffect(() => {
-    if (data?.user && !user) {
+    if (data?.user) {
       setUser(data.user);
     }
-  }, [data, user, setUser]);
+  }, [data, setUser]);
 
+  // Токен есть, но сервер пользователя не отдал (истёк/отозван токен, юзер
+  // удалён) — разлогиниваем вместо вечного спиннера. Чистые сетевые сбои
+  // не трогаем, чтобы не выкидывать офлайн-пользователя.
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token && !app) {
-      try {
-        const decoded = jwtDecode<JWTPayload>(token);
-        setApp({
-          seasonId: decoded.seasonId,
-          today: Date.now(),
-        });
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
+    if (!userId || loading) return;
+
+    const authFailed = error && error.graphQLErrors.length > 0;
+    const userMissing = !error && data && !data.user;
+
+    if (authFailed || userMissing) {
+      localStorage.removeItem('token');
+      setUser(null);
+      router.push('/login');
     }
-  }, [app, setApp]);
+  }, [userId, loading, error, data, setUser, router]);
 
   useEffect(() => {
     if (user && !app?.todayPlace && user.group?.places) {
