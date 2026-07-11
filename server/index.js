@@ -71,7 +71,7 @@ async function sendPushNotification(userId, title, body, url = '/') {
         successCount++;
       } catch (error) {
         console.error(`❌ Ошибка отправки на ${sub.endpoint}:`, error.message);
-        if (error.statusCode === 410) {
+        if (error.statusCode === 410 || error.statusCode === 404) {
           await sub.destroy();
         }
       }
