@@ -80,7 +80,7 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
       </div>
 
       {showItems && (
-        <ul className={styles['custom-select__list']}>
+        <ul className={styles['custom-select__list']} data-select-open>
           <li key="input" className={styles['custom-select__option']}>
             <input
               className={styles['custom-select__input']}
