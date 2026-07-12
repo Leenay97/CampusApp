@@ -6,6 +6,9 @@ import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import AddElectionModal from '@/components/AddElectionModal/AddElectionModal';
 import { useQuery } from '@apollo/client';
 import { GET_VOTES } from '@/graphql/queries/GetVote';
+import { GET_TECHICAL_DATA } from '@/graphql/queries/GetTechnicalData';
+import { UPDATE_TECHNICAL_DATA } from '@/graphql/mutations/UpdateTechnicalData';
+import Checkbox from '@/components/Checkbox/Checkbox';
 import { useApp } from '@/contexts/AppContext';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { CREATE_VOTE } from '@/graphql/mutations/CreateVote';
@@ -43,6 +46,19 @@ export default function ElectionPage(): JSX.Element {
     },
   });
 
+  const { data: technicalData, refetch: refetchTechnicalData } = useQuery(GET_TECHICAL_DATA);
+  const isElectionShown = technicalData?.technicalData?.isElectionShown ?? false;
+
+  const [updateTechnicalData] = useGlobalLoadingMutation(UPDATE_TECHNICAL_DATA, {
+    onCompleted: () => {
+      refetchTechnicalData();
+    },
+  });
+
+  function handleToggleElectionShown() {
+    updateTechnicalData({ isElectionShown: !isElectionShown });
+  }
+
   function handleDelete(vote: Vote) {
     if (window.confirm(`Удалить голосование «${vote.title}»?`)) {
       deleteVote({ id: vote.id });
@@ -68,7 +84,15 @@ export default function ElectionPage(): JSX.Element {
   if (error) return <div>Ошибка: {error.message}</div>;
 
   return (
-    <CenteredContainer wide noPadding>
+    <CenteredContainer noPadding>
+      <Section>
+        <Checkbox
+          checked={isElectionShown}
+          onChange={handleToggleElectionShown}
+          label="Показывать голосование ученикам"
+        />
+      </Section>
+
       <PrimaryButton onClick={handleOpenModal}>Добавить</PrimaryButton>
 
       {data?.getVotes?.map((vote: Vote) => (

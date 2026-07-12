@@ -8,6 +8,7 @@ export const technicalDataTypeDefs = gql`
     sportTimeStart: String
     workshopStart: String
     isRatingShown: Boolean
+    isElectionShown: Boolean
   }
 
   extend type Query {
@@ -22,6 +23,7 @@ export const technicalDataTypeDefs = gql`
       sportTimeStart: String
       workshopStart: String
       isRatingShown: Boolean
+      isElectionShown: Boolean
     ): TechnicalData
   }
 `;

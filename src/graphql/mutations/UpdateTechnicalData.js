@@ -8,6 +8,7 @@ export const UPDATE_TECHNICAL_DATA = gql`
     $workshopStart: String
     $sportTimeStart: String
     $isRatingShown: Boolean
+    $isElectionShown: Boolean
   ) {
     updateTechnicalData(
       workshopValue: $workshopValue
@@ -16,6 +17,7 @@ export const UPDATE_TECHNICAL_DATA = gql`
       workshopStart: $workshopStart
       sportTimeStart: $sportTimeStart
       isRatingShown: $isRatingShown
+      isElectionShown: $isElectionShown
     ) {
       workshopValue
       sportTimeValue
@@ -23,6 +25,7 @@ export const UPDATE_TECHNICAL_DATA = gql`
       workshopStart
       sportTimeStart
       isRatingShown
+      isElectionShown
     }
   }
 `;

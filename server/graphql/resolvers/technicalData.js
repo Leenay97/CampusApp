@@ -11,7 +11,15 @@ export const technicalDataResolvers = {
   Mutation: {
     updateTechnicalData: async (
       _,
-      { workshopValue, sportTimeValue, lessonValue, workshopStart, sportTimeStart, isRatingShown },
+      {
+        workshopValue,
+        sportTimeValue,
+        lessonValue,
+        workshopStart,
+        sportTimeStart,
+        isRatingShown,
+        isElectionShown,
+      },
       context,
     ) => {
       requireAdmin(context);
@@ -46,6 +54,10 @@ export const technicalDataResolvers = {
 
       if (isRatingShown !== undefined) {
         existingTechData.isRatingShown = isRatingShown;
+      }
+
+      if (isElectionShown !== undefined) {
+        existingTechData.isElectionShown = isElectionShown;
       }
 
       existingTechData.save();

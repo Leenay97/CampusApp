@@ -17,8 +17,13 @@ export default function ElectionPage(): JSX.Element {
   const { app } = useApp();
   const { user } = useUser();
 
+  const { data: technicalData, loading: technicalDataLoading } = useQuery(
+    queries.GET_TECHICAL_DATA,
+  );
+  const isElectionShown = technicalData?.technicalData?.isElectionShown ?? false;
+
   const { data, loading, refetch } = useQuery(queries.GET_VOTES_FOR_VOTING, {
-    skip: !app?.seasonId || !user?.id,
+    skip: !isElectionShown || !app?.seasonId || !user?.id,
     variables: app?.seasonId && user?.id ? { seasonId: app.seasonId, userId: user.id } : undefined,
   });
 
@@ -34,7 +39,7 @@ export default function ElectionPage(): JSX.Element {
     }
   }
 
-  if (loading)
+  if (loading || technicalDataLoading)
     return (
       <CenteredContainer>
         <Section>
@@ -43,7 +48,7 @@ export default function ElectionPage(): JSX.Element {
       </CenteredContainer>
     );
 
-  if (!data?.getVotes?.length) {
+  if (!isElectionShown || !data?.getVotes?.length) {
     return (
       <CenteredContainer>
         <Section>

@@ -1,4 +1,6 @@
 import { JSX, memo, useEffect, useState } from 'react';
+import { useQuery } from '@apollo/client';
+import queries from '@/graphql/queries';
 import { getHeaderMenuSections } from './constants';
 import styles from './BurgerMenu.module.scss';
 import Link from 'next/link';
@@ -13,7 +15,15 @@ type BurgerMenuProps = {
 };
 
 function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Element {
-  const sections = getHeaderMenuSections(userLevel ?? UserLevel.Student);
+  const { data: technicalData } = useQuery(queries.GET_TECHICAL_DATA);
+  const isElectionShown = technicalData?.technicalData?.isElectionShown ?? false;
+
+  const sections = getHeaderMenuSections(userLevel ?? UserLevel.Student).map((section) => ({
+    ...section,
+    options: isElectionShown
+      ? section.options
+      : section.options.filter((option) => option.link !== '/election'),
+  }));
   const [openTitle, setOpenTitle] = useState<string | null>(null);
 
   useEffect(() => {
