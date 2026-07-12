@@ -22,6 +22,7 @@ export default function MyWorkshopPage() {
   const { user } = useUser();
   const { data, loading, refetch } = useQuery(GET_WORKSHOPS_BY_TEACHER, {
     variables: { userId: user?.id },
+    skip: !user?.id,
   });
 
   async function handleCloseWorkshop(studentIds: string[]) {
@@ -37,7 +38,7 @@ export default function MyWorkshopPage() {
   const activeWorkshops = [...(data?.workshopsByTeacher ?? [])].filter((w) => !w.isClosed);
   const closedWorkshops = [...(data?.workshopsByTeacher ?? [])].filter((w) => w.isClosed);
 
-  if (loading)
+  if (!user || loading)
     return (
       <CenteredContainer>
         <Section>

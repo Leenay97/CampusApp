@@ -15,6 +15,7 @@ function AdminRubbersPage() {
   const { app } = useApp();
   const { loading, data, refetch } = useQuery(GET_SEASON_GROUPS, {
     variables: { seasonId: app?.seasonId },
+    skip: !app?.seasonId,
   });
   const [updateGroup] = useGlobalLoadingMutation(UPDATE_GROUP);
 
@@ -33,7 +34,7 @@ function AdminRubbersPage() {
     }
   }
 
-  if (loading)
+  if (!app || loading)
     return (
       <CenteredContainer>
         <Section>

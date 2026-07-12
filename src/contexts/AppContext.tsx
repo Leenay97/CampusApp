@@ -4,6 +4,7 @@ import { createContext, useContext, useState, ReactNode, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
+import { useUser } from '@/contexts/UserContext';
 
 export type AppValueContextType = {
   seasonId: string;
@@ -54,7 +55,12 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }
 
-  const userId = getUserId();
+  // Токен читается из localStorage только при рендере, а корневой провайдер
+  // при soft-навигации Next.js не перерендеривается — после логина он бы так
+  // и не узнал о токене. Подписка на UserContext (setUser вызывают логин-
+  // страница и AuthGuard) даёт ре-рендер, на котором токен перечитывается.
+  const { user } = useUser();
+  const userId = user?.id ?? getUserId();
 
   const { data: userData } = useQuery(queries.GET_USER, {
     variables: { id: userId },

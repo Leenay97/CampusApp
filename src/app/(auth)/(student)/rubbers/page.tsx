@@ -13,14 +13,17 @@ import { memo, useMemo } from 'react';
 
 function RubbersPage() {
   const { app } = useApp();
-  const { data, loading } = useQuery(GET_SEASON_GROUPS, { variables: { seasonId: app?.seasonId } });
+  const { data, loading } = useQuery(GET_SEASON_GROUPS, {
+    variables: { seasonId: app?.seasonId },
+    skip: !app?.seasonId,
+  });
 
   const sortedGroups = useMemo(() => {
     if (!data?.seasonGroups.length) return [];
     return [...data?.seasonGroups].sort((a: Group, b: Group) => b.rubbers - a.rubbers);
   }, [data?.seasonGroups]);
 
-  if (loading) {
+  if (!app || loading) {
     return (
       <CenteredContainer>
         <Section>
