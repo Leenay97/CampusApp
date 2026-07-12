@@ -18,5 +18,7 @@ export const postTypeDefs = gql`
     createPost(title: String!, text: String!, authorId: ID!): Post
     updatePost(id: ID!, title: String, text: String): Post
     deletePost(id: ID!): Post
+    uploadPostImage(file: Upload!): String!
+    deletePostImage(url: String!): Boolean!
   }
 `;

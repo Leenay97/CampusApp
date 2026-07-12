@@ -2,6 +2,7 @@
 
 import { Post as PostType, UserLevel } from '@/app/types';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import CreatePostModal from '@/components/CreatePostModal/CreatePostModal';
 import Loader from '@/components/Loader/Loaader';
 import Post from '@/components/Post/Post';
@@ -20,6 +21,7 @@ export default function InfoPage() {
   const { user } = useUser();
   const [showCreator, setShowCreator] = useState(false);
   const [editingPost, setEditingPost] = useState<PostType | null>(null);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
   const { data, loading, refetch } = useQuery(GET_POSTS);
   const [sendPushToAll] = useGlobalLoadingMutation(SEND_PUSH_ALL);
   const [deletePost] = useGlobalLoadingMutation(DELETE_POST);
@@ -64,8 +66,14 @@ export default function InfoPage() {
     setEditText('');
   }
 
-  async function handleDeletePost(id: string) {
-    await deletePost({ id });
+  async function handleDeleteRequest(id: string) {
+    setDeletingPostId(id);
+  }
+
+  async function handleDeleteConfirm() {
+    if (!deletingPostId) return;
+    await deletePost({ id: deletingPostId });
+    setDeletingPostId(null);
     refetch();
   }
 
@@ -96,7 +104,7 @@ export default function InfoPage() {
           post={post}
           isEditable={user?.userLevel !== UserLevel.Student}
           onEdit={handleEditPost}
-          onDelete={handleDeletePost}
+          onDelete={handleDeleteRequest}
         />
       ))}
 
@@ -114,6 +122,17 @@ export default function InfoPage() {
             setCreateText('');
           }}
         />
+      )}
+
+      {deletingPostId && (
+        <ConfirmModal
+          title="Удалить пост"
+          confirmText="Удалить"
+          onConfirm={handleDeleteConfirm}
+          onClose={() => setDeletingPostId(null)}
+        >
+          Вы точно хотите удалить пост?
+        </ConfirmModal>
       )}
 
       {editingPost && (

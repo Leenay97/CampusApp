@@ -2,9 +2,20 @@
   border: 1px solid #dcdcdc;
   border-radius: 8px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  // Разрешает редактору ужиматься в модалке: скроллит .content,
+  // а тулбар и остальная модалка остаются на месте
+  min-height: 0;
+}
+
+.content {
+  overflow-y: auto;
+  min-height: 150px;
 }
 
 .toolbar {
+  flex-shrink: 0;
   display: flex;
   gap: 8px;
   padding: 10px;
@@ -35,6 +46,43 @@
 
 :global(.ProseMirror p) {
   margin: 0;
+}
+
+:global(.ProseMirror img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.image-resizer {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+
+  img {
+    display: block;
+  }
+
+  .resize-handle {
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #4a90be;
+    border: 2px solid white;
+    cursor: nwse-resize;
+    opacity: 0;
+    // Чтобы на тачскринах перетаскивание ручки не скроллило страницу
+    touch-action: none;
+  }
+
+  &:hover .resize-handle,
+  &:global(.ProseMirror-selectednode) .resize-handle {
+    opacity: 1;
+  }
 }
 
 :global(.ProseMirror p.is-editor-empty:first-child::before) {
