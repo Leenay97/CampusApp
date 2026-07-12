@@ -1,9 +1,7 @@
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import Section from '@/components/Section/Section';
 import Title from '@/components/Title/Title';
-import { AdminPanelOptions } from './constants';
-import Link from 'next/link';
-import styles from './Panel.module.scss';
+import PanelMenu from './PanelMenu';
 import { ReactNode } from 'react';
 
 type AdminLayoutProps = {
@@ -14,14 +12,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <CenteredContainer wide>
       <Section>
-        <Title>Admin panel</Title>
-        <div className={styles['admin-panel']}>
-          {AdminPanelOptions.map((item) => (
-            <Link key={item.link} href={item.link} className={styles['admin-panel__option']}>
-              {item.name}
-            </Link>
-          ))}
-        </div>
+        <Title noMargin>Admin panel</Title>
+        <PanelMenu />
       </Section>
       {children}
     </CenteredContainer>

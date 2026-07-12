@@ -1,11 +1,50 @@
 .admin-panel {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-direction: column;
+    gap: 12px;
     border-radius: 8px;
+
+    &__group-title {
+        margin-bottom: 8px;
+        padding: 0;
+        border: none;
+        background: none;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--color-dark-blue);
+        opacity: 0.7;
+        cursor: pointer;
+        user-select: none;
+        &::before {
+            content: '▸';
+            display: inline-block;
+            margin-right: 4px;
+            transition: transform 0.25s ease;
+        }
+        &--open::before {
+            transform: rotate(90deg);
+        }
+    }
+    &__group-body {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.25s ease;
+        &--open {
+            grid-template-rows: 1fr;
+        }
+    }
+    &__group-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        overflow: hidden;
+        min-height: 0;
+    }
     &__option {
-        padding: 10px 15px;
-        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 13px;
+        text-align: center;
+        border-radius: 4px;
         background-color: var(--color-dark-blue);
         color: white;
     }
