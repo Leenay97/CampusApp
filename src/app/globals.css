@@ -1,5 +1,12 @@
-@import url('https://fonts.cdnfonts.com/css/nokia-sans-s60');
 @import './variables.css';
+
+@font-face {
+  font-family: 'Nokia Sans S60';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Nokia Sans S60'), url('/fonts/NokiaSansS60.woff') format('woff');
+}
 
 * {
   margin: 0;
