@@ -31,7 +31,15 @@ export function useGlobalLoadingMutation<TData, TVariables = Record<string, unkn
   async function wrappedMutate(variables?: TVariables): Promise<TData> {
     showLoading('LOADING');
     const response = await mutate({ variables });
-    return response.data as TData;
+    // При заданном onError-колбэке Apollo резолвит промис mutate даже при ошибке —
+    // пробрасываем её, чтобы try/catch вызывающего кода сработал
+    if (response.errors?.length) {
+      throw new Error(response.errors[0].message);
+    }
+    if (!response.data) {
+      throw new Error('Мутация не вернула данных');
+    }
+    return response.data;
   }
 
   const extendedResult: GlobalLoadingMutationResult<TData, TVariables> = {

@@ -122,7 +122,6 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       onClose();
     } catch (err) {
       console.error(err);
-      setError('Ошибка при переводе');
     }
   }
 
