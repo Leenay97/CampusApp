@@ -32,6 +32,7 @@ button, input, textarea, select {
 
   --color-white: #FFFFFF;
   --color-dark-blue: #4a90be;
+  --color-deep-blue: #2c77a9;
   --color-dark-blue-transparent: #2c77a984;
 
   --bg-primary: var(--color-blue);

@@ -34,26 +34,24 @@
         flex-direction: column;
         align-items: stretch;
         width: 100%;
-        padding-top: 12px;
+        padding: 15px 0;
 
         &:not(:first-child) {
-            margin-top: 12px;
             border-top: 1px solid #4a90be5b;
         }
     }
 
     &__section-title {
         width: 100%;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        padding: 8px 20px;
+        padding: 0px 20px;
         font-size: 14px;
         font-weight: 600;
-        letter-spacing: 0.02em;
         text-transform: uppercase;
-        color: var(--text-primary);
+        color: var(--color-deep-blue);
         background: none;
         border: none;
         font-family: inherit;
@@ -63,23 +61,26 @@
         transition: all 0.2s ease-in-out;
 
         &--open {
-            margin-bottom: 5px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4a90be3b;
         }
     }
 
     &__section-arrow {
-        display: inline-block;
+        position: absolute;
+        right: 20px;
+        top: 50%;
         width: 6px;
         height: 6px;
         border-right: 2px solid currentColor;
         border-bottom: 2px solid currentColor;
-        transform: rotate(45deg);
-        margin-top: -2px;
-        transition: transform 0.2s ease-in-out;
+        transform: translateY(-50%) rotate(45deg);
+        transition: transform 0.2s ease-in-out, top 0.2s ease-in-out;
 
         &--open {
-            transform: rotate(-135deg);
-            margin-top: 2px;
+            // компенсация padding-bottom: 15px у открытого заголовка
+            top: calc(50% - 5.5px);
+            transform: translateY(-50%) rotate(-135deg);
         }
     }
 
@@ -104,7 +105,7 @@
     }
 
     &__option {
-        padding: 14px 20px;
+        padding: 12px 20px;
         width: 100%;
         color: var(--text-primary);
         cursor: pointer;
@@ -113,6 +114,10 @@
         justify-content: center;
         opacity: 1;
         touch-action: manipulation;
+
+        &:last-child {
+            padding-bottom: 0;
+        }
     }
 
     &--hidden {
