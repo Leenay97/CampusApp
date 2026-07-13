@@ -68,16 +68,18 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
                   isSectionOpen ? styles['burger-menu__section-content--open'] : ''
                 }`}
               >
-                {section.options.map((option) => (
-                  <Link
-                    key={option.link}
-                    href={option.link}
-                    className={styles['burger-menu__option']}
-                    onClick={onClose}
-                  >
-                    {option.name}
-                  </Link>
-                ))}
+                <div className={styles['burger-menu__section-content-inner']}>
+                  {section.options.map((option) => (
+                    <Link
+                      key={option.link}
+                      href={option.link}
+                      className={styles['burger-menu__option']}
+                      onClick={onClose}
+                    >
+                      {option.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           );
