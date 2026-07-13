@@ -10,8 +10,9 @@ import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { GET_USER } from '@/graphql/queries/GetUser';
 import { useUser } from '@/contexts/UserContext';
 import { UPLOAD_AVATAR } from '@/graphql/mutations/UploadAvatar';
-import EditIcon from '@/modules/icons/EditIcon';
+import { DELETE_AVATAR } from '@/graphql/mutations/DeleteAvatar';
 import Modal from '../Modal/Modal';
+import Avatar from '../Avatar/Avatar';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
 import ModalFooter from '../Modal/ModalFooter';
@@ -36,8 +37,9 @@ type DataType = {
 
 export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Props) {
   const [uploadAvatar, { loading }] = useGlobalLoadingMutation(UPLOAD_AVATAR);
+  const [deleteAvatar, { loading: deleting }] = useGlobalLoadingMutation(DELETE_AVATAR);
   const [getUser] = useLazyQuery(GET_USER);
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
 
   const [image, setImage] = useState<string | null>(null);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
@@ -162,6 +164,19 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
     }
   }
 
+  async function handleDeleteAvatar() {
+    if (!userId) return;
+
+    try {
+      await deleteAvatar({ userId });
+
+      const updatedUser = await getUser({ variables: { id: userId } });
+      setUser(updatedUser.data.user);
+    } catch (error) {
+      console.error('Delete avatar error:', error);
+    }
+  }
+
   function handleCancelCrop() {
     setImage(null);
     setOriginalFile(null);
@@ -173,16 +188,7 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
       <ModalBody>
         {!image ? (
           <>
-            {photoUrl ? (
-              <img
-                src={`${process.env.NEXT_PUBLIC_API_URL}${photoUrl}`}
-                className={styles.image}
-                alt="Avatar"
-              />
-            ) : (
-              <div className={styles.placeholder}>You</div>
-            )}
-            <label className={styles.uploadButton}>
+            <label className={styles.avatarButton}>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -190,7 +196,8 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
                 disabled={loading}
                 hidden
               />
-              <EditIcon className={styles.icon} />
+              <Avatar name={user?.name} photoUrl={photoUrl} size={150} />
+              <div className={styles.hint}>(кликни чтобы изменить)</div>
             </label>
           </>
         ) : (
@@ -212,9 +219,14 @@ export function ChangeAvatarModal({ userId, photoUrl, onSuccess, onClose }: Prop
 
       {!image && (
         <ModalFooter>
-          <SecondaryButton onClick={onClose} disabled={loading}>
+          {photoUrl && (
+            <SecondaryButton onClick={handleDeleteAvatar} disabled={loading || deleting}>
+              {deleting ? 'Удаление...' : 'Удалить'}
+            </SecondaryButton>
+          )}
+          <PrimaryButton onClick={onClose} disabled={loading || deleting}>
             Отмена
-          </SecondaryButton>
+          </PrimaryButton>
         </ModalFooter>
       )}
 

@@ -1,7 +1,7 @@
 import { UserLevel } from '@/app/types';
 import { useMemo } from 'react';
 import styles from './Message.module.scss';
-import Image from 'next/image';
+import Avatar from '../Avatar/Avatar';
 
 type MessageProps = {
   role: UserLevel;
@@ -43,20 +43,7 @@ export default function Message({
         `}
       >
         {showAvatar ? (
-          <div className={styles['message__avatar']}>
-            {avatar ? (
-              <div
-                className={styles['image']}
-                style={{
-                  backgroundImage: avatar
-                    ? `url(${process.env.NEXT_PUBLIC_API_URL}${avatar})`
-                    : 'none',
-                }}
-              />
-            ) : (
-              <span>{name?.[0]?.toUpperCase()}</span>
-            )}
-          </div>
+          <Avatar className={styles['message__avatar']} name={name} photoUrl={avatar} size={35} />
         ) : (
           <div className={styles['message__avatar-spacer']} />
         )}

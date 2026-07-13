@@ -534,5 +534,25 @@ export const userResolvers = {
         throw new Error(`Upload failed: ${error.message}`);
       }
     },
+
+    deleteAvatar: async (_, { userId }, context) => {
+      requireSelfOrStaff(context, userId);
+
+      const user = await User.findByPk(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      if (user.photoUrl) {
+        const avatarPath = path.join(process.cwd(), user.photoUrl);
+        if (fs.existsSync(avatarPath)) {
+          fs.unlinkSync(avatarPath);
+        }
+        user.photoUrl = null;
+        await user.save();
+      }
+
+      return user;
+    },
   },
 };

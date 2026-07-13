@@ -14,28 +14,6 @@
     margin-bottom: 20px;
   }
 
-  &__avatar {
-    height: 35px;
-    width: 35px;
-    background-color: rgb(69, 122, 156);
-    border-radius: 20px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 600;
-    font-size: 16px;
-    
-    .image {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      background-size: 35px;
-    }
-  }
-
   &__avatar-spacer {
     height: 35px;
     width: 35px;

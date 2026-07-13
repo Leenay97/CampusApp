@@ -1,0 +1,10 @@
+import { gql } from '@apollo/client';
+
+export const DELETE_AVATAR = gql`
+  mutation DeleteAvatar($userId: ID!) {
+    deleteAvatar(userId: $userId) {
+      id
+      photoUrl
+    }
+  }
+`;
