@@ -1,13 +1,5 @@
 @import './variables.css';
 
-@font-face {
-  font-family: 'Nokia Sans S60';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: local('Nokia Sans S60'), url('/fonts/NokiaSansS60.woff') format('woff');
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -22,7 +14,6 @@
 
 button, input, textarea, select {
   font-family: inherit;
-  letter-spacing: 0.5px;
 }
 
 :root {
@@ -55,8 +46,6 @@ button, input, textarea, select {
 }
 
 body {
-  font-family: 'Nokia Sans S60', sans-serif;
-  letter-spacing: 0.5px;
   background-color: #f7fafc;
   background-image: url('/img/bg-colored.webp');
   background-size: 200px;
