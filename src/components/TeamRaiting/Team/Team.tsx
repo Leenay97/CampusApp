@@ -51,7 +51,7 @@ function Team({ team, place, changedPoints, hidden, mode }: TeamProps) {
       <div
         className={`${styles['team']} 
         ${place ? styles[`team_${place}`] : ''} 
-        ${mode === 'rubbers' ? styles['team_rubbers'] : ''}
+        ${mode === 'rubbers' && rubbers > 0 ? styles['team_rubbers'] : ''}
         ${hidden ? styles['team_hidden'] : ''}
     `}
       >
@@ -63,7 +63,7 @@ function Team({ team, place, changedPoints, hidden, mode }: TeamProps) {
 
   return (
     <div
-      className={`${styles['team']} ${place ? styles[`team_${place}`] : ''} ${mode === 'rubbers' ? styles['team_rubbers'] : ''}`}
+      className={`${styles['team']} ${place ? styles[`team_${place}`] : ''} ${mode === 'rubbers' && rubbers > 0 ? styles['team_rubbers'] : ''}`}
     >
       <div className={styles['team__place']}>{place}</div>
       <div className={styles['team__name']}>{team.name}</div>

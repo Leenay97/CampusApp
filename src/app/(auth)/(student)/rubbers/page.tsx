@@ -10,6 +10,7 @@ import { useApp } from '@/contexts/AppContext';
 import { GET_SEASON_GROUPS } from '@/graphql/queries/GetSeasonGroups';
 import { useQuery } from '@apollo/client';
 import { memo, useMemo } from 'react';
+import styles from './RubbersPage.module.scss';
 
 function RubbersPage() {
   const { app } = useApp();
@@ -37,9 +38,11 @@ function RubbersPage() {
     <CenteredContainer>
       <Section>
         <Title noMargin>Резиночки</Title>
-        {sortedGroups.map((group: Group, index: number) => (
-          <Team key={group.id} team={group} mode="rubbers" place={index + 1} />
-        ))}
+        <div className={styles['rating']}>
+          {sortedGroups.map((group: Group, index: number) => (
+            <Team key={group.id} team={group} mode="rubbers" place={index + 1} />
+          ))}
+        </div>
       </Section>
     </CenteredContainer>
   );
