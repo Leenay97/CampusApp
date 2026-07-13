@@ -33,18 +33,20 @@ function TeamRaiting() {
     <CenteredContainer noPadding>
       <Section>
         <Title noMargin>Рейтинг команд</Title>
-        {sortedGroups.length > 0 ? (
-          sortedGroups.map((team, index) => (
-            <Team
-              key={team.id}
-              team={team}
-              place={index + 1}
-              hidden={!technicalData?.technicalData.isRatingShown}
-            />
-          ))
-        ) : (
-          <div className={styles['empty']}>Нет команд</div>
-        )}
+        <div className={styles['rating']}>
+          {sortedGroups.length > 0 ? (
+            sortedGroups.map((team, index) => (
+              <Team
+                key={team.id}
+                team={team}
+                place={index + 1}
+                hidden={!technicalData?.technicalData.isRatingShown}
+              />
+            ))
+          ) : (
+            <div className={styles['empty']}>Нет команд</div>
+          )}
+        </div>
       </Section>
     </CenteredContainer>
   );
