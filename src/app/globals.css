@@ -1,3 +1,4 @@
+@import url('https://fonts.cdnfonts.com/css/nokia-sans-s60');
 @import './variables.css';
 
 * {
@@ -10,6 +11,11 @@
 
 *:focus-visible {
   outline: none;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  letter-spacing: 0.5px;
 }
 
 :root {
@@ -41,6 +47,8 @@
 }
 
 body {
+  font-family: 'Nokia Sans S60', sans-serif;
+  letter-spacing: 0.5px;
   background-color: #f7fafc;
   background-image: url('/img/bg-colored.webp');
   background-size: 200px;
