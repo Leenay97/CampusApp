@@ -23,7 +23,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" className={roboto.className}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-        <link rel="preload" href="/bg-colored.png" as="image" />
+        <link rel="preload" href="/img/bg-colored.webp" as="image" />
       </head>
       <body className={`antialiased`}>
         <ApolloWrapper>

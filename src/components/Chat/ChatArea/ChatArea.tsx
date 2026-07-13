@@ -47,7 +47,10 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
 
   return (
     <div className={styles['chat-area']} ref={containerRef}>
-      {loading && <Loader />}
+      {loading && <div className={styles['chat-area__empty']}>Загрузка...</div>}
+      {!loading && !groupedMessages.length && (
+        <div className={styles['chat-area__empty']}>Сообщений еще нет</div>
+      )}
       {groupedMessages.map((msg) => (
         <Message
           key={msg.id}

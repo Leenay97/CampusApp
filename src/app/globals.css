@@ -41,7 +41,8 @@
 }
 
 body {
-  background-image: url('/img/bg-colored.png');
+  background-color: #f7fafc;
+  background-image: url('/img/bg-colored.webp');
   background-size: 200px;
   background-repeat: repeat;
   color: var(--foreground);
