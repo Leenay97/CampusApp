@@ -25,6 +25,11 @@
         }
     }
 
+    &__input--open {
+        border-radius: 4px 4px 0 0;
+        border-bottom-color: transparent;
+    }
+
     &__list {
         display: flex;
         flex-wrap: nowrap;
@@ -33,13 +38,16 @@
         list-style: none;
         gap: 5px;
         max-height: 150px;
-        min-width: 200px;
+        width: 100%;
         overflow-y: scroll;
         z-index: 10;
         position: absolute;
-        top: 40px;
-        border-radius: 8px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        top: 100%;
+        left: 0;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
     }
 
     &__placeholder {
@@ -55,5 +63,12 @@
         input {
             padding-right: 30px;
         }
+    }
+
+    &__search {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1;
     }
 }

@@ -72,7 +72,10 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
 
   return (
     <div ref={selectRef} className={styles['custom-select']} style={{ width }}>
-      <div className={styles['custom-select__input']} onClick={() => setShowItems(true)}>
+      <div
+        className={`${styles['custom-select__input']} ${showItems ? styles['custom-select__input--open'] : ''}`}
+        onClick={() => setShowItems((prev) => !prev)}
+      >
         <span className={!value && placeholder ? styles['custom-select__placeholder'] : undefined}>
           {value || placeholder}
         </span>
@@ -81,7 +84,10 @@ export function CustomSelect<T extends { id: string; name: string; russianName?:
 
       {showItems && (
         <ul className={styles['custom-select__list']} data-select-open>
-          <li key="input" className={styles['custom-select__option']}>
+          <li
+            key="input"
+            className={`${styles['custom-select__option']} ${styles['custom-select__search']}`}
+          >
             <input
               className={styles['custom-select__input']}
               onChange={handleInputChange}
