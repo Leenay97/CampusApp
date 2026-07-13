@@ -13,6 +13,7 @@ type MessageProps = {
   showAvatar?: boolean;
   isFirstInGroup?: boolean;
   isLastInGroup?: boolean;
+  isPending?: boolean;
 };
 
 export default function Message({
@@ -25,10 +26,9 @@ export default function Message({
   showAvatar = true,
   isFirstInGroup = false,
   isLastInGroup = false,
+  isPending = false,
 }: MessageProps) {
   const isIncoming = useMemo(() => userId !== authorId, [userId, authorId]);
-
-  console.log('showAvatar:', showAvatar, 'text:', text);
 
   if (isIncoming) {
     return (
@@ -58,10 +58,11 @@ export default function Message({
   return (
     <div
       className={`
-      ${styles['message']} 
+      ${styles['message']}
       ${styles['message_my']}
       ${isFirstInGroup ? styles['message_first-in-group'] : ''}
       ${isLastInGroup ? styles['message_last-in-group'] : ''}
+      ${isPending ? styles['message_pending'] : ''}
     `}
     >
       <div className={styles['message__popup']}>

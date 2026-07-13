@@ -4,8 +4,9 @@ import { Message } from '@/app/types';
 import ChatArea from './ChatArea/ChatArea';
 import ChatInput from './ChatInput/ChatInput';
 import styles from './Chat.module.scss';
-import { useCallback, useState } from 'react';
-import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { useLoading } from '@/contexts/LoadingContext';
 import { SEND_MESSAGE } from '@/graphql/mutations/SendMessage';
 
 type ChatProps = {
@@ -16,6 +17,12 @@ type ChatProps = {
   isStaffChat?: boolean;
 };
 
+type PendingMessage = {
+  id: string;
+  text: string;
+  createdAt: string;
+};
+
 export default function Chat({
   messages,
   userId,
@@ -24,23 +31,70 @@ export default function Chat({
   isStaffChat = false,
 }: ChatProps) {
   const [message, setMessage] = useState('');
-  const [sendMessage] = useGlobalLoadingMutation(SEND_MESSAGE);
+  const [pendingMessages, setPendingMessages] = useState<PendingMessage[]>([]);
+  const knownIdsRef = useRef<Set<string>>(new Set());
+  const [sendMessage] = useMutation(SEND_MESSAGE);
+  const { showLoading, hideLoading } = useLoading();
+
+  // Убираем pending-сообщение, когда его подтверждённая копия приходит по подписке
+  useEffect(() => {
+    const newOwnTexts: string[] = [];
+    for (const msg of messages) {
+      if (knownIdsRef.current.has(msg.id)) continue;
+      knownIdsRef.current.add(msg.id);
+      if (msg.author.id === userId) newOwnTexts.push(msg.text);
+    }
+    if (newOwnTexts.length === 0) return;
+
+    setPendingMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const rest = [...prev];
+      for (const text of newOwnTexts) {
+        const index = rest.findIndex((p) => p.text === text);
+        if (index !== -1) rest.splice(index, 1);
+      }
+      return rest.length === prev.length ? prev : rest;
+    });
+  }, [messages, userId]);
 
   const handleSendMessage = useCallback(() => {
-    if (!message.trim() || !userId) return;
+    const text = message.trim();
+    if (!text || !userId) return;
 
-    sendMessage({
-      authorId: userId,
-      text: message.trim(),
-      groupId: groupId,
-      isStaffChat,
-    });
+    const pendingId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setPendingMessages((prev) => [
+      ...prev,
+      { id: pendingId, text, createdAt: Date.now().toString() },
+    ]);
     setMessage('');
-  }, [userId, message, groupId, isStaffChat, sendMessage]);
+
+    sendMessage({ variables: { authorId: userId, text, groupId, isStaffChat } }).catch(() => {
+      setPendingMessages((prev) => prev.filter((p) => p.id !== pendingId));
+      showLoading('ERROR');
+      setTimeout(hideLoading, 1500);
+    });
+  }, [userId, message, groupId, isStaffChat, sendMessage, showLoading, hideLoading]);
+
+  const displayMessages = useMemo<Message[]>(() => {
+    return [
+      ...messages,
+      ...pendingMessages.map(
+        (p) =>
+          ({
+            id: p.id,
+            groupId,
+            text: p.text,
+            createdAt: p.createdAt,
+            author: { id: userId },
+            pending: true,
+          }) as Message,
+      ),
+    ];
+  }, [messages, pendingMessages, groupId, userId]);
 
   return (
     <div className={`${styles['chat']} ${isStaffChat ? styles['chat--staff'] : ''}`}>
-      <ChatArea messages={messages} userId={userId} loading={loading} />
+      <ChatArea messages={displayMessages} userId={userId} loading={loading} />
       <ChatInput message={message} onChangeMessage={setMessage} onSend={handleSendMessage} />
     </div>
   );

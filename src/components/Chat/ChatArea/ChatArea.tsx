@@ -60,6 +60,7 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
           showAvatar={msg.showAvatar}
           isFirstInGroup={msg.isFirstInGroup}
           isLastInGroup={msg.isLastInGroup}
+          isPending={msg.pending}
         />
       ))}
     </div>

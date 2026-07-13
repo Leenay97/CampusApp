@@ -129,6 +129,7 @@ export type Message = {
   text: string;
   author: User;
   createdAt: string;
+  pending?: boolean;
 };
 
 export type VoteStatus = 'DRAFT' | 'ACTIVE' | 'FINISHED';

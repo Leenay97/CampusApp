@@ -123,4 +123,16 @@
       border-color: transparent transparent var(--primary-button-color) transparent;
     }
   }
+
+  $pending-color: #9fb3c2;
+
+  &_my.message_pending {
+    .message__popup {
+      background-color: $pending-color;
+    }
+
+    &.message_last-in-group .message__popup::before {
+      border-color: transparent transparent $pending-color transparent;
+    }
+  }
 }
