@@ -1,5 +1,5 @@
 'use client';
-import { memo, ReactNode } from 'react';
+import { memo, ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Modal.module.scss';
 
@@ -11,6 +11,14 @@ type ModalProps = {
 };
 
 function Modal({ onClose, children, className }: ModalProps) {
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   if (typeof window === 'undefined') return null;
 
   const modalRoot = document.getElementById('modal-root');
