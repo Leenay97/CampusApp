@@ -70,11 +70,13 @@ function Header() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
+      const chatPortal = document.getElementById('burger-menu-chat-portal');
 
       if (
         (isBurgerOpen || isProfileOpen) &&
         headerRef.current &&
-        !headerRef.current.contains(target)
+        !headerRef.current.contains(target) &&
+        !(chatPortal && chatPortal.contains(target))
       ) {
         setIsBurgerOpen(false);
         setIsProfileOpen(false);

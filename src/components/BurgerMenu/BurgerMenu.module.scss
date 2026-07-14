@@ -2,6 +2,7 @@
 
 .burger-menu {
     max-height: calc(100vh - 130px);
+    max-height: calc(100dvh - 130px);
     width: 100vw;
     z-index: 200;
     padding: 10px;
@@ -136,6 +137,7 @@
         border-radius: 8px;
         overflow: hidden;
         position: fixed;
+        z-index: 250;
         bottom: 20px;
         left: 20px;
         width: calc(100vw - 40px);
@@ -146,7 +148,7 @@
 
     &__chat-btn {
         border-radius: 6px;
-        width: 100%;
+        flex: 1;
         height: 40px;
         display: flex;
         align-items: center;

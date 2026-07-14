@@ -22,7 +22,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={roboto.className}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
+        />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#f7fafc" />
         <link rel="preload" href="/img/bg-colored.webp" as="image" />
       </head>
       <body className={`antialiased`}>

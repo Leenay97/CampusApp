@@ -45,7 +45,15 @@ button, input, textarea, select {
   --error-color: var(--color-red);
 }
 
+html, body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #f7fafc;
+  overscroll-behavior: none;
+}
+
 body {
+  display: flow-root;
   background-color: #f7fafc;
   background-image: url('/img/bg-colored.webp');
   background-size: 200px;

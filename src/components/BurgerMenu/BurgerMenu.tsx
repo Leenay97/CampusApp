@@ -1,4 +1,5 @@
 import { JSX, memo, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import { DefaultOpenSectionTitle, getHeaderMenuSections } from './constants';
@@ -36,6 +37,23 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
   function handleSectionToggle(title: string) {
     setOpenTitle((prev) => (prev === title ? null : title));
   }
+
+  const chatButtons = (
+    <div id="burger-menu-chat-portal" className={styles['burger-menu__chat']}>
+      {userLevel !== UserLevel.Student && (
+        <Link href="/staff-chat" className={styles['burger-menu__chat-btn']} onClick={onClose}>
+          <StaffChatIcon />
+          <div className="">Staff chat</div>
+        </Link>
+      )}
+      {userLevel !== UserLevel.Admin && (
+        <Link href="/chat" className={styles['burger-menu__chat-btn']} onClick={onClose}>
+          <GroupChatIcon />
+          <div className="">Чат группы</div>
+        </Link>
+      )}
+    </div>
+  );
 
   return (
     <div className={isOpen ? styles['burger-menu'] : styles['burger-menu--hidden']}>
@@ -84,21 +102,11 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
             </div>
           );
         })}
-        <div className={styles['burger-menu__chat']}>
-          {userLevel !== UserLevel.Student && (
-            <Link href="/staff-chat" className={styles['burger-menu__chat-btn']} onClick={onClose}>
-              <StaffChatIcon />
-              <div className="">Staff chat</div>
-            </Link>
-          )}
-          {userLevel !== UserLevel.Admin && (
-            <Link href="/chat" className={styles['burger-menu__chat-btn']} onClick={onClose}>
-              <GroupChatIcon />
-              <div className="">Чат группы</div>
-            </Link>
-          )}
-        </div>
       </nav>
+      {isOpen &&
+        typeof window !== 'undefined' &&
+        document.getElementById('modal-root') &&
+        createPortal(chatButtons, document.getElementById('modal-root') as HTMLElement)}
     </div>
   );
 }
