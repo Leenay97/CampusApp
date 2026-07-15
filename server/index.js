@@ -115,6 +115,50 @@ const startServer = async () => {
     next();
   }
 
+  // Стикерпаки — папки с картинками в public/stickers/<pack>/*, кладутся на
+  // сервер вручную вместе с деплоем public. Тут только чтение того, что на диске.
+  const STICKERS_DIR = path.join(__dirname, '..', 'public', 'stickers');
+  const STICKER_IMAGE_EXTENSIONS = new Set(['.png', '.webp', '.jpg', '.jpeg', '.gif']);
+
+  app.get('/api/stickers', async (req, res) => {
+    let packEntries;
+    try {
+      packEntries = await fs.promises.readdir(STICKERS_DIR, { withFileTypes: true });
+    } catch {
+      return res.json({ packs: [] });
+    }
+
+    const packNames = packEntries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+
+    const packs = await Promise.all(
+      packNames.map(async (packName) => {
+        let fileEntries;
+        try {
+          fileEntries = await fs.promises.readdir(path.join(STICKERS_DIR, packName), {
+            withFileTypes: true,
+          });
+        } catch {
+          return { name: packName, stickers: [] };
+        }
+
+        const stickers = fileEntries
+          .filter(
+            (entry) =>
+              entry.isFile() && STICKER_IMAGE_EXTENSIONS.has(path.extname(entry.name).toLowerCase()),
+          )
+          .map((entry) => `/stickers/${packName}/${entry.name}`)
+          .sort();
+
+        return { name: packName, stickers };
+      }),
+    );
+
+    res.json({ packs: packs.filter((pack) => pack.stickers.length > 0) });
+  });
+
   app.use('/api/push', pushAuth);
 
   app.get('/api/push/check', async (req, res) => {

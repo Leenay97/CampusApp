@@ -21,7 +21,8 @@ export default function StickerPicker({ onSelect, onClose }: StickerPickerProps)
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/stickers')
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/stickers`)
       .then((res) => res.json())
       .then((data) => {
         if (!cancelled) setPacks(data.packs ?? []);
