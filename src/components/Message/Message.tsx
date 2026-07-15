@@ -1,5 +1,6 @@
-import { UserLevel } from '@/app/types';
+import { MessageType, UserLevel } from '@/app/types';
 import { useMemo } from 'react';
+import Image from 'next/image';
 import styles from './Message.module.scss';
 import Avatar from '../Avatar/Avatar';
 
@@ -9,6 +10,7 @@ type MessageProps = {
   userId: string;
   authorId: string;
   text: string;
+  type?: MessageType;
   avatar?: string;
   showAvatar?: boolean;
   isFirstInGroup?: boolean;
@@ -22,6 +24,7 @@ export default function Message({
   userId,
   authorId,
   text,
+  type = 'TEXT',
   avatar,
   showAvatar = true,
   isFirstInGroup = false,
@@ -29,13 +32,31 @@ export default function Message({
   isPending = false,
 }: MessageProps) {
   const isIncoming = useMemo(() => userId !== authorId, [userId, authorId]);
+  const isSticker = type === 'STICKER';
+
+  const popupClassName = `${styles['message__popup']} ${
+    isSticker ? styles['message__popup_sticker'] : ''
+  }`;
+
+  const content = isSticker ? (
+    <Image
+      src={text}
+      alt="Стикер"
+      width={120}
+      height={120}
+      unoptimized
+      className={styles['message__sticker']}
+    />
+  ) : (
+    <div className={styles['message__text']}>{text}</div>
+  );
 
   if (isIncoming) {
     return (
       <div
         className={`
-          ${styles['message']} 
-          ${styles['message_incoming']} 
+          ${styles['message']}
+          ${styles['message_incoming']}
           ${role === 'TEACHER' ? styles['message_teacher'] : ''}
           ${!showAvatar ? styles['message_no-avatar'] : ''}
           ${isFirstInGroup ? styles['message_first-in-group'] : ''}
@@ -47,9 +68,9 @@ export default function Message({
         ) : (
           <div className={styles['message__avatar-spacer']} />
         )}
-        <div className={styles['message__popup']}>
-          <div className={styles['message__name']}>{name}</div>
-          <div className={styles['message__text']}>{text}</div>
+        <div className={popupClassName}>
+          {!isSticker && <div className={styles['message__name']}>{name}</div>}
+          {content}
         </div>
       </div>
     );
@@ -65,9 +86,7 @@ export default function Message({
       ${isPending ? styles['message_pending'] : ''}
     `}
     >
-      <div className={styles['message__popup']}>
-        <div className={styles['message__text']}>{text}</div>
-      </div>
+      <div className={popupClassName}>{content}</div>
     </div>
   );
 }

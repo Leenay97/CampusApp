@@ -57,6 +57,7 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
           userId={userId}
           authorId={msg.author.id}
           text={msg.text}
+          type={msg.type}
           name={msg.author.name}
           role={msg.author.userLevel}
           avatar={msg.author.photoUrl}

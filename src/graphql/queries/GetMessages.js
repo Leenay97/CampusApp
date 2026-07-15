@@ -5,6 +5,7 @@ export const GET_MESSAGES = gql`
     getMessages(groupId: $groupId) {
       id
       text
+      type
       author {
         id
         name

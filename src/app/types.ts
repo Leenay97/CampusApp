@@ -123,10 +123,13 @@ export type Class = {
   level: number;
 };
 
+export type MessageType = 'TEXT' | 'STICKER';
+
 export type Message = {
   id: string;
   groupId: string;
   text: string;
+  type?: MessageType;
   author: User;
   createdAt: string;
   pending?: boolean;

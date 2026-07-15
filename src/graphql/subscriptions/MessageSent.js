@@ -5,6 +5,7 @@ export const MESSAGE_SENT = gql`
     messageSent(groupId: $groupId) {
       id
       text
+      type
       createdAt
       author {
         id

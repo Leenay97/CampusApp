@@ -5,6 +5,7 @@ export const STAFF_MESSAGE_SENT = gql`
     staffMessageSent {
       id
       text
+      type
       createdAt
       author {
         id

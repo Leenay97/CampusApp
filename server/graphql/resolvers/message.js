@@ -4,6 +4,11 @@ import { Op } from 'sequelize';
 import { withFilter } from 'graphql-subscriptions';
 import { isStaff, requireAuth, requireStaff } from '../auth.js';
 
+// Стикеры — только из статических паков на диске (public/stickers/<pack>/<file>),
+// загрузка своих картинок через чат запрещена, поэтому путь должен быть
+// локальным и совпадать с тем, что реально может отдать раздача /stickers.
+const STICKER_PATH_RE = /^\/stickers\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+\.(png|webp|jpe?g|gif)$/;
+
 // Студент может читать и писать только в чат собственной группы;
 // персоналу доступны все чаты, включая учительский.
 // groupId берём из БД, а не из токена: токены регистрации его не содержат.
@@ -34,7 +39,7 @@ export const messageResolvers = {
     },
   },
   Mutation: {
-    sendMessage: async (_, { authorId, text, groupId, isStaffChat }, context) => {
+    sendMessage: async (_, { authorId, text, groupId, isStaffChat, type }, context) => {
       const { sendPushNotification } = context;
       const auth = requireAuth(context);
       if (String(auth.id) !== String(authorId)) {
@@ -48,6 +53,11 @@ export const messageResolvers = {
 
       if (!text) {
         throw new Error('Сообщение не может быть пустым');
+      }
+
+      const messageType = type === 'STICKER' ? 'STICKER' : 'TEXT';
+      if (messageType === 'STICKER' && !STICKER_PATH_RE.test(text)) {
+        throw new Error('Некорректный стикер');
       }
 
       const author = await User.findByPk(authorId);
@@ -76,6 +86,7 @@ export const messageResolvers = {
       const message = await Message.create({
         authorId,
         text,
+        type: messageType,
         groupId: groupId,
       });
 
@@ -101,6 +112,7 @@ export const messageResolvers = {
         ? `📩 Новое сообщение от ${author.name}`
         : `💬 ${author.name}`;
       const notificationUrl = isStaffChat ? '/staff-chat' : '/chat';
+      const notificationBody = messageType === 'STICKER' ? 'Стикер' : text;
 
       // Пуши уходят в фоне: ответ мутации не ждёт web-push, иначе отправка
       // сообщения в большую группу подвисает на секунды
@@ -108,7 +120,12 @@ export const messageResolvers = {
         recipients
           .filter((recipient) => recipient.id !== authorId)
           .map((recipient) =>
-            sendPushNotification(recipient.id, notificationTitle, text, notificationUrl),
+            sendPushNotification(
+              recipient.id,
+              notificationTitle,
+              notificationBody,
+              notificationUrl,
+            ),
           ),
       );
 

@@ -6,6 +6,7 @@ export const messageTypeDefs = gql`
     authorId: ID!
     author: User!
     text: String!
+    type: String!
     groupId: ID!
     createdAt: String!
   }
@@ -15,7 +16,13 @@ export const messageTypeDefs = gql`
   }
 
   extend type Mutation {
-    sendMessage(authorId: ID!, text: String!, groupId: ID!, isStaffChat: Boolean): Message
+    sendMessage(
+      authorId: ID!
+      text: String!
+      groupId: ID!
+      isStaffChat: Boolean
+      type: String
+    ): Message
   }
 
   extend type Subscription {

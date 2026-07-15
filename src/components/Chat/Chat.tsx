@@ -1,6 +1,6 @@
 'use client';
 
-import { Message } from '@/app/types';
+import { Message, MessageType } from '@/app/types';
 import ChatArea from './ChatArea/ChatArea';
 import ChatInput from './ChatInput/ChatInput';
 import styles from './Chat.module.scss';
@@ -20,6 +20,7 @@ type ChatProps = {
 type PendingMessage = {
   id: string;
   text: string;
+  type: MessageType;
   createdAt: string;
 };
 
@@ -57,23 +58,38 @@ export default function Chat({
     });
   }, [messages, userId]);
 
+  const sendChatMessage = useCallback(
+    (text: string, type: MessageType) => {
+      if (!text || !userId) return;
+
+      const pendingId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      setPendingMessages((prev) => [
+        ...prev,
+        { id: pendingId, text, type, createdAt: Date.now().toString() },
+      ]);
+
+      sendMessage({ variables: { authorId: userId, text, groupId, isStaffChat, type } }).catch(
+        () => {
+          setPendingMessages((prev) => prev.filter((p) => p.id !== pendingId));
+          showLoading('ERROR');
+          setTimeout(hideLoading, 1500);
+        },
+      );
+    },
+    [userId, groupId, isStaffChat, sendMessage, showLoading, hideLoading],
+  );
+
   const handleSendMessage = useCallback(() => {
     const text = message.trim();
-    if (!text || !userId) return;
-
-    const pendingId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    setPendingMessages((prev) => [
-      ...prev,
-      { id: pendingId, text, createdAt: Date.now().toString() },
-    ]);
+    if (!text) return;
     setMessage('');
+    sendChatMessage(text, 'TEXT');
+  }, [message, sendChatMessage]);
 
-    sendMessage({ variables: { authorId: userId, text, groupId, isStaffChat } }).catch(() => {
-      setPendingMessages((prev) => prev.filter((p) => p.id !== pendingId));
-      showLoading('ERROR');
-      setTimeout(hideLoading, 1500);
-    });
-  }, [userId, message, groupId, isStaffChat, sendMessage, showLoading, hideLoading]);
+  const handleSendSticker = useCallback(
+    (stickerUrl: string) => sendChatMessage(stickerUrl, 'STICKER'),
+    [sendChatMessage],
+  );
 
   const displayMessages = useMemo<Message[]>(() => {
     return [
@@ -84,6 +100,7 @@ export default function Chat({
             id: p.id,
             groupId,
             text: p.text,
+            type: p.type,
             createdAt: p.createdAt,
             author: { id: userId },
             pending: true,
@@ -95,7 +112,12 @@ export default function Chat({
   return (
     <div className={`${styles['chat']} ${isStaffChat ? styles['chat--staff'] : ''}`}>
       <ChatArea messages={displayMessages} userId={userId} loading={loading} />
-      <ChatInput message={message} onChangeMessage={setMessage} onSend={handleSendMessage} />
+      <ChatInput
+        message={message}
+        onChangeMessage={setMessage}
+        onSend={handleSendMessage}
+        onSendSticker={handleSendSticker}
+      />
     </div>
   );
 }

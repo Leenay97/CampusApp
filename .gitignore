@@ -23,6 +23,7 @@
 /build
 
 /.vscode
+/.claude
 
 # misc
 .DS_Store

@@ -37,7 +37,7 @@
   }
 
   &_incoming {
-    .message__popup {
+    .message__popup:not(.message__popup_sticker) {
       box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
     }
   }
@@ -60,7 +60,7 @@
     }
 
   &_incoming.message_last-in-group {
-    .message__popup::before {
+    .message__popup:not(.message__popup_sticker)::before {
       content: '';
       position: absolute;
       left: -8px;
@@ -78,7 +78,7 @@
   }
 
   &_teacher {
-    .message__popup {
+    .message__popup:not(.message__popup_sticker) {
       color: rgba(255, 255, 255, 0.9);
       background-color: var(--color-purple);
       box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
@@ -98,8 +98,8 @@
   &_my {
     flex-direction: row-reverse;
     margin-right: 8px;
-    
-    .message__popup {
+
+    .message__popup:not(.message__popup_sticker) {
       background-color: var(--primary-button-color);
       color: white;
       box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
@@ -111,7 +111,7 @@
   }
 
   &_my.message_last-in-group {
-    .message__popup::before {
+    .message__popup:not(.message__popup_sticker)::before {
       content: '';
       position: absolute;
       right: -8px;
@@ -127,12 +127,24 @@
   $pending-color: #9fb3c2;
 
   &_my.message_pending {
-    .message__popup {
+    .message__popup:not(.message__popup_sticker) {
       background-color: $pending-color;
     }
 
     &.message_last-in-group .message__popup::before {
       border-color: transparent transparent $pending-color transparent;
     }
+  }
+
+  &__popup_sticker {
+    background: none;
+    padding: 0;
+    min-width: 0;
+  }
+
+  &__sticker {
+    display: block;
+    width: 120px;
+    height: auto;
   }
 }

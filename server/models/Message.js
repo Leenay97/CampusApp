@@ -15,6 +15,11 @@ export const Message = sequelize.define('Message', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  type: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'TEXT',
+  },
   groupId: {
     type: DataTypes.UUID,
   },
