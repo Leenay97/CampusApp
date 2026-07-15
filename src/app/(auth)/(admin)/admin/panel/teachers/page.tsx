@@ -76,7 +76,11 @@ export default function TeachersPage() {
         <Modal onClose={() => setIsQrModalOpen(false)}>
           <ModalHeader title="QR для регистрации учителя" onClose={() => setIsQrModalOpen(false)} />
           <ModalBody>
-            {tokenLoading ? <Loader /> : <QRCodeCanvas value={registrationUrl} size={200} />}
+            {tokenLoading ? (
+              <Loader />
+            ) : (
+              <QRCodeCanvas style={{ margin: '0 auto' }} value={registrationUrl} size={200} />
+            )}
           </ModalBody>
         </Modal>
       )}
