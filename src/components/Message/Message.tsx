@@ -58,6 +58,7 @@ export default function Message({
           ${styles['message']}
           ${styles['message_incoming']}
           ${role === 'TEACHER' ? styles['message_teacher'] : ''}
+          ${role === 'ADMIN' ? styles['message_admin'] : ''}
           ${!showAvatar ? styles['message_no-avatar'] : ''}
           ${isFirstInGroup ? styles['message_first-in-group'] : ''}
           ${isLastInGroup ? styles['message_last-in-group'] : ''}

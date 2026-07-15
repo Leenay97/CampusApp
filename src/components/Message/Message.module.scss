@@ -83,15 +83,33 @@
       background-color: var(--color-purple);
       box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
     }
-    
+
     &.message_last-in-group {
-      .message__popup::before {
+      .message__popup:not(.message__popup_sticker)::before {
         border-color: transparent transparent var(--color-purple) transparent;
       }
     }
-    
+
     .message__name {
       color: rgba(246, 241, 108, 0.9);
+    }
+  }
+
+  &_admin {
+    .message__popup:not(.message__popup_sticker) {
+      color: rgba(255, 255, 255, 0.9);
+      background-color: var(--color-dark-red);
+      box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
+    }
+
+    &.message_last-in-group {
+      .message__popup:not(.message__popup_sticker)::before {
+        border-color: transparent transparent var(--color-dark-red) transparent;
+      }
+    }
+
+    .message__name {
+      color: rgba(255, 214, 175, 0.95);
     }
   }
 
