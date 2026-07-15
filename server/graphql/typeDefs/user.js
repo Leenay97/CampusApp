@@ -33,6 +33,7 @@ export const userTypeDefs = gql`
     usersByGroup(groupId: ID!): [User]
     usersByWorkshop(workshopId: ID!): [User]
     seasonStudents: [User!]
+    teacherRegistrationToken: String!
   }
 
   extend type Mutation {

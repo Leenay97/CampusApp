@@ -97,6 +97,11 @@ export const userResolvers = {
         ],
       });
     },
+
+    teacherRegistrationToken: async (_, __, context) => {
+      requireAdmin(context);
+      return process.env.TEACHER_REGISTRATION_TOKEN;
+    },
   },
 
   Mutation: {
