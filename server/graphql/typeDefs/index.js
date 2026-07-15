@@ -12,6 +12,7 @@ import { classTypeDefs } from './class.js';
 import { pushTypeDefs } from './pushNotifications.js';
 import { messageTypeDefs } from './message.js';
 import { voteTypeDefs } from './vote.js';
+import { ipodTypeDefs } from './ipod.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -28,4 +29,5 @@ export const typeDefs = [
   pushTypeDefs,
   messageTypeDefs,
   voteTypeDefs,
+  ipodTypeDefs,
 ];

@@ -6,8 +6,9 @@ import { Season } from './Season.js';
 import { Place } from './Place.js';
 import { Schedule } from './Schedule.js';
 import { TechnicalData } from './TechnicalData.js';
-import { IpodGroup } from './IpodGroup.js';
+import { IpodPair } from './IpodPair.js';
 import { IpodMatch } from './IpodMatch.js';
+import { IpodTournament } from './IpodTournament.js';
 import { House } from './House.js';
 import { Post } from './Post.js';
 import { Class } from './Class.js';
@@ -60,20 +61,6 @@ Workshop.belongsToMany(User, {
   through: 'UserWorkshop',
   as: 'students',
   foreignKey: 'workshopId',
-});
-
-// Ассоциации Ipod
-IpodGroup.hasMany(User);
-User.belongsTo(IpodGroup);
-
-IpodMatch.belongsToMany(IpodGroup, {
-  through: 'Ipod',
-  foreignKey: 'ipodGroup',
-});
-
-IpodGroup.belongsToMany(IpodMatch, {
-  through: 'Ipod',
-  foreignKey: 'ipodMatch',
 });
 
 House.hasMany(User, { foreignKey: 'houseId', as: 'users' });
@@ -155,6 +142,9 @@ export {
   Message,
   Vote,
   VoteOption,
+  IpodPair,
+  IpodMatch,
+  IpodTournament,
   ArchivedSeason,
   ArchivedGroup,
   ArchivedWorkshop,

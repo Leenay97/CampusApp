@@ -37,6 +37,13 @@ import { SET_VOTE_STATUS } from './SetVoteStatus';
 import { DELETE_VOTE } from './DeleteVote';
 import { GENERATE_PASSWORD_RESET_LINK } from './GeneratePasswordResetLink';
 import { RESET_PASSWORD } from './ResetPassword';
+import { CREATE_IPOD_PAIR } from './CreateIpodPair';
+import { DELETE_IPOD_PAIR } from './DeleteIpodPair';
+import { CREATE_IPOD_MATCH } from './CreateIpodMatch';
+import { SET_IPOD_MATCH_WINNER } from './SetIpodMatchWinner';
+import { ADVANCE_IPOD_ROUND } from './AdvanceIpodRound';
+import { SET_IPOD_ROUND_NAME } from './SetIpodRoundName';
+import { SET_IPOD_MATCH_DATE } from './SetIpodMatchDate';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -78,5 +85,12 @@ export const mutations = {
   DELETE_VOTE,
   GENERATE_PASSWORD_RESET_LINK,
   RESET_PASSWORD,
+  CREATE_IPOD_PAIR,
+  DELETE_IPOD_PAIR,
+  CREATE_IPOD_MATCH,
+  SET_IPOD_MATCH_WINNER,
+  ADVANCE_IPOD_ROUND,
+  SET_IPOD_ROUND_NAME,
+  SET_IPOD_MATCH_DATE,
 };
 export default mutations;

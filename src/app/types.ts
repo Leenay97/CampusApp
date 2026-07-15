@@ -152,3 +152,29 @@ export type VoteOption = {
 };
 
 export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';
+
+export type IpodPair = {
+  id: string;
+  name: string;
+  creatorId?: string | null;
+  students: User[];
+};
+
+export type IpodMatch = {
+  id: string;
+  round: number;
+  date: string;
+  pairs: IpodPair[];
+  winner?: IpodPair | null;
+};
+
+export type IpodRoundName = {
+  round: number;
+  name: string;
+};
+
+export type IpodTournament = {
+  seasonId: string;
+  currentRound: number;
+  roundNames: IpodRoundName[];
+};

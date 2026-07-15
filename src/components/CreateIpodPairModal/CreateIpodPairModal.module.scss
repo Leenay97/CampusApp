@@ -1,0 +1,41 @@
+@import '@app/globals.css';
+
+.create-pair {
+  width: 100%;
+  max-width: 480px;
+
+  &__body {
+    gap: 10px;
+  }
+
+  &__selected {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-height: 30px;
+    max-width: 100%;
+  }
+
+  &__hint {
+    color: var(--text-primary);
+    opacity: 0.5;
+    font-size: 13px;
+  }
+
+  &__chip {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: var(--color-dark-blue);
+    color: var(--color-white);
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  &__name-preview {
+    color: var(--text-primary);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+}

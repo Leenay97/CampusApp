@@ -21,6 +21,7 @@ const NavigationSection: MenuSection = {
     { name: 'Домики', link: '/houses' },
     { name: 'Резиночки', link: '/rubbers' },
     { name: 'Голосование', link: '/election' },
+    { name: 'iPod Battle', link: '/ipod' },
   ],
 };
 

@@ -11,6 +11,7 @@ import { classResolvers } from './class.js';
 import { pushResolvers } from './pushNotifications.js';
 import { messageResolvers } from './message.js';
 import { voteResolvers } from './vote.js';
+import { ipodResolvers } from './ipod.js';
 
 export const resolvers = [
   userResolvers,
@@ -26,4 +27,5 @@ export const resolvers = [
   pushResolvers,
   messageResolvers,
   voteResolvers,
+  ipodResolvers,
 ];

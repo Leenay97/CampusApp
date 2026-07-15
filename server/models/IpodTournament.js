@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export const IpodMatch = sequelize.define('IpodMatch', {
+export const IpodTournament = sequelize.define('IpodTournament', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -10,21 +10,14 @@ export const IpodMatch = sequelize.define('IpodMatch', {
   seasonId: {
     type: DataTypes.UUID,
     allowNull: false,
+    unique: true,
   },
-  round: {
+  currentRound: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
   },
-  pairIds: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    allowNull: false,
-  },
-  winnerId: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  date: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+  roundNames: {
+    type: DataTypes.JSONB,
+    defaultValue: {},
   },
 });

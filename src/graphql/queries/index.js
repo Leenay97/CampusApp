@@ -24,6 +24,10 @@ import { GET_VOTES, GET_VOTES_FOR_VOTING } from './GetVote';
 import { GET_ALL_STUDENTS } from './GetAllStudents';
 import { GET_ARCHIVED_SEASONS } from './GetArchivedSeasons';
 import { GET_ARCHIVED_SEASON } from './GetArchivedSeason';
+import { GET_IPOD_PAIRS } from './GetIpodPairs';
+import { GET_IPOD_MATCHES } from './GetIpodMatches';
+import { GET_IPOD_WAITING_PAIRS } from './GetIpodWaitingPairs';
+import { GET_IPOD_TOURNAMENT } from './GetIpodTournament';
 
 export const queries = {
   GET_GROUPS,
@@ -53,5 +57,9 @@ export const queries = {
   GET_ALL_STUDENTS,
   GET_ARCHIVED_SEASONS,
   GET_ARCHIVED_SEASON,
+  GET_IPOD_PAIRS,
+  GET_IPOD_MATCHES,
+  GET_IPOD_WAITING_PAIRS,
+  GET_IPOD_TOURNAMENT,
 };
 export default queries;
