@@ -351,6 +351,18 @@ export const userResolvers = {
       await user.destroy();
       return user;
     },
+    deleteUnregisteredStudents: async (_, { groupId }, context) => {
+      const auth = requireStaff(context);
+      if (auth.userLevel === 'TEACHER' && String(auth.groupId) !== String(groupId)) {
+        throw new Error('Доступ запрещен');
+      }
+
+      const students = await User.findAll({ where: { groupId, userLevel: 'STUDENT' } });
+      const unregistered = students.filter((student) => !student.name && !student.password);
+      await User.destroy({ where: { id: unregistered.map((student) => student.id) } });
+
+      return unregistered;
+    },
 
     transferCoins: async (_, { userId, recieverId, amount }, context) => {
       // Переводить можно только от собственного имени

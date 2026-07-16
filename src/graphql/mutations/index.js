@@ -1,6 +1,7 @@
 import { CREATE_GROUP } from './CreateGroup';
 import { CREATE_TEACHER } from './CreateTeacher';
 import { DELETE_USER } from './DeleteUser';
+import { DELETE_UNREGISTERED_STUDENTS } from './DeleteUnregisteredStudents';
 import { DELETE_GROUP } from './DeleteGroup';
 import { UPDATE_GROUP } from './UpdateGroup';
 import { CREATE_WORKSHOP } from './CreateWorkshop';
@@ -52,6 +53,7 @@ export const mutations = {
   CREATE_GROUP,
   CREATE_TEACHER,
   DELETE_USER,
+  DELETE_UNREGISTERED_STUDENTS,
   DELETE_GROUP,
   CREATE_WORKSHOP,
   CREATE_SEASON,

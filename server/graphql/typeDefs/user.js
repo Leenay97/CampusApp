@@ -71,6 +71,7 @@ export const userTypeDefs = gql`
       englishLevel: String
     ): User
     deleteUser(id: ID!): User
+    deleteUnregisteredStudents(groupId: ID!): [User]
     uploadAvatar(file: Upload!, userId: ID!): User!
     deleteAvatar(userId: ID!): User!
     transferCoins(userId: ID!, recieverId: ID!, amount: Int!): User

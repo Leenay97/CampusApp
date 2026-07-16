@@ -16,4 +16,9 @@
     &__group {
         opacity: 0.8;
     }
+
+    &--unregistered {
+        background-color: #9aa0a6;
+        cursor: default;
+    }
 }
