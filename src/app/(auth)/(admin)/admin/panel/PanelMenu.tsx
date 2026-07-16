@@ -6,7 +6,9 @@ import { AdminPanelGroups } from './constants';
 import styles from './Panel.module.scss';
 
 export default function PanelMenu() {
-  const [openGroups, setOpenGroups] = useState<string[]>([]);
+  const [openGroups, setOpenGroups] = useState<string[]>(
+    AdminPanelGroups.map((group) => group.title),
+  );
 
   const toggleGroup = (title: string) => {
     setOpenGroups((prev) =>
