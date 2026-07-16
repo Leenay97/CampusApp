@@ -5,4 +5,6 @@ export const Post = sequelize.define('Post', {
   title: { type: DataTypes.STRING, allowNull: false },
   text: { type: DataTypes.STRING, allowNull: false },
   authorId: { type: DataTypes.UUID },
+  // Счётчики реакций вида { "👍🏻": 3, "❤️": 1 }
+  reactions: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
 });

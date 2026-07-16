@@ -1,6 +1,11 @@
 import { gql } from 'apollo-server-express';
 
 export const postTypeDefs = gql`
+  type ReactionCount {
+    emoji: String!
+    count: Int!
+  }
+
   type Post {
     id: ID!
     title: String!
@@ -8,6 +13,8 @@ export const postTypeDefs = gql`
     createdAt: String!
     author: User
     authorId: ID!
+    reactions: [ReactionCount!]!
+    myReaction: String
   }
 
   extend type Query {
@@ -20,5 +27,6 @@ export const postTypeDefs = gql`
     deletePost(id: ID!): Post
     uploadPostImage(file: Upload!): String!
     deletePostImage(url: String!): Boolean!
+    setPostReaction(postId: ID!, emoji: String!): Post
   }
 `;

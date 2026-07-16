@@ -59,12 +59,19 @@ export type RegisterStudentWithExistingAccountResponse = {
   errors: string;
 };
 
+export type ReactionCount = {
+  emoji: string;
+  count: number;
+};
+
 export type Post = {
   id: string;
   text: string;
   title: string;
   createdAt: string;
   author: User;
+  reactions?: ReactionCount[];
+  myReaction?: string | null;
 };
 
 export type Season = {

@@ -7,6 +7,8 @@ import { requireAuth, requireStaff } from '../auth.js';
 // Картинки постов лежат в uploads/posts и упоминаются в тексте по этому пути
 const POST_IMAGE_REGEX = /\/uploads\/posts\/[\w.-]+/g;
 
+const ALLOWED_REACTIONS = ['👍🏻', '🤣', '👹', '❤️', '🎉', '😭', '👁️👄👁️'];
+
 function deletePostImageFiles(urls) {
   for (const url of urls) {
     // basename отсекает попытки выйти из папки через ../
@@ -20,8 +22,8 @@ function deletePostImageFiles(urls) {
 export const postResolvers = {
   Query: {
     posts: async (_, __, context) => {
-      requireAuth(context);
-      return await Post.findAll({
+      const auth = requireAuth(context);
+      const posts = await Post.findAll({
         include: [
           {
             model: User,
@@ -30,6 +32,14 @@ export const postResolvers = {
           },
         ],
       });
+
+      const currentUser = await User.findByPk(auth.id);
+      const myReactions = currentUser?.postReactions || {};
+
+      return posts.map((post) => ({
+        ...post.toJSON(),
+        myReaction: myReactions[post.id] || null,
+      }));
     },
   },
   Mutation: {
@@ -127,5 +137,49 @@ export const postResolvers = {
       deletePostImageFiles([url]);
       return true;
     },
+
+    // Повторный клик по уже выбранной реакции снимает её
+    setPostReaction: async (_, { postId, emoji }, context) => {
+      const auth = requireAuth(context);
+      if (!ALLOWED_REACTIONS.includes(emoji)) {
+        throw new Error('Недопустимая реакция');
+      }
+
+      const post = await Post.findByPk(postId);
+      if (!post) throw new Error('Пост не найден');
+
+      const user = await User.findByPk(auth.id);
+      if (!user) throw new Error('Пользователь не найден');
+
+      const userReactions = { ...(user.postReactions || {}) };
+      const previousEmoji = userReactions[postId] || null;
+      const nextEmoji = previousEmoji === emoji ? null : emoji;
+
+      const counts = { ...(post.reactions || {}) };
+      if (previousEmoji) {
+        const nextCount = (counts[previousEmoji] || 0) - 1;
+        if (nextCount > 0) counts[previousEmoji] = nextCount;
+        else delete counts[previousEmoji];
+      }
+      if (nextEmoji) {
+        counts[nextEmoji] = (counts[nextEmoji] || 0) + 1;
+      }
+
+      if (nextEmoji) userReactions[postId] = nextEmoji;
+      else delete userReactions[postId];
+
+      await user.update({ postReactions: userReactions });
+      await post.update({ reactions: counts });
+
+      return {
+        ...post.toJSON(),
+        myReaction: nextEmoji,
+      };
+    },
+  },
+
+  Post: {
+    reactions: (post) =>
+      Object.entries(post.reactions || {}).map(([emoji, count]) => ({ emoji, count })),
   },
 };

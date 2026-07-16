@@ -11,6 +11,11 @@ export const GET_POSTS = gql`
         name
         photoUrl
       }
+      reactions {
+        emoji
+        count
+      }
+      myReaction
     }
   }
 `;

@@ -32,6 +32,7 @@ import { SEND_PUSH_ALL } from './SendPushAll';
 import { SEND_MESSAGE } from './SendMessage';
 import { UPDATE_POST } from './UpdatePost';
 import { DELETE_POST } from './DeletePost';
+import { SET_POST_REACTION } from './SetPostReaction';
 import { CREATE_VOTE } from './CreateVote';
 import { CAST_VOTE } from './CastVote';
 import { SET_VOTE_STATUS } from './SetVoteStatus';
@@ -81,6 +82,7 @@ export const mutations = {
   SEND_PUSH_ALL,
   SEND_MESSAGE,
   DELETE_POST,
+  SET_POST_REACTION,
   CREATE_VOTE,
   CAST_VOTE,
   SET_VOTE_STATUS,
