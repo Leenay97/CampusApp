@@ -101,6 +101,22 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
     onClose();
   }
 
+  function handleUpdateApp() {
+    onClose();
+
+    // iOS standalone PWA has no browser chrome, so there's no reload button
+    // or pull-to-refresh — this is the only way for a user to force a fresh load.
+    // Fire-and-forget: browsers throttle SW update checks to ~once/24h, so this
+    // nudges a fresh sw.js check without blocking the reload on it.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => registration.update());
+      });
+    }
+
+    window.location.reload();
+  }
+
   const role = useMemo(() => user?.userLevel, [user?.userLevel]);
   const lives = 3;
   const remainedLives = user?.lives ?? 3;
@@ -145,6 +161,12 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
             Сменить аватар
           </div>
           <PushManager />
+          <div className={styles['profile-menu__option']} onClick={handleUpdateApp}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.65 6.35A7.95 7.95 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35Z" />
+            </svg>
+            Обновить
+          </div>
           <div className={styles['profile-menu__option']} onClick={handleLogout}>
             Выйти
           </div>
