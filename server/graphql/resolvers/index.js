@@ -12,6 +12,7 @@ import { pushResolvers } from './pushNotifications.js';
 import { messageResolvers } from './message.js';
 import { voteResolvers } from './vote.js';
 import { ipodResolvers } from './ipod.js';
+import { coinTransactionResolvers } from './coinTransaction.js';
 
 export const resolvers = [
   userResolvers,
@@ -28,4 +29,5 @@ export const resolvers = [
   messageResolvers,
   voteResolvers,
   ipodResolvers,
+  coinTransactionResolvers,
 ];

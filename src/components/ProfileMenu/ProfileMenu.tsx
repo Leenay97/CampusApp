@@ -2,6 +2,7 @@ import { JSX, memo, useMemo, useState } from 'react';
 import styles from './ProfileMenu.module.scss';
 import { useUser } from '@/contexts/UserContext';
 import TransferCoinsModal from '../TransferCoinsModal/TransferCoinsModal';
+import CoinHistoryModal from '../CoinHistoryModal/CoinHistoryModal';
 import Coin from '@/assets/img/coin.png';
 import Image from 'next/image';
 import QRModal from '../QRModal/QRModal';
@@ -17,6 +18,7 @@ type ProfileMenuProps = {
 
 function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
   const [transferModal, setTransferModal] = useState(false);
+  const [historyModal, setHistoryModal] = useState(false);
   const [myqr, setMyqr] = useState(false);
   const [fineModal, setFineModal] = useState(false);
   const [avatarModal, setAvatarModal] = useState(false);
@@ -79,6 +81,11 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
     onClose();
   }
 
+  function handleOpenHistoryModal() {
+    setHistoryModal(true);
+    onClose();
+  }
+
   function handleOpenQR() {
     setMyqr(true);
     onClose();
@@ -128,6 +135,9 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
           <div className={styles['profile-menu__option']} onClick={handleOpenTrabsferModal}>
             Перевести coins
           </div>
+          <div className={styles['profile-menu__option']} onClick={handleOpenHistoryModal}>
+            История coins
+          </div>
           <div className={styles['profile-menu__option']} onClick={handleOpenQR}>
             Мой QR
           </div>
@@ -142,6 +152,9 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
       </div>
       {transferModal && (
         <TransferCoinsModal onClose={() => setTransferModal(false)}></TransferCoinsModal>
+      )}
+      {historyModal && user?.id && (
+        <CoinHistoryModal studentId={user.id} onClose={() => setHistoryModal(false)} />
       )}
       {myqr && <QRModal onClose={() => setMyqr(false)}></QRModal>}
       {fineModal && <FineStudentModal onClose={() => setFineModal(false)}></FineStudentModal>}

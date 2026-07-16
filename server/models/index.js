@@ -21,6 +21,7 @@ import { ArchivedSeason } from './ArchivedSeason.js';
 import { ArchivedGroup } from './ArchivedGroup.js';
 import { ArchivedWorkshop } from './ArchivedWorkshop.js';
 import { ArchivedSporttime } from './ArchivedSporttime.js';
+import { CoinTransaction } from './CoinTransaction.js';
 
 // Сначала определите все ассоциации
 // Ассоциации Season
@@ -125,6 +126,11 @@ ArchivedWorkshop.belongsTo(ArchivedSeason, { foreignKey: 'archivedSeasonId', as:
 ArchivedSeason.hasMany(ArchivedSporttime, { foreignKey: 'archivedSeasonId', as: 'sporttimes' });
 ArchivedSporttime.belongsTo(ArchivedSeason, { foreignKey: 'archivedSeasonId', as: 'season' });
 
+// Ассоциации CoinTransaction
+User.hasMany(CoinTransaction, { foreignKey: 'studentId', as: 'coinTransactions' });
+CoinTransaction.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
+CoinTransaction.belongsTo(User, { foreignKey: 'counterpartyId', as: 'counterparty' });
+
 export {
   sequelize,
   User,
@@ -149,4 +155,5 @@ export {
   ArchivedGroup,
   ArchivedWorkshop,
   ArchivedSporttime,
+  CoinTransaction,
 };

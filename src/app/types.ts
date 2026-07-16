@@ -97,6 +97,14 @@ export type User = {
   englishLevel: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 };
 
+export type CoinTransaction = {
+  id: string;
+  amount: number;
+  reason?: string | null;
+  counterparty?: Pick<User, 'id' | 'name'> | null;
+  createdAt: string;
+};
+
 export type EnglishLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
 export enum UserLevel {

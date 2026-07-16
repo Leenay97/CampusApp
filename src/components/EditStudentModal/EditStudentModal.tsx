@@ -16,6 +16,7 @@ import Modal from '../Modal/Modal';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
 import ModalFooter from '../Modal/ModalFooter';
+import CoinHistoryModal from '../CoinHistoryModal/CoinHistoryModal';
 
 type ModalProps = {
   student: User;
@@ -34,6 +35,7 @@ type SelectOption = {
 };
 
 function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
+  const [showHistory, setShowHistory] = useState(false);
   const [name, setName] = useState<string>('');
   const [coins, setCoins] = useState<string>(student.coins ? String(student.coins) : '0');
   const [englishLevel, setEnglishLevel] = useState<EnglishLevelOption>({
@@ -164,9 +166,13 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
         )}
       </ModalBody>
       <ModalFooter>
+        <SecondaryButton onClick={() => setShowHistory(true)}>История coins</SecondaryButton>
         <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
         <PrimaryButton onClick={handleUpdate}>Принять</PrimaryButton>
       </ModalFooter>
+      {showHistory && (
+        <CoinHistoryModal studentId={student.id} onClose={() => setShowHistory(false)} />
+      )}
     </Modal>
   );
 }

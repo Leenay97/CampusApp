@@ -13,6 +13,7 @@ import { pushTypeDefs } from './pushNotifications.js';
 import { messageTypeDefs } from './message.js';
 import { voteTypeDefs } from './vote.js';
 import { ipodTypeDefs } from './ipod.js';
+import { coinTransactionTypeDefs } from './coinTransaction.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -30,4 +31,5 @@ export const typeDefs = [
   messageTypeDefs,
   voteTypeDefs,
   ipodTypeDefs,
+  coinTransactionTypeDefs,
 ];

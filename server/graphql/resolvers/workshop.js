@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { Place, Season, TechnicalData, User, Workshop, sequelize } from '../../models/index.js';
 import { requireAuth, requireStaff, requireSelfOrStaff } from '../auth.js';
+import { logCoinTransaction } from './coinTransaction.js';
 
 const UserWorkshop = sequelize.models.UserWorkshop;
 
@@ -222,13 +223,18 @@ export const workshopResolvers = {
       const students = await User.findAll({ where: { id: studentIds } });
 
       await Promise.all(
-        students.map((student) => {
+        students.map(async (student) => {
           // Коины за каждый тип активности начисляются не чаще раза в день
           if (student[coinsDateField] === today) return null;
 
           student.coins += coinsValue;
           student[coinsDateField] = today;
-          return student.save();
+          await student.save();
+          return logCoinTransaction({
+            studentId: student.id,
+            amount: coinsValue,
+            reason: isSport ? 'sport' : 'workshop',
+          });
         }),
       );
 

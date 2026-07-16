@@ -1,5 +1,6 @@
 import { Class, Lesson, Place, Season, TechnicalData, User } from '../../models/index.js';
 import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
+import { logCoinTransaction } from './coinTransaction.js';
 
 const classInclude = [
   { model: Place, as: 'place' },
@@ -147,13 +148,17 @@ export const classResolvers = {
       const coinsValue = techData?.lessonValue ?? 0;
 
       await Promise.all(
-        students.map((student) => {
-          // Коины за урок начисляются не чаще раза в день
+        students.map(async (student) => {
           if (!coinsValue || student.lessonCoinsDate === date) return null;
 
           student.coins += coinsValue;
           student.lessonCoinsDate = date;
-          return student.save();
+          await student.save();
+          return logCoinTransaction({
+            studentId: student.id,
+            amount: coinsValue,
+            reason: 'lesson',
+          });
         }),
       );
 

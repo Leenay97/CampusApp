@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
 import { isStaff, requireAuth, requireStaff, requireAdmin, requireSelfOrStaff } from '../auth.js';
+import { logCoinTransaction } from './coinTransaction.js';
 
 export const userResolvers = {
   User: {
@@ -320,10 +321,21 @@ export const userResolvers = {
       user.houseId = houseId !== undefined ? houseId : user.houseId;
       user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
       user.classId = classId !== undefined ? classId : user.classId;
+      const coinsDelta = coins !== undefined ? coins - (user.coins ?? 0) : 0;
       user.coins = coins !== undefined ? coins : user.coins;
       user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
 
       await user.save();
+
+      if (coinsDelta !== 0) {
+        await logCoinTransaction({
+          studentId: user.id,
+          amount: coinsDelta,
+          counterpartyId: context.auth.id,
+          reason: 'admin',
+        });
+      }
+
       return user;
     },
 
@@ -350,7 +362,8 @@ export const userResolvers = {
       if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
       if (amount <= 0) throw new Error('Некорректная сумма');
 
-      if (user.userLevel === 'STUDENT') {
+      const senderIsStudent = user.userLevel === 'STUDENT';
+      if (senderIsStudent) {
         if (user.coins < amount) {
           throw new Error('Недостаточно Coins');
         } else {
@@ -361,6 +374,30 @@ export const userResolvers = {
       reciever.coins += amount;
       await user.save();
       await reciever.save();
+
+      if (senderIsStudent) {
+        await logCoinTransaction({
+          studentId: user.id,
+          amount: -amount,
+          counterpartyId: reciever.id,
+          reason: 'transfer',
+        });
+      }
+      await logCoinTransaction({
+        studentId: reciever.id,
+        amount,
+        counterpartyId: user.id,
+        reason: 'transfer',
+      });
+
+      // Пуш уходит в фоне, ответ мутации его не ждёт
+      context.sendPushNotification(
+        reciever.id,
+        '🪙 Тебе перевели coins',
+        `${user.name}: +${amount}`,
+        '/',
+      );
+
       return user;
     },
 

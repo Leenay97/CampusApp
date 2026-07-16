@@ -29,6 +29,7 @@ import { GET_IPOD_MATCHES } from './GetIpodMatches';
 import { GET_IPOD_WAITING_PAIRS } from './GetIpodWaitingPairs';
 import { GET_IPOD_TOURNAMENT } from './GetIpodTournament';
 import { GET_TEACHER_REGISTRATION_TOKEN } from './GetTeacherRegistrationToken';
+import { GET_COIN_HISTORY } from './GetCoinHistory';
 
 export const queries = {
   GET_GROUPS,
@@ -63,5 +64,6 @@ export const queries = {
   GET_IPOD_WAITING_PAIRS,
   GET_IPOD_TOURNAMENT,
   GET_TEACHER_REGISTRATION_TOKEN,
+  GET_COIN_HISTORY,
 };
 export default queries;
