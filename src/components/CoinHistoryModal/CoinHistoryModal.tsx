@@ -28,11 +28,11 @@ function describeTransaction(transaction: CoinTransaction): string {
     case 'admin':
       return `Изменено: ${counterpartyName}`;
     case 'workshop':
-      return 'Мастерская';
+      return 'Workshop';
     case 'sport':
-      return 'Спорттайм';
+      return 'Sport time';
     case 'lesson':
-      return 'Урок английского';
+      return 'English lesson';
     default:
       return '—';
   }

@@ -15,7 +15,14 @@
 }
 
 .class-card__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-weight: 600;
+}
+
+.class-card__edit {
+  flex-shrink: 0;
 }
 
 .class-card__row {

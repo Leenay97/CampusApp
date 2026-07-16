@@ -13,8 +13,13 @@ export const GET_CLASSES = gql`
         id
         name
         russianName
+        group {
+          id
+          name
+        }
       }
       place {
+        id
         name
       }
     }

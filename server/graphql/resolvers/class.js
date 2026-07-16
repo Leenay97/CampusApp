@@ -101,15 +101,36 @@ export const classResolvers = {
       return await Class.findByPk(newClass.id, { include: classInclude });
     },
 
-    updateClass: async (_, { id, name, place }, context) => {
+    updateClass: async (_, { id, name, placeId, teacherIds, studentIds }, context) => {
       requireAdmin(context);
       const existingClass = await Class.findByPk(id);
       if (!existingClass) throw new Error('Класс не найден');
 
       if (name) existingClass.name = name;
-      if (place) existingClass.place = place;
+      if (placeId) existingClass.placeId = placeId;
 
       await existingClass.save();
+
+      if (teacherIds) {
+        if (teacherIds.length === 0) throw new Error('Не указаны учителя');
+        if (teacherIds.length > 3) throw new Error('Не больше 3 учителей');
+        await existingClass.setTeachers(teacherIds);
+      }
+
+      if (studentIds) {
+        const currentStudents = await existingClass.getStudents();
+        const removedIds = currentStudents
+          .filter((student) => !studentIds.includes(student.id))
+          .map((student) => student.id);
+
+        if (removedIds.length > 0) {
+          await User.update({ classId: null }, { where: { id: removedIds } });
+        }
+
+        if (studentIds.length > 0) {
+          await User.update({ classId: id }, { where: { id: studentIds, userLevel: 'STUDENT' } });
+        }
+      }
 
       return await Class.findByPk(id, { include: classInclude });
     },
@@ -147,6 +168,8 @@ export const classResolvers = {
       const techData = await TechnicalData.findOne();
       const coinsValue = techData?.lessonValue ?? 0;
 
+      const awardedStudentIds = [];
+
       await Promise.all(
         students.map(async (student) => {
           if (!coinsValue || student.lessonCoinsDate === date) return null;
@@ -154,12 +177,19 @@ export const classResolvers = {
           student.coins += coinsValue;
           student.lessonCoinsDate = date;
           await student.save();
+          awardedStudentIds.push(student.id);
           return logCoinTransaction({
             studentId: student.id,
             amount: coinsValue,
             reason: 'lesson',
           });
         }),
+      );
+
+      Promise.allSettled(
+        awardedStudentIds.map((studentId) =>
+          context.sendPushNotification(studentId, 'Ты молодец!', `+${coinsValue} coins`, '/'),
+        ),
       );
 
       await Lesson.create({

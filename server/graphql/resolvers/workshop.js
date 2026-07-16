@@ -222,6 +222,8 @@ export const workshopResolvers = {
 
       const students = await User.findAll({ where: { id: studentIds } });
 
+      const awardedStudentIds = [];
+
       await Promise.all(
         students.map(async (student) => {
           // Коины за каждый тип активности начисляются не чаще раза в день
@@ -230,12 +232,28 @@ export const workshopResolvers = {
           student.coins += coinsValue;
           student[coinsDateField] = today;
           await student.save();
+          awardedStudentIds.push(student.id);
           return logCoinTransaction({
             studentId: student.id,
             amount: coinsValue,
             reason: isSport ? 'sport' : 'workshop',
           });
         }),
+      );
+
+      const notificationTitle = isSport ? '+10 к силе' : 'Отличная работа!';
+      const notificationUrl = isSport ? '/sporttime' : '/workshops';
+
+      // Пуши уходят в фоне, ответ мутации их не ждёт
+      Promise.allSettled(
+        awardedStudentIds.map((studentId) =>
+          context.sendPushNotification(
+            studentId,
+            notificationTitle,
+            `+${coinsValue} coins`,
+            notificationUrl,
+          ),
+        ),
       );
 
       workshop.isClosed = true;

@@ -24,6 +24,7 @@ import { UPDATE_USER } from './UpdateUser';
 import { UPDATE_HOUSE } from './UpdateHouse';
 import { CREATE_POST } from './CreatePost';
 import { CREATE_CLASS } from './CreateClass';
+import { UPDATE_CLASS } from './UpdateClass';
 import { UPLOAD_AVATAR } from './UploadAvatar';
 import { UPLOAD_POST_IMAGE } from './UploadPostImage';
 import { DELETE_POST_IMAGE } from './DeletePostImage';
@@ -73,6 +74,7 @@ export const mutations = {
   CREATE_POST,
   UPDATE_POST,
   CREATE_CLASS,
+  UPDATE_CLASS,
   UPLOAD_AVATAR,
   UPLOAD_POST_IMAGE,
   DELETE_POST_IMAGE,

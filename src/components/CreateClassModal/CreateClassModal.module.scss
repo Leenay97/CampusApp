@@ -1,0 +1,30 @@
+@import '@app/globals.css';
+
+.student-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__selects {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.student-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+
+  &__chip {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: var(--color-dark-blue);
+    color: var(--color-white);
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+}

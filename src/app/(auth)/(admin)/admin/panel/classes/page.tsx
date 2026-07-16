@@ -1,6 +1,7 @@
 'use client';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import CreateClassModal from '@/components/CreateClassModal/CreateClassModal';
+import EditButton from '@/components/EditButton/EditButton';
 import Loader from '@/components/Loader/Loaader';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Section from '@/components/Section/Section';
@@ -16,15 +17,17 @@ type ClassItem = {
   name: string;
   teachers: User[];
   students: User[];
-  place?: { name: string };
+  place?: { id: string; name: string };
 };
 
+type ModalState = { mode: 'create' } | { mode: 'edit'; classItem: ClassItem };
+
 export default function ClassesPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalState, setModalState] = useState<ModalState | null>(null);
   const { loading, data, refetch } = useQuery(GET_CLASSES);
 
   function handleSubmit() {
-    setIsModalOpen(false);
+    setModalState(null);
     refetch();
   }
 
@@ -40,15 +43,27 @@ export default function ClassesPage() {
     <CenteredContainer wide noPadding>
       <Section>
         <Title>Языковые группы</Title>
-        <PrimaryButton onClick={() => setIsModalOpen(true)}>Добавить класс</PrimaryButton>
-        {isModalOpen && (
-          <CreateClassModal onClose={() => setIsModalOpen(false)} onSubmit={handleSubmit} />
+        <PrimaryButton onClick={() => setModalState({ mode: 'create' })}>
+          Добавить класс
+        </PrimaryButton>
+        {modalState && (
+          <CreateClassModal
+            classToEdit={modalState.mode === 'edit' ? modalState.classItem : undefined}
+            onClose={() => setModalState(null)}
+            onSubmit={handleSubmit}
+          />
         )}
         {data?.classes && data.classes.length > 0 ? (
           <div className={styles['class-list']}>
             {data.classes.map((classItem: ClassItem) => (
               <div key={classItem.id} className={styles['class-card']}>
-                <div className={styles['class-card__title']}>{classItem.name}</div>
+                <div className={styles['class-card__title']}>
+                  {classItem.name}
+                  <EditButton
+                    className={styles['class-card__edit']}
+                    onClick={() => setModalState({ mode: 'edit', classItem })}
+                  />
+                </div>
                 <div className={styles['class-card__row']}>
                   Учителя: {classItem.teachers.map((teacher) => teacher.name).join(', ') || '—'}
                 </div>
@@ -57,9 +72,7 @@ export default function ClassesPage() {
                 </div>
                 <div className={styles['class-card__row']}>
                   Студенты ({classItem.students.length}):{' '}
-                  {classItem.students
-                    .map((student) => student.russianName || student.name)
-                    .join(', ') || '—'}
+                  {classItem.students.map((student) => student.name).join(', ') || '—'}
                 </div>
               </div>
             ))}

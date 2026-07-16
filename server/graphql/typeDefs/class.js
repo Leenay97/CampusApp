@@ -19,7 +19,7 @@ export const classTypeDefs = gql`
 
   extend type Mutation {
     createClass(name: String!, placeId: ID!, teacherIds: [ID!]!, studentIds: [ID!]): Class
-    updateClass(id: ID!, name: String, place: String): Class
+    updateClass(id: ID!, name: String, placeId: ID, teacherIds: [ID!], studentIds: [ID!]): Class
     deleteClass(id: ID!): Class
     closeLesson(classId: ID!, teacherId: ID!, studentIds: [ID!]!): Class
   }
