@@ -79,15 +79,24 @@ function RegisterTeacherForm() {
         <Section>
           <div className={styles['prohibited-section__content']}>
             <Subtitle>Логин</Subtitle>
-            <InputField width="200px" value={login} onChange={setLogin} />
+            <InputField
+              width="200px"
+              value={login}
+              onChange={(v) => setLogin(v.replace(/\s+/g, ''))}
+            />
             <Subtitle>Пароль</Subtitle>
-            <InputField width="200px" type="password" value={password} onChange={setPassword} />
+            <InputField
+              width="200px"
+              type="password"
+              value={password}
+              onChange={(v) => setPassword(v.replace(/\s+/g, ''))}
+            />
             <Subtitle>Подтверди пароль</Subtitle>
             <InputField
               width="200px"
               type="password"
               value={confirmPassword}
-              onChange={setConfirmPassword}
+              onChange={(v) => setConfirmPassword(v.replace(/\s+/g, ''))}
             />
             <PrimaryButton onClick={handleRegister} width="200px">
               Зарегистрироваться

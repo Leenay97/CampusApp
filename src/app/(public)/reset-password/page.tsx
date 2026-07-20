@@ -61,7 +61,12 @@ function ResetPasswordForm() {
             <>
               <div>
                 <Subtitle>Пароль*</Subtitle>
-                <InputField width="100%" type="password" value={password} onChange={setPassword} />
+                <InputField
+                  width="100%"
+                  type="password"
+                  value={password}
+                  onChange={(v) => setPassword(v.replace(/\s+/g, ''))}
+                />
               </div>
 
               <div>
@@ -70,7 +75,7 @@ function ResetPasswordForm() {
                   width="100%"
                   type="password"
                   value={confirmPassword}
-                  onChange={setConfirmPassword}
+                  onChange={(v) => setConfirmPassword(v.replace(/\s+/g, ''))}
                 />
               </div>
 
