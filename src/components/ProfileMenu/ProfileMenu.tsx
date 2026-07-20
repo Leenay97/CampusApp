@@ -8,6 +8,7 @@ import Image from 'next/image';
 import QRModal from '../QRModal/QRModal';
 import FineStudentModal from '../FineStudentModal/FineStudentModal';
 import { ChangeAvatarModal } from '../ChangeAvatarModal/ChangeAvatarModal';
+import ChangePasswordModal from '../ChangePasswordModal/ChangePasswordModal';
 import PushManager from '../PushManager/PushManager';
 import { wsClient, client } from '@/lib/apollo';
 
@@ -22,6 +23,7 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
   const [myqr, setMyqr] = useState(false);
   const [fineModal, setFineModal] = useState(false);
   const [avatarModal, setAvatarModal] = useState(false);
+  const [passwordModal, setPasswordModal] = useState(false);
   const { user, setUser } = useUser();
 
   async function handleLogout() {
@@ -101,6 +103,11 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
     onClose();
   }
 
+  function handleOpenPasswordModal() {
+    setPasswordModal(true);
+    onClose();
+  }
+
   function handleUpdateApp() {
     onClose();
 
@@ -160,6 +167,11 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
           <div className={styles['profile-menu__option']} onClick={handleOpenAvatarModal}>
             Сменить аватар
           </div>
+          {(role === 'TEACHER' || role === 'ADMIN') && (
+            <div className={styles['profile-menu__option']} onClick={handleOpenPasswordModal}>
+              Сменить пароль
+            </div>
+          )}
           <PushManager />
           <div className={styles['profile-menu__option']} onClick={handleUpdateApp}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -188,6 +200,7 @@ function ProfileMenu({ isOpen, onClose }: ProfileMenuProps): JSX.Element {
           photoUrl={user?.photoUrl}
         ></ChangeAvatarModal>
       )}
+      {passwordModal && <ChangePasswordModal onClose={() => setPasswordModal(false)} />}
     </>
   );
 }

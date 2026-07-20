@@ -40,6 +40,7 @@ import { SET_VOTE_STATUS } from './SetVoteStatus';
 import { DELETE_VOTE } from './DeleteVote';
 import { GENERATE_PASSWORD_RESET_LINK } from './GeneratePasswordResetLink';
 import { RESET_PASSWORD } from './ResetPassword';
+import { CHANGE_PASSWORD } from './ChangePassword';
 import { CREATE_IPOD_PAIR } from './CreateIpodPair';
 import { DELETE_IPOD_PAIR } from './DeleteIpodPair';
 import { CREATE_IPOD_MATCH } from './CreateIpodMatch';
@@ -91,6 +92,7 @@ export const mutations = {
   DELETE_VOTE,
   GENERATE_PASSWORD_RESET_LINK,
   RESET_PASSWORD,
+  CHANGE_PASSWORD,
   CREATE_IPOD_PAIR,
   DELETE_IPOD_PAIR,
   CREATE_IPOD_MATCH,

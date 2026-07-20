@@ -79,5 +79,10 @@ export const userTypeDefs = gql`
     fineUser(id: ID!): User
     generatePasswordResetLink(userId: ID!): String!
     resetPassword(token: String!, password: String!, confirmPassword: String!): Boolean!
+    changePassword(
+      currentPassword: String!
+      newPassword: String!
+      confirmPassword: String!
+    ): Boolean!
   }
 `;

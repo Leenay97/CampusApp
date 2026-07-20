@@ -465,6 +465,22 @@ export const userResolvers = {
       return true;
     },
 
+    changePassword: async (_, { currentPassword, newPassword, confirmPassword }, context) => {
+      const auth = requireStaff(context);
+      if (!newPassword || newPassword !== confirmPassword) throw new Error('Пароли не совпадают');
+
+      const user = await User.findByPk(auth.id);
+      if (!user || !user.hashedPassword) throw new Error('Пользователь не найден');
+
+      const isValid = await bcrypt.compare(currentPassword, user.hashedPassword);
+      if (!isValid) throw new Error('Неверный текущий пароль');
+
+      user.hashedPassword = await bcrypt.hash(newPassword, 10);
+      await user.save();
+
+      return true;
+    },
+
     fineUser: async (_, { id }, context) => {
       requireStaff(context);
       const user = await User.findByPk(id);
