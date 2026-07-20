@@ -132,7 +132,11 @@ function RegisterForm() {
                 </div>
                 <div>
                   <Subtitle>Логин*</Subtitle>
-                  <InputField width="100%" value={login} onChange={setLogin} />
+                  <InputField
+                    width="100%"
+                    value={login}
+                    onChange={(v) => setLogin(v.replace(/\s+/g, ''))}
+                  />
                 </div>
 
                 <div>
@@ -141,7 +145,7 @@ function RegisterForm() {
                     width="100%"
                     type="password"
                     value={password}
-                    onChange={setPassword}
+                    onChange={(v) => setPassword(v.replace(/\s+/g, ''))}
                   />
                 </div>
 
@@ -151,7 +155,7 @@ function RegisterForm() {
                     width="100%"
                     type="password"
                     value={confirmPassword}
-                    onChange={setConfirmPassword}
+                    onChange={(v) => setConfirmPassword(v.replace(/\s+/g, ''))}
                   />
                 </div>
 
@@ -167,12 +171,21 @@ function RegisterForm() {
           <div className={styles['prohibited-section__content']}>
             <div>
               <Subtitle>Логин*</Subtitle>
-              <InputField width="100%" value={login} onChange={setLogin} />
+              <InputField
+                width="100%"
+                value={login}
+                onChange={(v) => setLogin(v.replace(/\s+/g, ''))}
+              />
             </div>
 
             <div>
               <Subtitle>Пароль*</Subtitle>
-              <InputField width="100%" type="password" value={password} onChange={setPassword} />
+              <InputField
+                width="100%"
+                type="password"
+                value={password}
+                onChange={(v) => setPassword(v.replace(/\s+/g, ''))}
+              />
             </div>
 
             <PrimaryButton width="100%" onClick={handleRegisterWithExistingAccount}>

@@ -59,13 +59,17 @@ export default function LoginPage(): JSX.Element {
           </div>
 
           <div className={style['section__input']}>
-            <InputField value={login} onChange={setLogin} placeholder="Логин" />
+            <InputField
+              value={login}
+              onChange={(v) => setLogin(v.replace(/\s+/g, ''))}
+              placeholder="Логин"
+            />
           </div>
 
           <div className={style['section__input']}>
             <InputField
               value={password}
-              onChange={setPassword}
+              onChange={(v) => setPassword(v.replace(/\s+/g, ''))}
               placeholder="Пароль"
               type="password"
             />

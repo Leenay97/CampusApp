@@ -5,7 +5,12 @@
 .input-field {
     display: flex;
     flex-direction: column;
-    
+
+
+    &__wrapper {
+        position: relative;
+        display: flex;
+    }
 
     &__input {
         padding: 8px;
@@ -13,11 +18,32 @@
         border-radius: 4px;
         height: var(--input-button-height);
         font-size: 16px;
+        width: 100%;
 
         &--error {
             padding: 8px;
             border: 1px solid var(--error-color);
             border-radius: 4px;
+            width: 100%;
+        }
+    }
+
+    &__toggle {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 0;
+        color: #888;
+        cursor: pointer;
+
+        &:hover {
+            color: #555;
         }
     }
 
