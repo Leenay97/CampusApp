@@ -9,6 +9,10 @@ export const messageTypeDefs = gql`
     type: String!
     groupId: ID!
     createdAt: String!
+    replyToId: ID
+    replyTo: Message
+    reactions: [ReactionCount!]!
+    myReaction: String
   }
 
   extend type Query {
@@ -22,7 +26,9 @@ export const messageTypeDefs = gql`
       groupId: ID!
       isStaffChat: Boolean
       type: String
+      replyToId: ID
     ): Message
+    setMessageReaction(messageId: ID!, emoji: String!): Message
   }
 
   extend type Subscription {

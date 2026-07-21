@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useLoading } from '@/contexts/LoadingContext';
 import { SEND_MESSAGE } from '@/graphql/mutations/SendMessage';
+import { SET_MESSAGE_REACTION } from '@/graphql/mutations/SetMessageReaction';
 
 type ChatProps = {
   messages: Message[];
@@ -22,6 +23,7 @@ type PendingMessage = {
   text: string;
   type: MessageType;
   createdAt: string;
+  replyTo?: Message['replyTo'];
 };
 
 export default function Chat({
@@ -33,8 +35,10 @@ export default function Chat({
 }: ChatProps) {
   const [message, setMessage] = useState('');
   const [pendingMessages, setPendingMessages] = useState<PendingMessage[]>([]);
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
   const knownIdsRef = useRef<Set<string>>(new Set());
   const [sendMessage] = useMutation(SEND_MESSAGE);
+  const [setMessageReaction] = useMutation(SET_MESSAGE_REACTION);
   const { showLoading, hideLoading } = useLoading();
 
   // Убираем pending-сообщение, когда его подтверждённая копия приходит по подписке
@@ -63,20 +67,60 @@ export default function Chat({
       if (!text || !userId) return;
 
       const pendingId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const replyToId = replyTo?.id;
       setPendingMessages((prev) => [
         ...prev,
-        { id: pendingId, text, type, createdAt: Date.now().toString() },
+        { id: pendingId, text, type, createdAt: Date.now().toString(), replyTo },
       ]);
+      setReplyTo(null);
 
-      sendMessage({ variables: { authorId: userId, text, groupId, isStaffChat, type } }).catch(
-        () => {
-          setPendingMessages((prev) => prev.filter((p) => p.id !== pendingId));
-          showLoading('ERROR');
-          setTimeout(hideLoading, 1500);
-        },
-      );
+      sendMessage({
+        variables: { authorId: userId, text, groupId, isStaffChat, type, replyToId },
+      }).catch(() => {
+        setPendingMessages((prev) => prev.filter((p) => p.id !== pendingId));
+        showLoading('ERROR');
+        setTimeout(hideLoading, 1500);
+      });
     },
-    [userId, groupId, isStaffChat, sendMessage, showLoading, hideLoading],
+    [userId, groupId, isStaffChat, sendMessage, showLoading, hideLoading, replyTo],
+  );
+
+  const handleReply = useCallback((msg: Message) => setReplyTo(msg), []);
+  const handleCancelReply = useCallback(() => setReplyTo(null), []);
+
+  const handleReact = useCallback(
+    (messageId: string, emoji: string) => {
+      const target = messages.find((m) => m.id === messageId);
+      const previousEmoji = target?.myReaction ?? null;
+      const nextEmoji = previousEmoji === emoji ? null : emoji;
+
+      const counts = new Map((target?.reactions ?? []).map((r) => [r.emoji, r.count]));
+      if (previousEmoji) {
+        const prevCount = (counts.get(previousEmoji) ?? 1) - 1;
+        if (prevCount > 0) counts.set(previousEmoji, prevCount);
+        else counts.delete(previousEmoji);
+      }
+      if (nextEmoji) {
+        counts.set(nextEmoji, (counts.get(nextEmoji) ?? 0) + 1);
+      }
+
+      setMessageReaction({
+        variables: { messageId, emoji },
+        optimisticResponse: {
+          setMessageReaction: {
+            __typename: 'Message',
+            id: messageId,
+            myReaction: nextEmoji,
+            reactions: Array.from(counts, ([e, count]) => ({
+              __typename: 'ReactionCount',
+              emoji: e,
+              count,
+            })),
+          },
+        },
+      });
+    },
+    [messages, setMessageReaction],
   );
 
   const handleSendMessage = useCallback(() => {
@@ -104,6 +148,7 @@ export default function Chat({
             createdAt: p.createdAt,
             author: { id: userId },
             pending: true,
+            replyTo: p.replyTo,
           }) as Message,
       ),
     ];
@@ -111,12 +156,20 @@ export default function Chat({
 
   return (
     <div className={`${styles['chat']} ${isStaffChat ? styles['chat--staff'] : ''}`}>
-      <ChatArea messages={displayMessages} userId={userId} loading={loading} />
+      <ChatArea
+        messages={displayMessages}
+        userId={userId}
+        loading={loading}
+        onReply={handleReply}
+        onReact={handleReact}
+      />
       <ChatInput
         message={message}
         onChangeMessage={setMessage}
         onSend={handleSendMessage}
         onSendSticker={handleSendSticker}
+        replyTo={replyTo}
+        onCancelReply={handleCancelReply}
       />
     </div>
   );

@@ -13,6 +13,21 @@ export const STAFF_MESSAGE_SENT = gql`
         userLevel
         photoUrl
       }
+      replyToId
+      replyTo {
+        id
+        text
+        type
+        author {
+          id
+          name
+        }
+      }
+      reactions {
+        emoji
+        count
+      }
+      myReaction
     }
   }
 `;

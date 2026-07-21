@@ -100,6 +100,8 @@ Lesson.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
 Message.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
 User.hasMany(Message, { foreignKey: 'authorId', as: 'messages' });
 
+Message.belongsTo(Message, { foreignKey: 'replyToId', as: 'replyTo' });
+
 User.hasMany(Post, {
   foreignKey: 'authorId',
   as: 'posts',

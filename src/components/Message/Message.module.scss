@@ -20,14 +20,29 @@
     flex-shrink: 0;
   }
 
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+    max-width: calc(100% - 60px);
+  }
+
+  &__bubble-wrapper {
+    position: relative;
+    max-width: 100%;
+  }
+
   &__popup {
     background-color: white;
-    max-width: calc(100% - 60px);
     padding: 10px 15px;
     border-radius: 8px;
     position: relative;
     word-wrap: break-word;
     min-width: 120px;
+    max-width: 100%;
+    cursor: pointer;
   }
 
   &__name {
@@ -44,16 +59,16 @@
 
     &_no-avatar {
     gap: 0;
-    
+
     .message__avatar {
         display: none;
     }
-    
+
     .message__avatar-spacer {
         display: none;
     }
-    
-    .message__popup {
+
+    .message__content {
         margin-left: 47px;
         max-width: calc(100% - 47px);
     }
@@ -93,6 +108,14 @@
     .message__name {
       color: rgba(246, 241, 108, 0.9);
     }
+
+    .message__reply {
+      border-left-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .message__reply-author {
+      color: rgba(246, 241, 108, 0.9);
+    }
   }
 
   &_admin {
@@ -111,20 +134,49 @@
     .message__name {
       color: rgba(255, 214, 175, 0.95);
     }
+
+    .message__reply {
+      border-left-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .message__reply-author {
+      color: rgba(255, 214, 175, 0.95);
+    }
   }
 
   &_my {
     flex-direction: row-reverse;
     margin-right: 8px;
 
+    .message__content {
+      align-items: flex-end;
+    }
+
     .message__popup:not(.message__popup_sticker) {
       background-color: var(--primary-button-color);
       color: white;
       box-shadow: 0 4px 5px rgba(0, 0, 0, 0.142);
-      
+
       .message__name {
         color: rgba(255, 255, 255, 0.9);
       }
+    }
+
+    .message__reply {
+      border-left-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .message__reply-author {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .message__reply-text {
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .message__actions {
+      left: auto;
+      right: 0;
     }
   }
 
@@ -164,5 +216,130 @@
     display: block;
     width: 120px;
     height: auto;
+  }
+
+  &__reply {
+    border-left: 3px solid var(--primary-button-color);
+    padding-left: 8px;
+    margin-bottom: 6px;
+  }
+
+  &__reply-author {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary-button-color);
+  }
+
+  &__reply-text {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+
+  &__actions {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    z-index: 2;
+    width: max-content;
+    max-width: 260px;
+  }
+
+  &__actions--below {
+    bottom: auto;
+    top: calc(100% + 6px);
+  }
+
+  &__actions-reactions {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid rgba(111, 123, 201, 0.387);
+    padding-bottom: 3px;
+  }
+
+  &__actions-reaction {
+    border: none;
+    background: none;
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+      transform: scale(1.15);
+    }
+
+    &--active {
+      background-color: rgba(74, 144, 190, 0.18);
+    }
+  }
+
+  &__actions-reply {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--text-primary);
+    padding: 4px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &__reactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__reaction {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 1px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &--mine {
+      border-color: var(--primary-button-color);
+    }
+  }
+
+  &__reaction-count {
+    font-size: 10px;
+    color: rgba(0, 0, 0, 0.5);
   }
 }

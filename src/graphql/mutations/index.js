@@ -34,6 +34,7 @@ import { SEND_MESSAGE } from './SendMessage';
 import { UPDATE_POST } from './UpdatePost';
 import { DELETE_POST } from './DeletePost';
 import { SET_POST_REACTION } from './SetPostReaction';
+import { SET_MESSAGE_REACTION } from './SetMessageReaction';
 import { CREATE_VOTE } from './CreateVote';
 import { CAST_VOTE } from './CastVote';
 import { SET_VOTE_STATUS } from './SetVoteStatus';
@@ -86,6 +87,7 @@ export const mutations = {
   SEND_MESSAGE,
   DELETE_POST,
   SET_POST_REACTION,
+  SET_MESSAGE_REACTION,
   CREATE_VOTE,
   CAST_VOTE,
   SET_VOTE_STATUS,

@@ -23,4 +23,14 @@ export const Message = sequelize.define('Message', {
   groupId: {
     type: DataTypes.UUID,
   },
+  replyToId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
+  // Счётчики реакций вида { "👍🏻": 3, "❤️": 1 }
+  reactions: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: {},
+  },
 });

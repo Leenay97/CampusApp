@@ -140,6 +140,13 @@ export type Class = {
 
 export type MessageType = 'TEXT' | 'STICKER';
 
+export type MessageReplyPreview = {
+  id: string;
+  text: string;
+  type?: MessageType;
+  author: Pick<User, 'id' | 'name'>;
+};
+
 export type Message = {
   id: string;
   groupId: string;
@@ -148,6 +155,10 @@ export type Message = {
   author: User;
   createdAt: string;
   pending?: boolean;
+  replyToId?: string | null;
+  replyTo?: MessageReplyPreview | null;
+  reactions?: ReactionCount[];
+  myReaction?: string | null;
 };
 
 export type VoteStatus = 'DRAFT' | 'ACTIVE' | 'FINISHED';

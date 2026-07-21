@@ -7,6 +7,7 @@ export const SEND_MESSAGE = gql`
     $text: String!
     $isStaffChat: Boolean
     $type: String
+    $replyToId: ID
   ) {
     sendMessage(
       groupId: $groupId
@@ -14,6 +15,7 @@ export const SEND_MESSAGE = gql`
       text: $text
       isStaffChat: $isStaffChat
       type: $type
+      replyToId: $replyToId
     ) {
       text
       type

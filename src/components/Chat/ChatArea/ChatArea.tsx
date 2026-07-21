@@ -8,9 +8,11 @@ type ChatAreaProps = {
   messages: MessageType[];
   userId: string;
   loading?: boolean;
+  onReply?: (message: MessageType) => void;
+  onReact?: (messageId: string, emoji: string) => void;
 };
 
-export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
+export default function ChatArea({ messages, userId, loading, onReply, onReact }: ChatAreaProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
   }, [sortedMessages, userId]);
 
   return (
-    <div className={styles['chat-area']} ref={containerRef}>
+    <div className={styles['chat-area']} ref={containerRef} data-chat-scroll>
       {loading && <div className={styles['chat-area__empty']}>Загрузка...</div>}
       {!loading && !groupedMessages.length && (
         <div className={styles['chat-area__empty']}>Сообщений еще нет</div>
@@ -65,6 +67,11 @@ export default function ChatArea({ messages, userId, loading }: ChatAreaProps) {
           isFirstInGroup={msg.isFirstInGroup}
           isLastInGroup={msg.isLastInGroup}
           isPending={msg.pending}
+          replyTo={msg.replyTo}
+          reactions={msg.reactions}
+          myReaction={msg.myReaction}
+          onReply={onReply ? () => onReply(msg) : undefined}
+          onReact={onReact ? (emoji) => onReact(msg.id, emoji) : undefined}
         />
       ))}
     </div>

@@ -15,6 +15,8 @@ export const User = sequelize.define('User', {
   votes: { type: DataTypes.JSONB, allowNull: true },
   // Реакция пользователя на посты вида { [postId]: "👍🏻" }
   postReactions: { type: DataTypes.JSONB, allowNull: true },
+  // Реакция пользователя на сообщения чата вида { [messageId]: "👍🏻" }
+  messageReactions: { type: DataTypes.JSONB, allowNull: true },
   // Дата последнего начисления коинов за мастеркласс / спорттайм / урок английского:
   // коины за каждый тип активности можно получить не чаще раза в день
   workshopCoinsDate: { type: DataTypes.DATEONLY, allowNull: true },

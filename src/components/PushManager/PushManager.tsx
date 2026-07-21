@@ -195,15 +195,15 @@ export default function PushManager() {
   }
 
   if (!isSupported) {
-    return <div>⚠️ Браузер не поддерживает уведомления</div>;
+    return <div>Уведомления не доступны</div>;
   }
 
   if (!swReady) {
-    return <div>⏳ Загрузка Service Worker... Подождите</div>;
+    return <div>Уведомления не доступны</div>;
   }
 
   if (permission === 'denied') {
-    return <div>🔕 Уведомления запрещены. Разрешите в настройках браузера</div>;
+    return <div>Уведомления не доступны</div>;
   }
 
   return (

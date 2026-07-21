@@ -13,6 +13,21 @@ export const GET_MESSAGES = gql`
         photoUrl
       }
       createdAt
+      replyToId
+      replyTo {
+        id
+        text
+        type
+        author {
+          id
+          name
+        }
+      }
+      reactions {
+        emoji
+        count
+      }
+      myReaction
     }
   }
 `;

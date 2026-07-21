@@ -9,6 +9,8 @@ import { isStaff, requireAuth, requireStaff } from '../auth.js';
 // локальным и совпадать с тем, что реально может отдать раздача /stickers.
 const STICKER_PATH_RE = /^\/stickers\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+\.(png|webp|jpe?g|gif)$/;
 
+const ALLOWED_REACTIONS = ['👍🏻', '🤣', '👹', '❤️', '🎉', '😭'];
+
 // Студент может читать и писать только в чат собственной группы;
 // персоналу доступны все чаты, включая учительский.
 // groupId берём из БД, а не из токена: токены регистрации его не содержат.
@@ -26,20 +28,33 @@ async function requireGroupAccess(context, groupId) {
 export const messageResolvers = {
   Query: {
     getMessages: async (_, { groupId }, context) => {
-      await requireGroupAccess(context, groupId);
-      return await Message.findAll({
+      const auth = await requireGroupAccess(context, groupId);
+      const messages = await Message.findAll({
         where: { groupId },
         include: [
           {
             model: User,
             as: 'author',
           },
+          {
+            model: Message,
+            as: 'replyTo',
+            include: [{ model: User, as: 'author' }],
+          },
         ],
       });
+
+      const currentUser = await User.findByPk(auth.id);
+      const myReactions = currentUser?.messageReactions || {};
+
+      return messages.map((message) => ({
+        ...message.toJSON(),
+        myReaction: myReactions[message.id] || null,
+      }));
     },
   },
   Mutation: {
-    sendMessage: async (_, { authorId, text, groupId, isStaffChat, type }, context) => {
+    sendMessage: async (_, { authorId, text, groupId, isStaffChat, type, replyToId }, context) => {
       const { sendPushNotification } = context;
       const auth = requireAuth(context);
       if (String(auth.id) !== String(authorId)) {
@@ -65,6 +80,15 @@ export const messageResolvers = {
         throw new Error('Пользователь не найден');
       }
 
+      let validReplyToId = null;
+      if (replyToId) {
+        const replyTarget = await Message.findByPk(replyToId);
+        if (!replyTarget || String(replyTarget.groupId) !== String(groupId)) {
+          throw new Error('Сообщение для ответа не найдено');
+        }
+        validReplyToId = replyToId;
+      }
+
       console.log('Author data:', author.toJSON());
 
       let recipients = [];
@@ -88,6 +112,7 @@ export const messageResolvers = {
         text,
         type: messageType,
         groupId: groupId,
+        replyToId: validReplyToId,
       });
 
       const messageWithAuthor = await Message.findByPk(message.id, {
@@ -95,6 +120,11 @@ export const messageResolvers = {
           {
             model: User,
             as: 'author',
+          },
+          {
+            model: Message,
+            as: 'replyTo',
+            include: [{ model: User, as: 'author' }],
           },
         ],
       });
@@ -131,6 +161,46 @@ export const messageResolvers = {
 
       return messageWithAuthor;
     },
+
+    // Повторный клик по уже выбранной реакции снимает её
+    setMessageReaction: async (_, { messageId, emoji }, context) => {
+      const auth = requireAuth(context);
+      if (!ALLOWED_REACTIONS.includes(emoji)) {
+        throw new Error('Недопустимая реакция');
+      }
+
+      const message = await Message.findByPk(messageId);
+      if (!message) throw new Error('Сообщение не найдено');
+      await requireGroupAccess(context, message.groupId);
+
+      const user = await User.findByPk(auth.id);
+      if (!user) throw new Error('Пользователь не найден');
+
+      const userReactions = { ...(user.messageReactions || {}) };
+      const previousEmoji = userReactions[messageId] || null;
+      const nextEmoji = previousEmoji === emoji ? null : emoji;
+
+      const counts = { ...(message.reactions || {}) };
+      if (previousEmoji) {
+        const nextCount = (counts[previousEmoji] || 0) - 1;
+        if (nextCount > 0) counts[previousEmoji] = nextCount;
+        else delete counts[previousEmoji];
+      }
+      if (nextEmoji) {
+        counts[nextEmoji] = (counts[nextEmoji] || 0) + 1;
+      }
+
+      if (nextEmoji) userReactions[messageId] = nextEmoji;
+      else delete userReactions[messageId];
+
+      await user.update({ messageReactions: userReactions });
+      await message.update({ reactions: counts });
+
+      return {
+        ...message.toJSON(),
+        myReaction: nextEmoji,
+      };
+    },
   },
   Subscription: {
     messageSent: {
@@ -150,5 +220,11 @@ export const messageResolvers = {
         return pubsub.asyncIterator('STAFF_MESSAGE_SENT');
       },
     },
+  },
+
+  Message: {
+    reactions: (message) =>
+      Object.entries(message.reactions || {}).map(([emoji, count]) => ({ emoji, count })),
+    myReaction: (message) => message.myReaction ?? null,
   },
 };
