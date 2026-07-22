@@ -46,6 +46,10 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
     skip: !selectedGroup.id,
   });
 
+  const registeredStudents = (studentsData?.usersByGroup || []).filter(
+    (student: { name?: string | null }) => student.name,
+  );
+
   const [fineUser, { loading: fineUserLoading }] = useGlobalLoadingMutation(FINE_USER);
 
   useEffect(() => {
@@ -174,12 +178,12 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
               />
             </div>
 
-            {studentsData?.usersByGroup?.length > 0 && (
+            {registeredStudents.length > 0 && (
               <div>
                 <Subtitle>Студент</Subtitle>
                 <CustomSelect
                   key={`student-select-${selectedStudent.id}`}
-                  items={studentsData?.usersByGroup || []}
+                  items={registeredStudents}
                   onChange={setSelectedStudent}
                   initValue={selectedStudent.name}
                 />

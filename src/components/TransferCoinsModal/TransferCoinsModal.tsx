@@ -50,6 +50,10 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     skip: !selectedGroup.id,
   });
 
+  const registeredStudents = (studentsData?.usersByGroup || []).filter(
+    (student: { name?: string | null }) => student.name,
+  );
+
   const [transferCoins, { loading: transferCoinsLoading }] =
     useGlobalLoadingMutation(TRANSFER_COINS);
 
@@ -185,12 +189,12 @@ function TransferCoinsModal({ onClose }: ModalProps) {
               />
             </div>
 
-            {studentsData?.usersByGroup?.length > 0 && (
+            {registeredStudents.length > 0 && (
               <div>
                 <Subtitle>Студент</Subtitle>
                 <CustomSelect
                   key={`student-select-${selectedStudent.id}`}
-                  items={studentsData?.usersByGroup || []}
+                  items={registeredStudents}
                   onChange={setSelectedStudent}
                   initValue={selectedStudent.name}
                 />

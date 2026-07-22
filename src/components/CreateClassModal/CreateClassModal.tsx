@@ -74,7 +74,10 @@ function CreateClassModal({ classToEdit, onClose, onSubmit }: ModalProps) {
   const studentsInGroup = useMemo(() => {
     const selectedIds = new Set(selectedStudents.map((student) => student.id));
     return students
-      .filter((student) => student.group?.id === studentGroupId && !selectedIds.has(student.id))
+      .filter(
+        (student) =>
+          student.group?.id === studentGroupId && !selectedIds.has(student.id) && student.name,
+      )
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [students, studentGroupId, selectedStudents]);
 

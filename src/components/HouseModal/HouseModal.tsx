@@ -51,6 +51,9 @@ function HouseModal({ id, number, onClose }: ModalProps) {
     variables: { groupId: selectedGroup.id },
     skip: !selectedGroup.id,
   });
+  const registeredStudents = (studentsData?.usersByGroup || []).filter(
+    (student: { name?: string | null }) => student.name,
+  );
   const { user } = useUser();
 
   useEffect(() => {
@@ -121,12 +124,12 @@ function HouseModal({ id, number, onClose }: ModalProps) {
                     initValue={selectedGroup.name}
                   />
                 </div>
-                {studentsData?.usersByGroup?.length > 0 ? (
+                {registeredStudents.length > 0 ? (
                   <div>
                     <Subtitle>Студент</Subtitle>
                     <CustomSelect
                       key={`student-select-${selectedStudent.id}`}
-                      items={studentsData?.usersByGroup || []}
+                      items={registeredStudents}
                       onChange={setSelectedStudent}
                       initValue={selectedStudent.name}
                     />

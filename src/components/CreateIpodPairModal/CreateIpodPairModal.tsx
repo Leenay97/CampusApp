@@ -34,7 +34,10 @@ export function CreateIpodPairModal({ students, onClose, onCreate }: CreateIpodP
   const studentsInGroup = useMemo(() => {
     const selectedIds = new Set(selectedStudents.map((student) => student.id));
     return students
-      .filter((student) => student.group?.id === selectedGroupId && !selectedIds.has(student.id))
+      .filter(
+        (student) =>
+          student.group?.id === selectedGroupId && !selectedIds.has(student.id) && student.name,
+      )
       .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   }, [students, selectedGroupId, selectedStudents]);
 
