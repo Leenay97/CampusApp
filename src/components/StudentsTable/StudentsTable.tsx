@@ -27,6 +27,7 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
   }
 
   function getSortValue(student: User, field: SortField): string | number {
+    console.log(field);
     switch (field) {
       case 'name':
         return student?.name || '';
@@ -118,9 +119,9 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
           </div>
           <div
             className={`${styles['students__cell']} ${styles['sortable']}`}
-            onClick={() => handleSort('class')}
+            onClick={() => handleSort('englishLevel')}
           >
-            Уровень языка {getSortIcon('class')}
+            Level {getSortIcon('englishLevel')}
           </div>
           <div
             className={`${styles['students__cell']} ${styles['sortable']}`}

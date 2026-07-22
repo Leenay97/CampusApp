@@ -81,46 +81,27 @@ export default function HousesPage() {
 
         {showMap && (
           <div className={styles['map-wrapper']}>
-            <TransformWrapper
-              initialScale={1}
-              minScale={0.5}
-              maxScale={4}
-              wheel={{ step: 0.05 }}
-              pinch={{ step: 0.05 }}
-              doubleClick={{ mode: 'reset' }}
-              limitToBounds={true}
-              centerOnInit={true}
-              panning={{ velocityDisabled: true }}
-            >
-              <TransformComponent
-                wrapperStyle={{ width: '100%', height: '100%' }}
-                contentStyle={{ width: '100%', height: '100%' }}
-              >
-                <div className={styles['image-container']}>
-                  <Image
-                    className={styles['houses__map']}
-                    src={mapImage}
-                    alt="map"
-                    priority
-                    sizes="100vw"
-                    quality={75}
-                    loading="eager"
-                  />
-                </div>
-              </TransformComponent>
-            </TransformWrapper>
+            <Image
+              className={styles['houses__map']}
+              src={mapImage}
+              alt="map"
+              priority
+              sizes="100vw"
+              quality={75}
+              loading="eager"
+            />
           </div>
         )}
         {user?.userLevel === 'ADMIN' && (
           <>
             <Subtitle noMargin>Добавить домик</Subtitle>
             <div className={styles['houses__add']}>
-              <Subtitle>№</Subtitle>
+              <Subtitle noMargin>№</Subtitle>
               <InputField
                 value={creationNumber}
                 onChange={handleChangeNumber}
-                width="40px"
-                maxLength={2}
+                width="60px"
+                maxLength={3}
               />
               <PrimaryButton onClick={handleCreate}>Добавить</PrimaryButton>
             </div>
