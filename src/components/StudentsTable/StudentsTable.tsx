@@ -4,7 +4,7 @@ import styles from './StudentsTable.module.scss';
 import EditButton from '../EditButton/EditButton';
 import EditStudentModal from '../EditStudentModal/EditStudentModal';
 
-type SortField = 'name' | 'group' | 'house' | 'coins' | 'class' | 'englishLevel';
+type SortField = 'name' | 'russianName' | 'group' | 'house' | 'coins' | 'class' | 'englishLevel';
 type SortOrder = 'asc' | 'desc';
 
 type StudentsTableProps = {
@@ -30,6 +30,8 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
     switch (field) {
       case 'name':
         return student?.name || '';
+      case 'russianName':
+        return student?.russianName || '';
       case 'group':
         return student?.group?.name || '';
       case 'house':
@@ -86,6 +88,12 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
         <div className={styles['students__header']}>
           <div
             className={`${styles['students__cell']} ${styles['sortable']}`}
+            onClick={() => handleSort('russianName')}
+          >
+            Русское имя {getSortIcon('russianName')}
+          </div>
+          <div
+            className={`${styles['students__cell']} ${styles['sortable']}`}
             onClick={() => handleSort('name')}
           >
             Имя {getSortIcon('name')}
@@ -124,6 +132,7 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
 
         {sortedStudents.map((student) => (
           <div key={student.id} className={styles['students__row']}>
+            <div className={styles['students__cell']}>{student?.russianName || '—'}</div>
             <div className={styles['students__cell']}>{student?.name || '—'}</div>
             <div className={styles['students__cell']}>{student?.group?.name || '—'}</div>
             <div className={styles['students__cell']}>{student?.house?.number || '—'}</div>
