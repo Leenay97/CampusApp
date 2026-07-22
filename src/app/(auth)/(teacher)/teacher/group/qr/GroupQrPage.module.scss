@@ -1,0 +1,27 @@
+@import '@app/globals.css';
+@import '@app/variables.css';
+
+.group-qr {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 200px;
+
+  &__link-row {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 280px;
+  }
+
+  &__link {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    color: var(--color-dark-blue);
+  }
+}
