@@ -38,6 +38,7 @@ export function AddStudent({ onAdd, groupId }: AddTeacherProps) {
       <Subtitle>Добавить студента</Subtitle>
       <div className={styles['add-teacher__input']}>
         <InputField value={studentName} onChange={handleChange} placeholder="Вася Пупкин" />
+        <Subtitle noMargin>Дата рождения</Subtitle>
         <InputField type="date" value={birthday} onChange={setBirthday} />
         <PrimaryButton onClick={handleCreateTeacher}>Добавить</PrimaryButton>
       </div>
