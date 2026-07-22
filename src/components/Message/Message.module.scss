@@ -116,6 +116,10 @@
     .message__reply-author {
       color: rgba(246, 241, 108, 0.9);
     }
+
+    .message__reply-text {
+      color: rgba(255, 255, 255, 0.75);
+    }
   }
 
   &_admin {
@@ -141,6 +145,10 @@
 
     .message__reply-author {
       color: rgba(255, 214, 175, 0.95);
+    }
+
+    .message__reply-text {
+      color: rgba(255, 255, 255, 0.75);
     }
   }
 
@@ -210,6 +218,12 @@
     background: none;
     padding: 0;
     min-width: 0;
+  }
+
+  &__text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 16px;
   }
 
   &__sticker {

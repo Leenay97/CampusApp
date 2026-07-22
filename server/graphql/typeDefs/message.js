@@ -34,5 +34,6 @@ export const messageTypeDefs = gql`
   extend type Subscription {
     messageSent(groupId: ID!): Message
     staffMessageSent: Message
+    messageReactionSet(groupId: ID!): Message
   }
 `;

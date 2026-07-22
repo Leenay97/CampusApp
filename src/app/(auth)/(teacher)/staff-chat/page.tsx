@@ -4,6 +4,7 @@ import { useMemo, useEffect } from 'react';
 import { Message as MessageType } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import { STAFF_MESSAGE_SENT } from '@/graphql/subscriptions/StaffMessageSent';
+import { MESSAGE_REACTION_SET } from '@/graphql/subscriptions/MessageReactionSet';
 import { GET_MESSAGES } from '@/graphql/queries/GetMessages';
 import Chat from '@/components/Chat/Chat';
 import { useQuery } from '@apollo/client';
@@ -33,6 +34,31 @@ export default function StaffChat() {
         return {
           ...prev,
           getMessages: [...prev.getMessages, newMessage],
+        };
+      },
+    });
+
+    return () => unsubscribe();
+  }, [subscribeToMore, user?.group?.id]);
+
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_TEACHERS_CHAT_KEY) return;
+
+    const unsubscribe = subscribeToMore({
+      document: MESSAGE_REACTION_SET,
+      variables: { groupId: process.env.NEXT_PUBLIC_TEACHERS_CHAT_KEY },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const updated = subscriptionData.data.messageReactionSet;
+
+        return {
+          ...prev,
+          getMessages: prev.getMessages.map((msg: MessageType) =>
+            msg.id === updated.id
+              ? { ...msg, reactions: updated.reactions, myReaction: updated.myReaction }
+              : msg,
+          ),
         };
       },
     });

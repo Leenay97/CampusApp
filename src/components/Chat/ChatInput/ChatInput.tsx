@@ -22,6 +22,11 @@ export default function ChatInput({
   onCancelReply,
 }: ChatInputProps) {
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false);
+  // На тач-устройствах Enter должен переносить строку — там есть отдельная
+  // кнопка отправки, а «плоская» физическая клавиатура — признак десктопа
+  const [isTouchDevice] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches,
+  );
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     onChangeMessage(e.target.value);
@@ -66,7 +71,7 @@ export default function ChatInput({
             value={message}
             onChange={handleChange}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (e.key === 'Enter' && !e.shiftKey && !isTouchDevice) {
                 e.preventDefault();
                 onSend();
               }

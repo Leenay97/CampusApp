@@ -4,6 +4,7 @@ import { useMemo, useEffect } from 'react';
 import { Message as MessageType } from '@/app/types';
 import { useUser } from '@/contexts/UserContext';
 import { MESSAGE_SENT } from '@/graphql/subscriptions/MessageSent';
+import { MESSAGE_REACTION_SET } from '@/graphql/subscriptions/MessageReactionSet';
 import { GET_MESSAGES } from '@/graphql/queries/GetMessages';
 import Chat from '@/components/Chat/Chat';
 import { useQuery } from '@apollo/client';
@@ -33,6 +34,31 @@ export default function GroupChat() {
         return {
           ...prev,
           getMessages: [...prev.getMessages, newMessage],
+        };
+      },
+    });
+
+    return () => unsubscribe();
+  }, [subscribeToMore, user?.group?.id]);
+
+  useEffect(() => {
+    if (!user?.group?.id) return;
+
+    const unsubscribe = subscribeToMore({
+      document: MESSAGE_REACTION_SET,
+      variables: { groupId: user.group.id },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const updated = subscriptionData.data.messageReactionSet;
+
+        return {
+          ...prev,
+          getMessages: prev.getMessages.map((msg: MessageType) =>
+            msg.id === updated.id
+              ? { ...msg, reactions: updated.reactions, myReaction: updated.myReaction }
+              : msg,
+          ),
         };
       },
     });

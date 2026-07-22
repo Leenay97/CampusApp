@@ -196,10 +196,14 @@ export const messageResolvers = {
       await user.update({ messageReactions: userReactions });
       await message.update({ reactions: counts });
 
-      return {
+      const updatedMessage = {
         ...message.toJSON(),
         myReaction: nextEmoji,
       };
+
+      pubsub.publish('MESSAGE_REACTION_SET', { messageReactionSet: updatedMessage });
+
+      return updatedMessage;
     },
   },
   Subscription: {
@@ -218,6 +222,27 @@ export const messageResolvers = {
       subscribe: (_, __, context) => {
         requireStaff(context);
         return pubsub.asyncIterator('STAFF_MESSAGE_SENT');
+      },
+    },
+    // myReaction зависит от того, кто подписан, поэтому пересчитываем его
+    // персонально для каждого получателя, а не берём из опубликованного payload
+    messageReactionSet: {
+      subscribe: async (root, args, context, info) => {
+        await requireGroupAccess(context, args.groupId);
+        return withFilter(
+          () => pubsub.asyncIterator('MESSAGE_REACTION_SET'),
+          (payload) => String(payload.messageReactionSet.groupId) === String(args.groupId),
+        )(root, args, context, info);
+      },
+      resolve: async (payload, args, context) => {
+        const auth = requireAuth(context);
+        const user = await User.findByPk(auth.id);
+        const myReactions = user?.messageReactions || {};
+        const message = payload.messageReactionSet;
+        return {
+          ...message,
+          myReaction: myReactions[message.id] || null,
+        };
       },
     },
   },
