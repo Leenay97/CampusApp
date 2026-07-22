@@ -49,7 +49,7 @@
         align-items: center;
         justify-content: center;
         padding: 0px 20px;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         letter-spacing: 0.25px;
         text-transform: uppercase;
@@ -116,6 +116,7 @@
         justify-content: center;
         opacity: 1;
         touch-action: manipulation;
+        font-size: 14px;
 
         &:last-child {
             padding-bottom: 0;

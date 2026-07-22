@@ -17,5 +17,6 @@ export const houseTypeDefs = gql`
     createHouse(number: String!): House
     updateHouse(id: ID!, grade: Int): House
     deleteHouse(id: ID!): House
+    resetHouseGrades: [House]
   }
 `;

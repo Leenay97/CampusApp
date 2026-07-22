@@ -1,11 +1,11 @@
 'use client';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
+import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
 import Section from '@/components/Section/Section';
 import Title from '@/components/Title/Title';
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import mapImage from '@/assets/img/map.jpg';
 import styles from './Houses.module.scss';
 import Subtitle from '@/components/Subtitle/Subtitle';
@@ -18,13 +18,18 @@ import { GET_HOUSES } from '@/graphql/queries/GetHouses';
 import Filters from '@/components/Filters/Filters';
 import { useUser } from '@/contexts/UserContext';
 import Loader from '@/components/Loader/Loaader';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
+import { RESET_HOUSE_GRADES } from '@/graphql/mutations/ResetHouseGrades';
+import { compareHouseNumbers } from '@/utils/sortHouseNumbers';
 
 type SortOption = 'по номеру' | 'по оценке';
 
 export default function HousesPage() {
   const [showMap, setShowMap] = useState<boolean>(false);
   const [creationNumber, setCreationNumber] = useState('');
+  const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [createHouse] = useGlobalLoadingMutation(CREATE_HOUSE);
+  const [resetHouseGrades] = useGlobalLoadingMutation(RESET_HOUSE_GRADES);
   const { data, loading, refetch } = useQuery(GET_HOUSES);
   const [sortBy, setSortBy] = useState<SortOption>('по номеру');
   const { user } = useUser();
@@ -43,13 +48,23 @@ export default function HousesPage() {
     setCreationNumber(value);
   }
 
+  async function handleResetGrades() {
+    try {
+      await resetHouseGrades();
+      setShowResetModal(false);
+      refetch();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   const sortedHouses = useMemo(() => {
     if (!data?.houses) return [];
 
     const houses = [...data?.houses];
 
     if (sortBy === 'по номеру') {
-      return houses.sort((a, b) => Number(a.number) - Number(b.number));
+      return houses.sort((a, b) => compareHouseNumbers(a.number, b.number));
     } else {
       return houses.sort((a, b) => {
         if (!a.grade && !b.grade) return 0;
@@ -118,6 +133,21 @@ export default function HousesPage() {
             onChange={(value) => setSortBy(value as SortOption)}
           />
         </div>
+
+        {user?.userLevel === 'ADMIN' && (
+          <SecondaryButton onClick={() => setShowResetModal(true)}>Сбросить оценки</SecondaryButton>
+        )}
+
+        {showResetModal && (
+          <ConfirmModal
+            title="Сбросить оценки?"
+            confirmText="Сбросить"
+            onConfirm={handleResetGrades}
+            onClose={() => setShowResetModal(false)}
+          >
+            Оценки всех домиков будут обнулены. Это действие нельзя отменить.
+          </ConfirmModal>
+        )}
 
         <div className={styles['houses__container']}>
           {sortedHouses.map((house) => (

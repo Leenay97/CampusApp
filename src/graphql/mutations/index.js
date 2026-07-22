@@ -23,6 +23,7 @@ import { FINE_USER } from './FineUser';
 import { CREATE_HOUSE } from './CreateHouse';
 import { UPDATE_USER } from './UpdateUser';
 import { UPDATE_HOUSE } from './UpdateHouse';
+import { RESET_HOUSE_GRADES } from './ResetHouseGrades';
 import { CREATE_POST } from './CreatePost';
 import { CREATE_CLASS } from './CreateClass';
 import { UPDATE_CLASS } from './UpdateClass';
@@ -76,6 +77,7 @@ export const mutations = {
   CREATE_HOUSE,
   UPDATE_USER,
   UPDATE_HOUSE,
+  RESET_HOUSE_GRADES,
   CREATE_POST,
   UPDATE_POST,
   CREATE_CLASS,

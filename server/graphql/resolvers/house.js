@@ -60,5 +60,10 @@ export const houseResolvers = {
 
       return existingHouse;
     },
+    resetHouseGrades: async (_, __, context) => {
+      requireAdmin(context);
+      await House.update({ grade: null }, { where: {} });
+      return await House.findAll();
+    },
   },
 };
