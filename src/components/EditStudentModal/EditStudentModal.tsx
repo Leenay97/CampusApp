@@ -45,6 +45,7 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
   const [group, setGroup] = useState({ id: '', name: '' });
   const [englishClass, setEnglishClass] = useState({ id: '', name: '' });
   const [house, setHouse] = useState({ id: student.house?.id, name: student.house?.number });
+  const [birthday, setBirthday] = useState<string>(student.birthday ?? '');
   const [updateUser] = useGlobalLoadingMutation(UPDATE_USER);
   const { data, loading: seasonLoading } = useQuery(GET_ACTIVE_SEASON);
   const { data: classesData, loading: classesLoading } = useQuery(GET_CLASSES);
@@ -64,6 +65,7 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
     setName(student?.name);
     setGroup({ id: student?.group?.id ?? '', name: student?.group?.name ?? '' });
     setEnglishClass({ id: student?.class?.id ?? '', name: student?.class?.name ?? '' });
+    setBirthday(student?.birthday ?? '');
   }, [student]);
 
   function handleChangeName(value: string) {
@@ -85,6 +87,10 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
     setHouse({ id, name });
   }
 
+  function handleChangeBirthday(value: string) {
+    setBirthday(value);
+  }
+
   function handleChangeEnglishLevel({ id, name }: EnglishLevelOption) {
     setEnglishLevel({ id, name });
   }
@@ -99,6 +105,7 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
         coins: Number(coins) || null,
         houseId: house.id || null,
         englishLevel: englishLevel.id || null,
+        birthday: birthday || null,
       });
       onClose();
       onSubmit();
@@ -161,6 +168,10 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
             <div>
               <Subtitle>Coins</Subtitle>
               <InputField value={coins} onChange={handleChangeCoins} />
+            </div>
+            <div>
+              <Subtitle>Дата рождения</Subtitle>
+              <InputField type="date" value={birthday} onChange={handleChangeBirthday} />
             </div>
           </>
         )}

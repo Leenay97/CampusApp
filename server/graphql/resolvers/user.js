@@ -151,7 +151,7 @@ export const userResolvers = {
         group,
       };
     },
-    createStudent: async (_, { russianName, groupId }, context) => {
+    createStudent: async (_, { russianName, groupId, birthday }, context) => {
       requireStaff(context);
       const group = await Group.findByPk(groupId);
       if (!group) throw new Error('Группы не существует');
@@ -169,6 +169,7 @@ export const userResolvers = {
         coins: 0,
         userLevel: 'STUDENT',
         lives: 3,
+        birthday: birthday || null,
       });
 
       return user;
@@ -308,7 +309,7 @@ export const userResolvers = {
 
     updateUser: async (
       _,
-      { id, name, russianName, groupId, houseId, englishLevel, classId, coins },
+      { id, name, russianName, groupId, houseId, englishLevel, classId, coins, birthday },
       context,
     ) => {
       requireStaff(context);
@@ -321,6 +322,7 @@ export const userResolvers = {
       user.houseId = houseId !== undefined ? houseId : user.houseId;
       user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
       user.classId = classId !== undefined ? classId : user.classId;
+      user.birthday = birthday !== undefined ? birthday : user.birthday;
       const coinsDelta = coins !== undefined ? coins - (user.coins ?? 0) : 0;
       user.coins = coins !== undefined ? coins : user.coins;
       user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;

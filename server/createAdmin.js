@@ -13,7 +13,7 @@ async function createAdminUser() {
       coins: 0,
       photoUrl: null,
       userLevel: 'ADMIN',
-      login: 'CampusAdmin',
+      login: 'CampusAdmin1',
       hashedPassword: hashedPassword,
       isActive: true,
       lives: 0,

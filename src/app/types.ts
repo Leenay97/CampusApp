@@ -102,6 +102,7 @@ export type User = {
   house?: House;
   class: Class;
   englishLevel: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+  birthday?: string;
 };
 
 export type CoinTransaction = {

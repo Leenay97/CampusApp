@@ -7,12 +7,12 @@
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   &__header {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr 50px;
+    grid-template-columns: 1.5fr 1fr 1fr 0.5fr 0.5fr 1fr 0.5fr 0.5fr 50px;
     background-color: var(--text-primary);
     color: white;
     border-bottom: 2px solid #e0e0e0;
@@ -21,7 +21,7 @@
 
   &__row {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr 50px;
+    grid-template-columns: 1.5fr 1fr 1fr 0.5fr 0.5fr 1fr 0.5fr 0.5fr 50px;
     border-bottom: 1px solid #e0e0e0;
     transition: background-color 0.2s;
 
@@ -36,6 +36,11 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: center;
+  }
+
+  &__edit {
+    height: 12px;
+    width: 12px;
   }
 
   .sortable {

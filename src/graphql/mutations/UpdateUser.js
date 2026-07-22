@@ -10,6 +10,7 @@ export const UPDATE_USER = gql`
     $classId: ID
     $coins: Int
     $englishLevel: String
+    $birthday: String
   ) {
     updateUser(
       id: $id
@@ -20,6 +21,7 @@ export const UPDATE_USER = gql`
       classId: $classId
       coins: $coins
       englishLevel: $englishLevel
+      birthday: $birthday
     ) {
       id
       russianName
@@ -34,6 +36,7 @@ export const UPDATE_USER = gql`
       }
       name
       houseId
+      birthday
     }
   }
 `;

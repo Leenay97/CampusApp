@@ -25,6 +25,7 @@ export const GET_STUDENTS_BY_GROUP_ID = gql`
         name
       }
       englishLevel
+      birthday
     }
   }
 `;

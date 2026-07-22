@@ -40,7 +40,7 @@ function TeamRaiting() {
                 key={team.id}
                 team={team}
                 place={index + 1}
-                hidden={!technicalData?.technicalData.isRatingShown}
+                hidden={!technicalData?.technicalData?.isRatingShown}
               />
             ))
           ) : (

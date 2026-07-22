@@ -3,8 +3,17 @@ import { User } from '@/app/types';
 import styles from './StudentsTable.module.scss';
 import EditButton from '../EditButton/EditButton';
 import EditStudentModal from '../EditStudentModal/EditStudentModal';
+import { calculateAge, formatDateForDisplay } from '@/utils/age';
 
-type SortField = 'name' | 'russianName' | 'group' | 'house' | 'coins' | 'class' | 'englishLevel';
+type SortField =
+  | 'name'
+  | 'russianName'
+  | 'group'
+  | 'house'
+  | 'coins'
+  | 'class'
+  | 'englishLevel'
+  | 'age';
 type SortOrder = 'asc' | 'desc';
 
 type StudentsTableProps = {
@@ -43,6 +52,8 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
         return student?.class?.name;
       case 'englishLevel':
         return student?.englishLevel || '';
+      case 'age':
+        return calculateAge(student?.birthday) ?? 0;
       default:
         return '';
     }
@@ -107,6 +118,12 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
           </div>
           <div
             className={`${styles['students__cell']} ${styles['sortable']}`}
+            onClick={() => handleSort('age')}
+          >
+            Возраст {getSortIcon('age')}
+          </div>
+          <div
+            className={`${styles['students__cell']} ${styles['sortable']}`}
             onClick={() => handleSort('house')}
           >
             Домик {getSortIcon('house')}
@@ -136,11 +153,20 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
             <div className={styles['students__cell']}>{student?.russianName || '—'}</div>
             <div className={styles['students__cell']}>{student?.name || '—'}</div>
             <div className={styles['students__cell']}>{student?.group?.name || '—'}</div>
+            <div
+              className={styles['students__cell']}
+              title={formatDateForDisplay(student?.birthday)}
+            >
+              {calculateAge(student?.birthday) ?? '—'}
+            </div>
             <div className={styles['students__cell']}>{student?.house?.number || '—'}</div>
             <div className={styles['students__cell']}>{student?.class?.name || '—'}</div>
             <div className={styles['students__cell']}>{student?.englishLevel || '—'}</div>
             <div className={styles['students__cell']}>{student?.coins || '0'}</div>
-            <EditButton onClick={() => setSelectedStudent(student)} />
+            <EditButton
+              className={styles['students__edit']}
+              onClick={() => setSelectedStudent(student)}
+            />
           </div>
         ))}
       </div>

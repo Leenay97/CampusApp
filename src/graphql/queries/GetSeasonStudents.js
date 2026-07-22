@@ -26,6 +26,7 @@ export const GET_SEASON_STUDENTS = gql`
         name
       }
       englishLevel
+      birthday
     }
   }
 `;

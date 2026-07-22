@@ -17,6 +17,7 @@ export const userTypeDefs = gql`
     class: Class
     photoUrl: String
     login: String
+    birthday: String
   }
 
   type AuthPayload {
@@ -38,7 +39,7 @@ export const userTypeDefs = gql`
 
   extend type Mutation {
     login(login: String!, password: String!): AuthPayload!
-    createStudent(russianName: String!, groupId: ID!): User
+    createStudent(russianName: String!, groupId: ID!, birthday: String): User
     createTeacher(name: String!): User
     registerTeacher(
       token: String!
@@ -69,6 +70,7 @@ export const userTypeDefs = gql`
       classId: ID
       coins: Int
       englishLevel: String
+      birthday: String
     ): User
     deleteUser(id: ID!): User
     deleteUnregisteredStudents(groupId: ID!): [User]

@@ -13,14 +13,16 @@ type AddTeacherProps = {
 
 export function AddStudent({ onAdd, groupId }: AddTeacherProps) {
   const [studentName, setStudentName] = useState('');
+  const [birthday, setBirthday] = useState('');
   const [createStudent] = useGlobalLoadingMutation(mutations.CREATE_STUDENT);
 
   async function handleCreateTeacher() {
     if (!studentName) return;
 
     try {
-      await createStudent({ russianName: studentName, groupId });
+      await createStudent({ russianName: studentName, groupId, birthday: birthday || null });
       setStudentName('');
+      setBirthday('');
       onAdd?.();
     } catch (err) {
       return;
@@ -36,6 +38,7 @@ export function AddStudent({ onAdd, groupId }: AddTeacherProps) {
       <Subtitle>Добавить студента</Subtitle>
       <div className={styles['add-teacher__input']}>
         <InputField value={studentName} onChange={handleChange} placeholder="Вася Пупкин" />
+        <InputField type="date" value={birthday} onChange={setBirthday} />
         <PrimaryButton onClick={handleCreateTeacher}>Добавить</PrimaryButton>
       </div>
     </div>
