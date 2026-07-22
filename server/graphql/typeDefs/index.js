@@ -14,6 +14,7 @@ import { messageTypeDefs } from './message.js';
 import { voteTypeDefs } from './vote.js';
 import { ipodTypeDefs } from './ipod.js';
 import { coinTransactionTypeDefs } from './coinTransaction.js';
+import { mazeRunnerTypeDefs } from './mazeRunner.js';
 
 export const typeDefs = [
   baseTypeDefs,
@@ -32,4 +33,5 @@ export const typeDefs = [
   voteTypeDefs,
   ipodTypeDefs,
   coinTransactionTypeDefs,
+  mazeRunnerTypeDefs,
 ];

@@ -22,6 +22,8 @@ import { ArchivedGroup } from './ArchivedGroup.js';
 import { ArchivedWorkshop } from './ArchivedWorkshop.js';
 import { ArchivedSporttime } from './ArchivedSporttime.js';
 import { CoinTransaction } from './CoinTransaction.js';
+import { MazeRunnerEvent } from './MazeRunnerEvent.js';
+import { MazeRunnerAttempt } from './MazeRunnerAttempt.js';
 
 // Сначала определите все ассоциации
 // Ассоциации Season
@@ -133,6 +135,10 @@ User.hasMany(CoinTransaction, { foreignKey: 'studentId', as: 'coinTransactions' 
 CoinTransaction.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
 CoinTransaction.belongsTo(User, { foreignKey: 'counterpartyId', as: 'counterparty' });
 
+// Ассоциации MazeRunnerAttempt
+Group.hasOne(MazeRunnerAttempt, { foreignKey: 'groupId', as: 'mazeRunnerAttempt' });
+MazeRunnerAttempt.belongsTo(Group, { foreignKey: 'groupId', as: 'group' });
+
 export {
   sequelize,
   User,
@@ -158,4 +164,6 @@ export {
   ArchivedWorkshop,
   ArchivedSporttime,
   CoinTransaction,
+  MazeRunnerEvent,
+  MazeRunnerAttempt,
 };

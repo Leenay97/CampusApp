@@ -19,6 +19,10 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
   const { data: technicalData } = useQuery(queries.GET_TECHICAL_DATA);
   const isElectionShown = technicalData?.technicalData?.isElectionShown ?? false;
 
+  const { data: mazeRunnerData } = useQuery(queries.GET_MAZE_RUNNER_STATUS);
+  // Ивент видят студенты и учителя, админу он в меню не нужен — у него своя панель
+  const isMazeRunnerShown = mazeRunnerData?.mazeRunnerStatus?.isActive ?? false;
+
   const sections = getHeaderMenuSections(userLevel ?? UserLevel.Student).map((section) => ({
     ...section,
     options: isElectionShown
@@ -58,6 +62,12 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
   return (
     <div className={isOpen ? styles['burger-menu'] : styles['burger-menu--hidden']}>
       <nav className={styles['burger-menu__wrapper']}>
+        {isMazeRunnerShown && (
+          <Link href="/maze-runner" className={styles['burger-menu__event']} onClick={onClose}>
+            <span className={styles['burger-menu__event-dot']} />
+            Maze Runner
+          </Link>
+        )}
         {sections.map((section, index) => {
           const isCollapsible = Boolean(section.title);
           const isSectionOpen = isCollapsible ? openTitle === section.title : true;

@@ -132,6 +132,41 @@
         transition: all 0.3s ease-in-out;
     }
 
+    &__event {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px 20px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        font-weight: 700;
+        letter-spacing: 0.25px;
+        color: white;
+        background: linear-gradient(90deg, var(--accent-orange), var(--accent-yellow));
+        touch-action: manipulation;
+    }
+
+    &__event-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: white;
+        animation: burger-menu-event-pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes burger-menu-event-pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.4;
+            transform: scale(1.4);
+        }
+    }
+
     &__chat {
         display: flex;
         flex-direction: row;

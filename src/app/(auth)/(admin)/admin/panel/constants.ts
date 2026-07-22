@@ -25,6 +25,10 @@ export const AdminPanelGroups: MenuGroup[] = [
     ],
   },
   {
+    title: 'Ивенты',
+    options: [{ name: 'Maze Runner', link: '/admin/panel/events' }],
+  },
+  {
     title: 'Прочее',
     options: [
       { name: 'Управление домиками', link: '/admin/panel/houses' },

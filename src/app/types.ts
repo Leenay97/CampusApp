@@ -200,6 +200,22 @@ export type IpodRoundName = {
   name: string;
 };
 
+export type MazeRunnerEvent = {
+  id: string;
+  code: string | null;
+  isCyclic: boolean;
+  codeword: string | null;
+  isActive: boolean;
+};
+
+export type MazeRunnerStatus = {
+  isActive: boolean;
+  codeLength: number | null;
+  isSolved: boolean;
+  lockedUntil: string | null;
+  codeword: string | null;
+};
+
 export type IpodTournament = {
   seasonId: string;
   currentRound: number;

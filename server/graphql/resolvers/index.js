@@ -13,6 +13,7 @@ import { messageResolvers } from './message.js';
 import { voteResolvers } from './vote.js';
 import { ipodResolvers } from './ipod.js';
 import { coinTransactionResolvers } from './coinTransaction.js';
+import { mazeRunnerResolvers } from './mazeRunner.js';
 
 export const resolvers = [
   userResolvers,
@@ -30,4 +31,5 @@ export const resolvers = [
   voteResolvers,
   ipodResolvers,
   coinTransactionResolvers,
+  mazeRunnerResolvers,
 ];

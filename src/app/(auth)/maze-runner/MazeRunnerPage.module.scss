@@ -1,0 +1,40 @@
+@import '@app/globals.css';
+@import '@app/variables.css';
+
+.maze-runner {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__locked {
+    padding: 12px;
+    border-radius: var(--border-radius-s);
+    background-color: var(--color-red);
+    color: white;
+    font-weight: 500;
+  }
+
+  &__title {
+    color: white;
+    font-size: 16px;
+  }
+
+  &__success {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: var(--border-radius-s);
+    background-color: var(--color-green);
+    color: white;
+  }
+
+  &__codeword {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+}

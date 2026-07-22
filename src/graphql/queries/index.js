@@ -30,6 +30,8 @@ import { GET_IPOD_WAITING_PAIRS } from './GetIpodWaitingPairs';
 import { GET_IPOD_TOURNAMENT } from './GetIpodTournament';
 import { GET_TEACHER_REGISTRATION_TOKEN } from './GetTeacherRegistrationToken';
 import { GET_COIN_HISTORY } from './GetCoinHistory';
+import { GET_MAZE_RUNNER_EVENT } from './GetMazeRunnerEvent';
+import { GET_MAZE_RUNNER_STATUS } from './GetMazeRunnerStatus';
 
 export const queries = {
   GET_GROUPS,
@@ -65,5 +67,7 @@ export const queries = {
   GET_IPOD_TOURNAMENT,
   GET_TEACHER_REGISTRATION_TOKEN,
   GET_COIN_HISTORY,
+  GET_MAZE_RUNNER_EVENT,
+  GET_MAZE_RUNNER_STATUS,
 };
 export default queries;

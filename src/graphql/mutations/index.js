@@ -50,6 +50,8 @@ import { SET_IPOD_MATCH_WINNER } from './SetIpodMatchWinner';
 import { ADVANCE_IPOD_ROUND } from './AdvanceIpodRound';
 import { SET_IPOD_ROUND_NAME } from './SetIpodRoundName';
 import { SET_IPOD_MATCH_DATE } from './SetIpodMatchDate';
+import { UPDATE_MAZE_RUNNER_EVENT } from './UpdateMazeRunnerEvent';
+import { SUBMIT_MAZE_RUNNER_CODE } from './SubmitMazeRunnerCode';
 
 export const mutations = {
   UPDATE_GROUP,
@@ -104,5 +106,7 @@ export const mutations = {
   ADVANCE_IPOD_ROUND,
   SET_IPOD_ROUND_NAME,
   SET_IPOD_MATCH_DATE,
+  UPDATE_MAZE_RUNNER_EVENT,
+  SUBMIT_MAZE_RUNNER_CODE,
 };
 export default mutations;

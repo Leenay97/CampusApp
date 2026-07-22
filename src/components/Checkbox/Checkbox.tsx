@@ -1,7 +1,8 @@
+import { ReactNode } from 'react';
 import styles from './Checkbox.module.scss';
 
 type CheckboxProps = {
-  label: string;
+  label: ReactNode | string;
   checked: boolean;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
