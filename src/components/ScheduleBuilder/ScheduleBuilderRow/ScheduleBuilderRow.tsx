@@ -111,7 +111,6 @@ export default function ScheduleBuilderRow({
       <div className={styles['schedule-row__card']}>
         <div className={styles['schedule-row__emoji']}>{icon}</div>
         <div className={styles['schedule-row__activity']}>{schedule.activity}</div>
-        {state === 'now' && <div className={styles['schedule-row__badge']}>Now</div>}
       </div>
     </div>
   );
