@@ -19,7 +19,6 @@ export function getActivityIcon(activity: string): string {
   return match ? match[1] : '📍';
 }
 
-// Выбор иконки при составлении расписания; пустая строка = автоподбор по названию
 export const EMOJI_CHOICES = [
   '🍳',
   '🍝',
@@ -50,10 +49,11 @@ export const EMOJI_CHOICES = [
   '📍',
   '❗',
   '🔥',
+  '🕯️',
 ];
 
 export const DEFAULT_SCHEDULE = {
-  name: 'DAY 1....',
+  name: 'No schedule yet.',
   schedule: [
     {
       time: '09:00',
