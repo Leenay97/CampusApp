@@ -23,10 +23,14 @@ function AddPoints({ groups, onSave }: AddPointsProps) {
     }
   }, [groups]);
 
-  function handleChange(groupId: string, amount: number) {
+  function handleChange(groupId: string, rawValue: string) {
+    const originalTeam = Array.isArray(groups) ? groups.find((g) => g.id === groupId) : undefined;
+    const originalPoints = originalTeam?.points ?? 0;
+    const delta = rawValue === '' ? 0 : Number(rawValue);
+
     setChangedGroups((prev) =>
       prev.map((group) =>
-        group.id === groupId ? { ...group, points: (group.points ?? 0) + amount } : group,
+        group.id === groupId ? { ...group, points: originalPoints + delta } : group,
       ),
     );
   }
@@ -50,12 +54,12 @@ function AddPoints({ groups, onSave }: AddPointsProps) {
         return (
           <div key={team.id} className={styles['team']}>
             <Team team={team} place={index + 1} changedPoints={changedPoints} />
-            <button className={styles['add-btn']} onClick={() => handleChange(team.id, -100)}>
-              -100
-            </button>
-            <button className={styles['add-btn']} onClick={() => handleChange(team.id, 100)}>
-              +100
-            </button>
+            <input
+              type="number"
+              className={styles['points-input']}
+              value={changedPoints || ''}
+              onChange={(e) => handleChange(team.id, e.target.value)}
+            />
           </div>
         );
       })}

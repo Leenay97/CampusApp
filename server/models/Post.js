@@ -3,7 +3,7 @@ import { sequelize } from '../config/database.js';
 export const Post = sequelize.define('Post', {
   id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
   title: { type: DataTypes.STRING, allowNull: false },
-  text: { type: DataTypes.STRING, allowNull: false },
+  text: { type: DataTypes.TEXT, allowNull: false },
   authorId: { type: DataTypes.UUID },
   // Счётчики реакций вида { "👍🏻": 3, "❤️": 1 }
   reactions: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },

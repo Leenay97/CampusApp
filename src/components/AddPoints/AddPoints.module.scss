@@ -6,15 +6,13 @@
     gap: 10px;
 }
 
-.add-btn {
-    border: 0;
-    background-color: var(--primary-button-color);
-    padding: 10px 15px;
+.points-input {
+    width: 70px;
+    padding: 10px;
+    border: 1px solid var(--primary-button-color);
     border-radius: 5px;
     font-weight: bold;
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
+    text-align: center;
 }
 .save-btn {
     position: absolute;
