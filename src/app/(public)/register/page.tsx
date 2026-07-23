@@ -102,7 +102,7 @@ function RegisterForm() {
   return (
     <CenteredContainer>
       <Section>
-        <Title noMargin>Hey, campus student!</Title>
+        <Title noMargin>Регистрация студента</Title>
       </Section>
       <Section>
         <SwitchSelector
