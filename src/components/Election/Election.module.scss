@@ -2,6 +2,10 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    &__section {
+        gap: 0px;
+    }
 }
 
 .status {

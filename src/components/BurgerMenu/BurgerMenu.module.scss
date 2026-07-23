@@ -146,6 +146,11 @@
         color: white;
         background: linear-gradient(90deg, var(--accent-orange), var(--accent-yellow));
         touch-action: manipulation;
+        margin-top: 5px;
+
+        &--vote {
+            background: linear-gradient(90deg, var(--color-purple), var(--color-dark-blue));
+        }
     }
 
     &__event-dot {

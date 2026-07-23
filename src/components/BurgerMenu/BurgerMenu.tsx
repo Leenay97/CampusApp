@@ -23,12 +23,7 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
   // Ивент видят студенты и учителя, админу он в меню не нужен — у него своя панель
   const isMazeRunnerShown = mazeRunnerData?.mazeRunnerStatus?.isActive ?? false;
 
-  const sections = getHeaderMenuSections(userLevel ?? UserLevel.Student).map((section) => ({
-    ...section,
-    options: isElectionShown
-      ? section.options
-      : section.options.filter((option) => option.link !== '/election'),
-  }));
+  const sections = getHeaderMenuSections(userLevel ?? UserLevel.Student);
   const [openTitle, setOpenTitle] = useState<string | null>(DefaultOpenSectionTitle);
 
   useEffect(() => {
@@ -66,6 +61,16 @@ function BurgerMenu({ isOpen, userLevel, onClose }: BurgerMenuProps): JSX.Elemen
           <Link href="/maze-runner" className={styles['burger-menu__event']} onClick={onClose}>
             <span className={styles['burger-menu__event-dot']} />
             Maze Runner
+          </Link>
+        )}
+        {isElectionShown && (
+          <Link
+            href="/election"
+            className={`${styles['burger-menu__event']} ${styles['burger-menu__event--vote']}`}
+            onClick={onClose}
+          >
+            <span className={styles['burger-menu__event-dot']} />
+            Голосование
           </Link>
         )}
         {sections.map((section, index) => {

@@ -7,6 +7,7 @@ type Props = {
   adminMode?: boolean;
   showCount?: boolean;
   disabled?: boolean;
+  finished?: boolean;
   onClick?: () => void;
 };
 export default function ElectionItem({
@@ -15,6 +16,7 @@ export default function ElectionItem({
   showCount = false,
   voted = false,
   disabled = false,
+  finished = false,
   onClick,
 }: Props) {
   const clickable = Boolean(onClick) && !disabled;
@@ -29,7 +31,7 @@ export default function ElectionItem({
       {(adminMode || showCount) && (
         <span className={styles['item__count']}>{option.votesNumber}</span>
       )}
-      {!adminMode && (
+      {!adminMode && !finished && (
         <span className={`${styles['item__check']} ${voted ? styles['item__check_active'] : ''}`}>
           ✓
         </span>

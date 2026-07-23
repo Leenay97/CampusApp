@@ -20,8 +20,6 @@ const NavigationSection: MenuSection = {
     { name: 'Лента', link: '/information' },
     { name: 'Домики', link: '/houses' },
     { name: 'Резиночки', link: '/rubbers' },
-    { name: 'Голосование', link: '/election' },
-    { name: 'iPod Battle', link: '/ipod' },
   ],
 };
 
@@ -30,6 +28,7 @@ const StudentActivitiesSection: MenuSection = {
   options: [
     { name: 'Мастерклассы', link: '/workshops' },
     { name: 'Sport Time', link: '/sporttime' },
+    { name: 'iPod Battle', link: '/ipod' },
   ],
 };
 

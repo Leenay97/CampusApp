@@ -17,10 +17,12 @@ import { DELETE_VOTE } from '@/graphql/mutations/DeleteVote';
 import Election from '@/components/Election/Election';
 import Loader from '@/components/Loader/Loaader';
 import Section from '@/components/Section/Section';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { Vote } from '@/app/types';
 
 export default function ElectionPage(): JSX.Element {
   const [openModal, setIsOpenModal] = useState(false);
+  const [finishingVote, setFinishingVote] = useState<Vote | null>(null);
   const { app } = useApp();
 
   const { data, loading, error, refetch } = useQuery(GET_VOTES, {
@@ -65,6 +67,12 @@ export default function ElectionPage(): JSX.Element {
     }
   }
 
+  function handleFinishConfirm() {
+    if (!finishingVote) return;
+    setVoteStatus({ id: finishingVote.id, status: 'FINISHED' });
+    setFinishingVote(null);
+  }
+
   function handleOpenModal() {
     setIsOpenModal(true);
   }
@@ -101,12 +109,24 @@ export default function ElectionPage(): JSX.Element {
           election={vote}
           adminMode
           onStart={() => setVoteStatus({ id: vote.id, status: 'ACTIVE' })}
-          onFinish={() => setVoteStatus({ id: vote.id, status: 'FINISHED' })}
+          onFinish={() => setFinishingVote(vote)}
           onDelete={() => handleDelete(vote)}
         />
       ))}
 
       {openModal && <AddElectionModal onClose={handleCloseModal} onCreate={createVote} />}
+
+      {finishingVote && (
+        <ConfirmModal
+          title="Завершить голосование"
+          confirmText="Завершить"
+          onConfirm={handleFinishConfirm}
+          onClose={() => setFinishingVote(null)}
+        >
+          Вы точно хотите завершить голосование «{finishingVote.title}»? Ученики перестанут видеть
+          его как активное, изменить результат будет нельзя.
+        </ConfirmModal>
+      )}
     </CenteredContainer>
   );
 }

@@ -33,12 +33,15 @@ export default function Election({
   const showResults = adminMode || isFinished;
 
   const sortedOptions = useMemo(() => {
+    if (showResults) {
+      return [...election.options].sort((a, b) => b.votesNumber - a.votesNumber);
+    }
     return [...election.options].sort((a, b) => a.name.localeCompare(b.name));
-  }, [election.options]);
+  }, [election.options, showResults]);
 
   return (
     <CenteredContainer noPadding>
-      <Section>
+      <Section className={styles['election__section']}>
         <Subtitle>{election.title}</Subtitle>
         {adminMode && <div className={styles['status']}>{STATUS_LABELS[election.status]}</div>}
         {!adminMode && isFinished && (
@@ -53,6 +56,7 @@ export default function Election({
               adminMode={adminMode}
               voted={item.id === election.votedOptionId}
               disabled={adminMode || election.status !== 'ACTIVE'}
+              finished={isFinished}
               onClick={onVote ? () => onVote(item.id) : undefined}
             />
           ))}
@@ -61,6 +65,9 @@ export default function Election({
           <div className={styles['controls']}>
             {election.status === 'DRAFT' && onStart && (
               <SecondaryButton onClick={onStart}>Запустить</SecondaryButton>
+            )}
+            {election.status === 'FINISHED' && onStart && (
+              <SecondaryButton onClick={onStart}>Возобновить</SecondaryButton>
             )}
             {election.status === 'ACTIVE' && onFinish && (
               <SecondaryButton onClick={onFinish}>Завершить</SecondaryButton>
