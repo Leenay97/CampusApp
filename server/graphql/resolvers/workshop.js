@@ -126,6 +126,40 @@ export const workshopResolvers = {
       return workshop;
     },
 
+    updateWorkshop: async (
+      _,
+      { id, name, description, placeId, teacherId, maxStudents, maxAge, date },
+      context,
+    ) => {
+      requireStaff(context);
+      const workshop = await Workshop.findByPk(id);
+      if (!workshop) throw new Error('Мастеркласс не найден');
+
+      const updates = {};
+      if (name !== undefined) updates.name = name;
+      if (description !== undefined) updates.description = description;
+      if (placeId !== undefined) updates.placeId = placeId;
+      if (teacherId !== undefined) updates.teacherId = teacherId;
+      if (maxStudents !== undefined) updates.maxStudents = maxStudents;
+      if (maxAge !== undefined) updates.maxAge = maxAge;
+      if (date !== undefined) updates.date = date;
+
+      await workshop.update(updates);
+
+      return await Workshop.findByPk(id, {
+        include: [
+          { model: User, as: 'teacher' },
+          {
+            model: User,
+            as: 'students',
+            through: { model: UserWorkshop },
+            attributes: ['id', 'name'],
+          },
+          { model: Place, as: 'place', attributes: ['id', 'name'] },
+        ],
+      });
+    },
+
     joinWorkshop: async (_, { studentId, workshopId }, context) => {
       // Студент записывает только себя; персонал может записать любого
       requireSelfOrStaff(context, studentId);

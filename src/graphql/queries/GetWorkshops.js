@@ -8,6 +8,7 @@ export const GET_WORKSHOPS = gql`
       description
       date
       teacher {
+        id
         name
         photoUrl
       }
@@ -20,6 +21,7 @@ export const GET_WORKSHOPS = gql`
         name
       }
       maxStudents
+      maxAge
       isClosed
     }
   }

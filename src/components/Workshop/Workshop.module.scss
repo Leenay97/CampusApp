@@ -1,6 +1,7 @@
 @import '@app/globals.css';
 
 .workshop {
+    position: relative;
     background-color: white;
     padding: 15px;
     border-radius: 10px;
@@ -10,7 +11,15 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     color: var(--text-primary);
 
+  &__edit {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    opacity: 0.5;
+  }
+
   &--active {
+    position: relative;
     background-color: rgb(255, 255, 255);
     border: 5px solid rgb(128, 186, 92);
     padding: 15px;

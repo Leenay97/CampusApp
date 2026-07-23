@@ -34,6 +34,16 @@ export const workshopTypeDefs = gql`
       type: String!
       date: String!
     ): Workshop
+    updateWorkshop(
+      id: ID!
+      name: String
+      description: String
+      placeId: ID
+      teacherId: ID
+      maxStudents: Int
+      maxAge: Int
+      date: String
+    ): Workshop
     joinWorkshop(studentId: ID!, workshopId: ID!, isSport: Boolean): Workshop
     closeWorkshop(studentIds: [ID!]!, workshopId: ID!): Workshop
   }

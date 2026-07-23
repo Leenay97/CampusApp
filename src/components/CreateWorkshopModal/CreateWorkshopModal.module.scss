@@ -7,4 +7,21 @@
         font-size: 24px;
     }
 
+    &__add-place-toggle {
+        border: none;
+        background: none;
+        color: var(--primary-button-color);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 0 0;
+    }
+
+    &__add-place {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
 }

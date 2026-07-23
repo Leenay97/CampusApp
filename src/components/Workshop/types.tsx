@@ -16,6 +16,7 @@ export type Workshop = {
   isSport?: boolean;
   date?: Date;
   handleJoin?: () => void;
+  onEdit?: () => void;
 };
 
 export type WorkshopCounterProps = {

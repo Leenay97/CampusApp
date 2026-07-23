@@ -5,6 +5,7 @@ import { memo } from 'react';
 import WorkshopCounter from './WorkshopCounter/WorkshopCounter';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
+import EditButton from '@components/EditButton/EditButton';
 
 function Workshop({
   name,
@@ -22,15 +23,15 @@ function Workshop({
   noButtons,
   date,
   handleJoin,
+  onEdit,
 }: WorkshopType) {
   const studentCount = students?.length ?? 0;
   const isFull = studentCount >= (maxStudentAmount ?? 0);
 
-  console.log(date);
-
   if (isClosed) {
     return (
       <div className={styles['workshop--active']}>
+        {onEdit && <EditButton className={styles['workshop__edit']} onClick={onEdit} />}
         <div className={styles['workshop__name']}>{name}</div>
         <div className={styles['workshop__teacher']}>
           <div className={styles['teacher-photo']} />
@@ -44,6 +45,7 @@ function Workshop({
 
   return (
     <div className={joined ? styles['workshop--active'] : styles['workshop']}>
+      {onEdit && <EditButton className={styles['workshop__edit']} onClick={onEdit} />}
       <div className={styles['workshop__name']}>{name}</div>
       {place && <div className={styles['workshop__place']}>{place}</div>}
       {description && <div className={styles['workshop__description']}>{description}</div>}

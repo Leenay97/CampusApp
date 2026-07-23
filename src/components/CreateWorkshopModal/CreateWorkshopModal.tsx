@@ -8,7 +8,7 @@ import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
-import { Place, User } from '@/app/types';
+import { Place, User, Workshop as WorkshopType } from '@/app/types';
 import { CustomSelect } from '@components/CustomSelect/CustomSelect';
 import Subtitle from '../Subtitle/Subtitle';
 import Loader from '../Loader/Loaader';
@@ -30,6 +30,8 @@ type ModalProps = {
   onDateChange: (e: ChangeEvent<HTMLSelectElement, Element>) => void;
   onClose: () => void;
   onSubmit: () => void;
+  editMode?: boolean;
+  workshop?: WorkshopType;
 };
 
 function CreateWorkshopModal({
@@ -39,18 +41,34 @@ function CreateWorkshopModal({
   onDateChange,
   onClose,
   onSubmit,
+  editMode = false,
+  workshop,
 }: ModalProps) {
-  const [selectedTeacher, setSelectedTeacher] = useState<User>({} as User);
-  const [selectedPlace, setSelectedPlace] = useState<Place>({} as Place);
-  const [name, setName] = useState<string>('');
-  const [maxAge, setMaxAge] = useState<string>('');
-  const [capacity, setCapacity] = useState<string>('');
+  const [selectedTeacher, setSelectedTeacher] = useState<User>(
+    (workshop?.teacher as User) ?? ({} as User),
+  );
+  const [selectedPlace, setSelectedPlace] = useState<Place>(
+    (workshop?.place as Place) ?? ({} as Place),
+  );
+  const [name, setName] = useState<string>(workshop?.name ?? '');
+  const [maxAge, setMaxAge] = useState<string>(workshop?.maxAge ? String(workshop.maxAge) : '');
+  const [capacity, setCapacity] = useState<string>(
+    workshop?.maxStudents ? String(workshop.maxStudents) : '',
+  );
+  const [isAddingPlace, setIsAddingPlace] = useState(false);
+  const [newPlaceName, setNewPlaceName] = useState('');
 
   const { data: teachersData, loading: teachersLoading } = useQuery(queries.GET_TEACHERS);
 
-  const { data: placesData, loading: placesLoading } = useQuery(queries.GET_PLACES);
+  const {
+    data: placesData,
+    loading: placesLoading,
+    refetch: refetchPlaces,
+  } = useQuery(queries.GET_PLACES);
 
   const [createWorkshop] = useGlobalLoadingMutation(mutations.CREATE_WORKSHOP);
+  const [updateWorkshop] = useGlobalLoadingMutation(mutations.UPDATE_WORKSHOP);
+  const [createPlace] = useGlobalLoadingMutation(mutations.CREATE_PLACE);
 
   const loading = teachersLoading || placesLoading;
 
@@ -73,29 +91,60 @@ function CreateWorkshopModal({
     setName('');
     setCapacity('');
     setMaxAge('');
+    setIsAddingPlace(false);
+    setNewPlaceName('');
+  }
+
+  async function handleCreatePlace() {
+    if (!newPlaceName.trim()) return;
+    try {
+      const data = (await createPlace({ name: newPlaceName, isTeamPlace: false })) as {
+        createPlace: Place;
+      };
+      await refetchPlaces();
+      if (data?.createPlace) {
+        setSelectedPlace(data.createPlace);
+      }
+      setNewPlaceName('');
+      setIsAddingPlace(false);
+    } catch (error) {
+      console.error('Error creating place:', error);
+    }
   }
 
   async function handleSubmit() {
     try {
-      await createWorkshop({
-        name,
-        placeId: selectedPlace.id,
-        teacherId: selectedTeacher.id,
-        maxStudents: parseInt(capacity, 10),
-        maxAge: parseInt(maxAge),
-        type: sportTime ? 'SPORT' : 'WORKSHOP',
-        date: selectedDate,
-      });
+      if (editMode && workshop) {
+        await updateWorkshop({
+          id: workshop.id,
+          name,
+          placeId: selectedPlace.id,
+          teacherId: selectedTeacher.id,
+          maxStudents: parseInt(capacity, 10),
+          maxAge: parseInt(maxAge),
+          date: selectedDate,
+        });
+      } else {
+        await createWorkshop({
+          name,
+          placeId: selectedPlace.id,
+          teacherId: selectedTeacher.id,
+          maxStudents: parseInt(capacity, 10),
+          maxAge: parseInt(maxAge),
+          type: sportTime ? 'SPORT' : 'WORKSHOP',
+          date: selectedDate,
+        });
+      }
       onSubmit();
     } catch (error) {
-      console.error('Error creating workshop:', error);
+      console.error(editMode ? 'Error updating workshop:' : 'Error creating workshop:', error);
     }
   }
 
   return (
     <Modal onClose={onClose} className={styles['modal__content']}>
       <ModalHeader
-        title={`Добавить ${sportTime ? 'Sport Time' : 'мастеркласс'}`}
+        title={`${editMode ? 'Редактировать' : 'Добавить'} ${sportTime ? 'Sport Time' : 'мастеркласс'}`}
         onClose={onClose}
       />
       <ModalBody>
@@ -132,11 +181,45 @@ function CreateWorkshopModal({
             </div>
             <div>
               <Subtitle>Учитель</Subtitle>
-              <CustomSelect items={teachers} onChange={handleChangeTeacher} />
+              <CustomSelect
+                items={teachers}
+                initValue={selectedTeacher?.name}
+                onChange={handleChangeTeacher}
+              />
             </div>
             <div>
               <Subtitle>Место</Subtitle>
-              <CustomSelect items={places} onChange={handleChangePlace} />
+              <CustomSelect
+                items={places}
+                initValue={selectedPlace?.name}
+                onChange={handleChangePlace}
+              />
+              {isAddingPlace ? (
+                <div className={styles['modal__add-place']}>
+                  <InputField
+                    value={newPlaceName}
+                    onChange={setNewPlaceName}
+                    placeholder="Название места"
+                  />
+                  <PrimaryButton onClick={handleCreatePlace}>Добавить</PrimaryButton>
+                  <SecondaryButton
+                    onClick={() => {
+                      setIsAddingPlace(false);
+                      setNewPlaceName('');
+                    }}
+                  >
+                    Отмена
+                  </SecondaryButton>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className={styles['modal__add-place-toggle']}
+                  onClick={() => setIsAddingPlace(true)}
+                >
+                  + Добавить новое место
+                </button>
+              )}
             </div>
             <div>
               <Subtitle>Количество человек</Subtitle>
@@ -153,7 +236,7 @@ function CreateWorkshopModal({
       </ModalBody>
       <ModalFooter>
         <SecondaryButton onClick={handleClose}>Отмена</SecondaryButton>
-        <PrimaryButton onClick={handleSubmit}>Добавить</PrimaryButton>
+        <PrimaryButton onClick={handleSubmit}>{editMode ? 'Сохранить' : 'Добавить'}</PrimaryButton>
       </ModalFooter>
     </Modal>
   );

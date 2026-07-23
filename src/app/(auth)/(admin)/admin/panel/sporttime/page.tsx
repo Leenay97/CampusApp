@@ -14,6 +14,7 @@ import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 
 export default function SportTimePage(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingWorkshop, setEditingWorkshop] = useState<WorkshopType | null>(null);
   const [showClosed, setShowClosed] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
 
@@ -99,10 +100,19 @@ export default function SportTimePage(): JSX.Element {
 
   function handleCloseModal() {
     setIsModalOpen(false);
+    setEditingWorkshop(null);
+  }
+
+  function handleEditWorkshop(workshop: WorkshopType) {
+    if (workshop.date) {
+      setSelectedDate(formatLocalDate(new Date(Number(workshop.date))));
+    }
+    setEditingWorkshop(workshop);
   }
 
   function handleSubmit() {
     setIsModalOpen(false);
+    setEditingWorkshop(null);
     refetch();
   }
 
@@ -126,13 +136,15 @@ export default function SportTimePage(): JSX.Element {
           Добавить Sport Time
         </PrimaryButton>
 
-        {isModalOpen && (
+        {(isModalOpen || editingWorkshop) && (
           <CreateWorkshopModal
             onSubmit={handleSubmit}
             onClose={handleCloseModal}
             allDates={allDates}
             selectedDate={selectedDate}
             onDateChange={handleDateChange}
+            editMode={Boolean(editingWorkshop)}
+            workshop={editingWorkshop ?? undefined}
             sportTime
           />
         )}
@@ -148,6 +160,7 @@ export default function SportTimePage(): JSX.Element {
             avatar={workshop.teacher.photoUrl}
             isClosed={workshop.isClosed}
             toClose
+            onEdit={() => handleEditWorkshop(workshop)}
           />
         ))}
         <PrimaryButton onClick={() => setShowClosed((prev) => !prev)}>
@@ -165,6 +178,7 @@ export default function SportTimePage(): JSX.Element {
               teacher={workshop.teacher?.name}
               avatar={workshop.teacher?.photoUrl}
               maxAge={workshop.maxAge}
+              onEdit={() => handleEditWorkshop(workshop)}
               toClose
               isClosed={workshop.isClosed}
             />
