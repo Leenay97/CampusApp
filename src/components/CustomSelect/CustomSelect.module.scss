@@ -7,7 +7,7 @@
     position: relative;
     width: 240px;
     font-size: 14px;
-    
+
     &__input {
         display: flex;
         align-items: center;
@@ -27,27 +27,45 @@
 
     &__input--open {
         border-radius: 4px 4px 0 0;
+        border-color: var(--text-primary);
         border-bottom-color: transparent;
     }
 
+    &__input--open-up {
+        border-radius: 0 0 4px 4px;
+        border-color: var(--text-primary);
+        border-top-color: transparent;
+    }
+
     &__list {
-        display: flex;
-        flex-wrap: nowrap;
+        display: block;
         background-color: white;
-        flex-direction: column;
-        list-style: none;
-        gap: 5px;
-        max-height: 150px;
-        width: 100%;
-        overflow-y: scroll;
-        z-index: 10;
-        position: absolute;
-        top: 100%;
-        left: 0;
+        z-index: 2000;
+        position: fixed;
         box-sizing: border-box;
-        border: 1px solid #ccc;
+        overflow: hidden;
+        border: 1px solid var(--text-primary);
         border-top: none;
         border-radius: 0 0 4px 4px;
+    }
+
+    &__list--up {
+        border-top: 1px solid var(--text-primary);
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+    }
+
+    &__options {
+        list-style: none;
+        max-height: 235px;
+        overflow-y: scroll;
+        overscroll-behavior: contain;
+        box-sizing: border-box;
+        margin-bottom: 5px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 
     &__placeholder {
@@ -56,9 +74,14 @@
 
     &__option {
         padding: 10px 10px;
-        font-size: 14px;
+        font-size: 13px;
         cursor: pointer;
         position: relative;
+        margin-bottom: 5px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
 
         input {
             padding-right: 30px;
@@ -66,9 +89,7 @@
     }
 
     &__search {
-        position: sticky;
-        top: 0;
+        position: relative;
         background-color: white;
-        z-index: 1;
     }
 }
