@@ -59,7 +59,7 @@ export default function AdminEventsPage() {
     );
 
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer noPaddingTop>
       <Section>
         <Title>Maze Runner</Title>
 

@@ -23,12 +23,14 @@ function AddRubbers({ groups, onSave }: AddRubbersProps) {
     }
   }, [groups]);
 
-  function handleChange(groupId: string, amount: number) {
+  function handleChange(groupId: string, rawValue: string) {
+    const originalTeam = Array.isArray(groups) ? groups.find((g) => g.id === groupId) : undefined;
+    const originalRubbers = originalTeam?.rubbers ?? 0;
+    const delta = rawValue === '' ? 0 : Number(rawValue);
+
     setChangedGroups((prev) =>
       prev.map((group) =>
-        group.id === groupId
-          ? { ...group, rubbers: Math.max(0, (group.rubbers ?? 0) + amount) }
-          : group,
+        group.id === groupId ? { ...group, rubbers: Math.max(0, originalRubbers + delta) } : group,
       ),
     );
   }
@@ -52,12 +54,12 @@ function AddRubbers({ groups, onSave }: AddRubbersProps) {
         return (
           <div key={team.id} className={styles['team']}>
             <Team team={team} mode="rubbers" place={index + 1} changedPoints={changedRubbers} />
-            <button className={styles['add-btn']} onClick={() => handleChange(team.id, -1)}>
-              -1
-            </button>
-            <button className={styles['add-btn']} onClick={() => handleChange(team.id, 1)}>
-              +1
-            </button>
+            <input
+              type="number"
+              className={styles['points-input']}
+              value={changedRubbers || ''}
+              onChange={(e) => handleChange(team.id, e.target.value)}
+            />
           </div>
         );
       })}

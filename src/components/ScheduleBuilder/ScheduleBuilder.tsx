@@ -104,7 +104,7 @@ export default function ScheduleBuilder({ editMode }: { editMode?: boolean }) {
           <InputField
             value={name}
             onChange={setName}
-            style={{ fontSize: '24px', color: '#4a90be', fontWeight: 'bold' }}
+            style={{ fontSize: '20px', color: '#4a90be', fontWeight: 'bold' }}
           />
         ) : (
           <Title noMargin>{name}</Title>

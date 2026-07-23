@@ -120,7 +120,7 @@ export default function SportTimePage(): JSX.Element {
     );
 
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer noPaddingTop>
       <div className={style['workshops-wrapper']}>
         <PrimaryButton onClick={handleOpenModal} width="100%">
           Добавить Sport Time

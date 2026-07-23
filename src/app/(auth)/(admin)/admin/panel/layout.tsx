@@ -10,12 +10,14 @@ type AdminLayoutProps = {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <CenteredContainer>
-      <Section>
-        <Title noMargin>Admin panel</Title>
-        <PanelMenu />
-      </Section>
+    <>
+      <CenteredContainer>
+        <Section>
+          <Title noMargin>Admin panel</Title>
+          <PanelMenu />
+        </Section>
+      </CenteredContainer>
       {children}
-    </CenteredContainer>
+    </>
   );
 }

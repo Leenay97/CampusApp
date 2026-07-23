@@ -88,7 +88,7 @@ export default function HousesPage() {
     );
 
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer noPaddingTop>
       <Section>
         <Title>Houses</Title>
         <PrimaryButton onClick={() => setShowMap((prev) => !prev)}>

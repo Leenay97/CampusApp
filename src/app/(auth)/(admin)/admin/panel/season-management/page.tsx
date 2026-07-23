@@ -59,24 +59,26 @@ function SeasonManagementPage() {
   }
 
   return (
-    <Section>
-      <Title>Season Management</Title>
-      <PrimaryButton className={styles['add-season-btn']} onClick={handleOpenModal}>
-        Добавить сезон
-      </PrimaryButton>
-      {isCreateModalOpen && (
-        <AddSeasonModal
-          onClose={() => setIsCreateModalOpen(false)}
-          onSubmit={handleSeasonCreated}
+    <CenteredContainer wide noPaddingTop>
+      <Section>
+        <Title>Season Management</Title>
+        <PrimaryButton className={styles['add-season-btn']} onClick={handleOpenModal}>
+          Добавить сезон
+        </PrimaryButton>
+        {isCreateModalOpen && (
+          <AddSeasonModal
+            onClose={() => setIsCreateModalOpen(false)}
+            onSubmit={handleSeasonCreated}
+          />
+        )}
+        <SeasonsTable
+          onRefetchSeason={refetch}
+          onArchive={handleArchiveSeason}
+          onActivate={handleActivateSeason}
+          seasons={data?.seasons}
         />
-      )}
-      <SeasonsTable
-        onRefetchSeason={refetch}
-        onArchive={handleArchiveSeason}
-        onActivate={handleActivateSeason}
-        seasons={data?.seasons}
-      />
-    </Section>
+      </Section>
+    </CenteredContainer>
   );
 }
 export default SeasonManagementPage;

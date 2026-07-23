@@ -72,7 +72,7 @@ export default function TechnicalData() {
     );
 
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer noPaddingTop>
       <Section>
         <Title>Тех. данные</Title>
         <div>

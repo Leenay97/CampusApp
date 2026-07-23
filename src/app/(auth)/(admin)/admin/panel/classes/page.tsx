@@ -40,7 +40,7 @@ export default function ClassesPage() {
       </CenteredContainer>
     );
   return (
-    <CenteredContainer wide noPadding>
+    <CenteredContainer noPaddingTop>
       <Section>
         <Title>Языковые группы</Title>
         <PrimaryButton onClick={() => setModalState({ mode: 'create' })}>

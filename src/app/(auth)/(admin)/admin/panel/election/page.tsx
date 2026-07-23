@@ -92,7 +92,7 @@ export default function ElectionPage(): JSX.Element {
   if (error) return <div>Ошибка: {error.message}</div>;
 
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer noPaddingTop>
       <Section>
         <Checkbox
           checked={isElectionShown}

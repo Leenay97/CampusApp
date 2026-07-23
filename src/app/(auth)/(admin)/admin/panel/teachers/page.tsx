@@ -58,7 +58,7 @@ export default function TeachersPage() {
 
   return (
     <>
-      <CenteredContainer noPadding>
+      <CenteredContainer noPaddingTop>
         <Section>
           <List<User>
             title="Учителя"

@@ -3,7 +3,7 @@ import ScheduleBuilder from '@/components/ScheduleBuilder/ScheduleBuilder';
 
 export default function Schedule() {
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer noPaddingTop>
       <ScheduleBuilder editMode />
     </CenteredContainer>
   );

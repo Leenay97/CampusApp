@@ -44,7 +44,7 @@ function AdminRubbersPage() {
     );
 
   return (
-    <CenteredContainer noPadding>
+    <CenteredContainer noPaddingTop>
       <AddRubbers groups={data?.seasonGroups as Group[]} onSave={handleSaveGroups} />
     </CenteredContainer>
   );
