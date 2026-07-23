@@ -17,6 +17,7 @@ import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
 import ModalFooter from '../Modal/ModalFooter';
 import CoinHistoryModal from '../CoinHistoryModal/CoinHistoryModal';
+import styles from './EditStudentModal.module.scss';
 
 type ModalProps = {
   student: User;
@@ -125,13 +126,13 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
   return (
     <Modal onClose={onClose}>
       <ModalHeader title={`Изменить студента: ${student?.name}`} onClose={onClose} />
-      <ModalBody>
+      <ModalBody className={styles['modal-body']}>
         {loading && <Loader />}
         {!loading && (
           <>
             <div>
               <Subtitle>Имя</Subtitle>
-              <InputField value={name} onChange={handleChangeName} />
+              <InputField width="240px" value={name} onChange={handleChangeName} />
             </div>
             <div>
               <Subtitle>Группа</Subtitle>
@@ -167,11 +168,16 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
             </div>
             <div>
               <Subtitle>Coins</Subtitle>
-              <InputField value={coins} onChange={handleChangeCoins} />
+              <InputField width="240px" value={coins} onChange={handleChangeCoins} />
             </div>
             <div>
               <Subtitle>Дата рождения</Subtitle>
-              <InputField type="date" value={birthday} onChange={handleChangeBirthday} />
+              <InputField
+                width="240px"
+                type="date"
+                value={birthday}
+                onChange={handleChangeBirthday}
+              />
             </div>
           </>
         )}
