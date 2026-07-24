@@ -415,6 +415,38 @@ export const userResolvers = {
       return user;
     },
 
+    transferCoinsToGroup: async (_, { userId, groupId, amount }, context) => {
+      // Массовое начисление без списания у отправителя — доступно только персоналу
+      requireStaff(context);
+      const user = await User.findByPk(userId);
+      if (!user) throw new Error('Отправитель не найден');
+      if (amount <= 0) throw new Error('Некорректная сумма');
+
+      const students = await User.findAll({ where: { groupId, userLevel: 'STUDENT' } });
+      if (students.length === 0) throw new Error('В группе нет студентов');
+
+      for (const student of students) {
+        student.coins += amount;
+        await student.save();
+
+        await logCoinTransaction({
+          studentId: student.id,
+          amount,
+          counterpartyId: user.id,
+          reason: 'transfer',
+        });
+
+        context.sendPushNotification(
+          student.id,
+          'Тебе перевели coins',
+          `${user.name}: +${amount}`,
+          '/',
+        );
+      }
+
+      return students;
+    },
+
     addWorkshop: async (_, { id, workshopId }, context) => {
       requireSelfOrStaff(context, id);
       const user = await User.findByPk(id);

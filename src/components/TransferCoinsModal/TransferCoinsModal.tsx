@@ -11,6 +11,7 @@ import { GET_STUDENTS_BY_GROUP_ID } from '@/graphql/queries/GetStudentsByGroupId
 import { InputField } from '../InputField/InputField';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { TRANSFER_COINS } from '@/graphql/mutations/TransferCoins';
+import { TRANSFER_COINS_TO_GROUP } from '@/graphql/mutations/TransferCoinsToGroup';
 import { useUser } from '@/contexts/UserContext';
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import { GetUserResponse, GetUserVariables } from '@/graphql/types';
@@ -38,6 +39,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
   const [coins, setCoins] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [scanCompleted, setScanCompleted] = useState(false);
+  const [groupTransferMode, setGroupTransferMode] = useState(false);
   const isTransferringRef = useRef(false);
   const { data: groupsData, loading: groupsLoading } = useQuery(GET_ACTIVE_SEASON);
   const [getUser, { data: userData, loading: userLoading }] = useLazyQuery<
@@ -57,6 +59,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
 
   const [transferCoins, { loading: transferCoinsLoading }] =
     useGlobalLoadingMutation(TRANSFER_COINS);
+  const [transferCoinsToGroup, { loading: transferGroupLoading }] =
+    useGlobalLoadingMutation(TRANSFER_COINS_TO_GROUP);
 
   useEffect(() => {
     if (userData?.user && !scanCompleted) {
@@ -135,6 +139,37 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     }
   }
 
+  async function transferToGroup() {
+    if (!user?.group?.id || !coins) {
+      setError('Укажите сумму');
+      return;
+    }
+
+    if (isTransferringRef.current) return;
+    isTransferringRef.current = true;
+
+    try {
+      await transferCoinsToGroup({
+        userId: user.id,
+        groupId: user.group.id,
+        amount: Number(coins),
+      });
+      setCoins('');
+      setError('');
+      onClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      isTransferringRef.current = false;
+    }
+  }
+
+  function toggleGroupTransferMode() {
+    setGroupTransferMode((prev) => !prev);
+    setError('');
+    setCoins('');
+  }
+
   function handleError(error: unknown) {
     console.error('Ошибка сканера:', error);
     setError('Не удалось получить доступ к камере. Проверьте разрешения.');
@@ -182,9 +217,28 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       <ModalBody>
         {showLoader && <Loader />}
 
-        {!showLoader && (
+        {!showLoader && groupTransferMode && (
+          <>
+            <div>
+              <Subtitle>{user?.group?.name}</Subtitle>
+              <InputField
+                value={coins}
+                onChange={setCoins}
+                type="number"
+                placeholder="Введите сумму"
+              />
+            </div>
+
+            {error && <div className={styles['error']}>{error}</div>}
+          </>
+        )}
+
+        {!showLoader && !groupTransferMode && (
           <>
             <PrimaryButton onClick={toggleScanner}>Перевести по QR</PrimaryButton>
+            {user?.userLevel === 'TEACHER' && user?.group?.id && (
+              <PrimaryButton onClick={toggleGroupTransferMode}>Перевести моей группе</PrimaryButton>
+            )}
             <div>
               <Subtitle>Группа</Subtitle>
               <CustomSelect
@@ -225,10 +279,16 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       </ModalBody>
 
       <ModalFooter>
-        <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
+        <SecondaryButton onClick={groupTransferMode ? toggleGroupTransferMode : onClose}>
+          {groupTransferMode ? 'Назад' : 'Отмена'}
+        </SecondaryButton>
         <PrimaryButton
-          onClick={transfer}
-          disabled={!selectedStudent.id || !coins || transferCoinsLoading}
+          onClick={groupTransferMode ? transferToGroup : transfer}
+          disabled={
+            groupTransferMode
+              ? !coins || transferGroupLoading
+              : !selectedStudent.id || !coins || transferCoinsLoading
+          }
         >
           Перевести
         </PrimaryButton>

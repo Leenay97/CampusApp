@@ -20,6 +20,7 @@ import { JOIN_WORKSHOP } from './JoinWorkshop';
 import { CLOSE_WORKSHOP } from './CloseWorkshop';
 import { UPDATE_TECHNICAL_DATA } from './UpdateTechnicalData';
 import { TRANSFER_COINS } from './TransferCoins';
+import { TRANSFER_COINS_TO_GROUP } from './TransferCoinsToGroup';
 import { FINE_USER } from './FineUser';
 import { CREATE_HOUSE } from './CreateHouse';
 import { UPDATE_USER } from './UpdateUser';
@@ -77,6 +78,7 @@ export const mutations = {
   CLOSE_WORKSHOP,
   UPDATE_TECHNICAL_DATA,
   TRANSFER_COINS,
+  TRANSFER_COINS_TO_GROUP,
   FINE_USER,
   CREATE_HOUSE,
   UPDATE_USER,
