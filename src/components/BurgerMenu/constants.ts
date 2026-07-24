@@ -37,6 +37,7 @@ const AdminActivitiesSection: MenuSection = {
   options: [
     { name: 'Мастерклассы', link: '/workshops' },
     { name: 'Sport Time', link: '/sporttime' },
+    { name: 'iPod Battle', link: '/ipod' },
   ],
 };
 
