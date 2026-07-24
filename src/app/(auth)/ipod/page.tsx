@@ -22,6 +22,7 @@ import { CreateIpodPairModal } from '@/components/CreateIpodPairModal/CreateIpod
 import { InputField } from '@/components/InputField/InputField';
 import ChevronIcon from '@/components/Icons/ChevronIcon/ChevronIcon';
 import { IpodMatch, IpodPair, IpodRoundName, UserLevel } from '@/app/types';
+import { pairGroupNames } from '@/utils/ipodPair';
 import styles from './Ipod.module.scss';
 
 function todayDateString(): string {
@@ -305,6 +306,7 @@ export default function IpodPage() {
             <div className={styles['ipod__waiting-list']}>
               {waitingPairs.map((pair) => {
                 const isSelected = selectedWaitingPairIds.includes(pair.id);
+                const groupNames = pairGroupNames(pair.students);
                 return (
                   <div key={pair.id} className={styles['ipod__waiting-row']}>
                     {isAdmin ? (
@@ -318,9 +320,17 @@ export default function IpodPage() {
                         onClick={() => toggleWaitingPair(pair.id)}
                       >
                         {pair.name}
+                        {groupNames && (
+                          <span className={styles['ipod__pair-group']}>{groupNames}</span>
+                        )}
                       </button>
                     ) : (
-                      <span className={styles['ipod__waiting-pair']}>{pair.name}</span>
+                      <span className={styles['ipod__waiting-pair']}>
+                        {pair.name}
+                        {groupNames && (
+                          <span className={styles['ipod__pair-group']}>{groupNames}</span>
+                        )}
+                      </span>
                     )}
                     {isAdmin && (
                       <button
@@ -410,6 +420,7 @@ export default function IpodPage() {
                           const isWinner = match.winner?.id === pair.id;
                           const canPickWinner =
                             isAdmin && !isWinner && match.round === currentRound;
+                          const groupNames = pairGroupNames(pair.students);
                           return (
                             <div
                               key={pair.id}
@@ -432,6 +443,9 @@ export default function IpodPage() {
                               }
                             >
                               {pair.name}
+                              {groupNames && (
+                                <span className={styles['ipod__pair-group']}>{groupNames}</span>
+                              )}
                             </div>
                           );
                         })}

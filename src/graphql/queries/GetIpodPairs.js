@@ -10,6 +10,10 @@ export const GET_IPOD_PAIRS = gql`
         id
         name
         russianName
+        group {
+          id
+          name
+        }
       }
     }
   }

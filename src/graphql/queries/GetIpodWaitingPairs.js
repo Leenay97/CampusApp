@@ -6,6 +6,13 @@ export const GET_IPOD_WAITING_PAIRS = gql`
       id
       name
       creatorId
+      students {
+        id
+        group {
+          id
+          name
+        }
+      }
     }
   }
 `;

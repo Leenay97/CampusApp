@@ -1,4 +1,4 @@
-import { IpodPair, IpodMatch, IpodTournament, User } from '../../models/index.js';
+import { IpodPair, IpodMatch, IpodTournament, User, Group } from '../../models/index.js';
 import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
 
 async function getCurrentRound(seasonId) {
@@ -212,7 +212,10 @@ export const ipodResolvers = {
 
   IpodPair: {
     students: async (pair) => {
-      return await User.findAll({ where: { id: pair.studentIds } });
+      return await User.findAll({
+        where: { id: pair.studentIds },
+        include: [{ model: Group, as: 'group' }],
+      });
     },
   },
 

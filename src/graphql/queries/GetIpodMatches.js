@@ -13,6 +13,10 @@ export const GET_IPOD_MATCHES = gql`
           id
           name
           russianName
+          group {
+            id
+            name
+          }
         }
       }
       winner {
