@@ -10,6 +10,11 @@ export const GET_VOTES = gql`
         id
         name
         votesNumber
+        groupId
+        group {
+          id
+          name
+        }
       }
     }
   }
@@ -26,6 +31,11 @@ export const GET_VOTES_FOR_VOTING = gql`
         id
         name
         votesNumber
+        groupId
+        group {
+          id
+          name
+        }
       }
     }
   }

@@ -176,6 +176,8 @@ export type VoteOption = {
   id: string;
   name: string;
   votesNumber: number;
+  groupId?: string | null;
+  group?: Group | null;
 };
 
 export type LoadingType = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';

@@ -36,6 +36,7 @@ export default function ElectionPage(): JSX.Element {
       await castVote({ voteId, optionId, userId: user?.id });
     } catch (error) {
       console.error(error);
+      alert(error instanceof Error ? error.message : 'Не удалось проголосовать');
     }
   }
 
@@ -64,6 +65,7 @@ export default function ElectionPage(): JSX.Element {
         <Election
           key={vote.id}
           election={vote}
+          userGroupId={user?.group?.id}
           onVote={(optionId) => handleVote(vote.id, optionId)}
         />
       ))}

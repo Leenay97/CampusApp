@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, useRef, useEffect } from 'react';
+import { useQuery } from '@apollo/client';
 import { InputField } from '../InputField/InputField';
 import Modal from '../Modal/Modal';
 import ModalBody from '../Modal/ModalBody';
@@ -11,15 +12,21 @@ import ElectionOption from './ElectionOption';
 import styles from './AddElectionModal.module.scss';
 import ActionButton from '../ActionButton/ActionButton';
 import { useApp } from '@/contexts/AppContext';
+import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
+import { Vote } from '@/app/types';
 
 type AddElectionModalProps = {
   onClose: () => void;
-  onCreate: (variables?: Record<string, unknown> | undefined) => Promise<unknown>;
+  onSubmit: (variables?: Record<string, unknown> | undefined) => Promise<unknown>;
+  election?: Vote | null;
 };
 
 type OptionType = {
   id: string;
   name: string;
+  groupId?: string;
+  groupName?: string;
+  votesNumber?: number;
 };
 
 let idCounter = 0;
@@ -28,19 +35,43 @@ function generateId() {
   return String(++idCounter);
 }
 
-export default function AddElectionModal({ onClose, onCreate }: AddElectionModalProps) {
+export default function AddElectionModal({ onClose, onSubmit, election }: AddElectionModalProps) {
   const { app } = useApp();
-  const [title, setTitle] = useState('');
-  const [options, setOptions] = useState<OptionType[]>([{ id: generateId(), name: '' }]);
+  const isEditing = Boolean(election);
+  const [title, setTitle] = useState(election?.title ?? '');
+  const [options, setOptions] = useState<OptionType[]>(() =>
+    election?.options?.length
+      ? election.options.map((opt) => ({
+          id: opt.id,
+          name: opt.name,
+          groupId: opt.groupId ?? undefined,
+          groupName: opt.group?.name ?? undefined,
+          votesNumber: opt.votesNumber,
+        }))
+      : [{ id: generateId(), name: '' }],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const optionsContainerRef = useRef<HTMLDivElement>(null);
   const lastOptionRef = useRef<HTMLDivElement>(null);
+  const { data: seasonData } = useQuery(GET_ACTIVE_SEASON);
+  const groups = seasonData?.activeSeason?.groups || [];
 
   const handleChangeOption = useCallback((id: string, value: string) => {
     setOptions((prev) => {
       return prev.map((item) => {
         if (item.id === id) {
           return { ...item, name: value };
+        }
+        return item;
+      });
+    });
+  }, []);
+
+  const handleChangeOptionGroup = useCallback((id: string, group: { id: string; name: string }) => {
+    setOptions((prev) => {
+      return prev.map((item) => {
+        if (item.id === id) {
+          return { ...item, groupId: group.id, groupName: group.name };
         }
         return item;
       });
@@ -61,7 +92,7 @@ export default function AddElectionModal({ onClose, onCreate }: AddElectionModal
     });
   }, []);
 
-  const handleCreate = useCallback(async () => {
+  const handleSubmit = useCallback(async () => {
     if (!title.trim()) {
       alert('Введите название голосования');
       return;
@@ -73,30 +104,34 @@ export default function AddElectionModal({ onClose, onCreate }: AddElectionModal
       return;
     }
 
-    if (!app?.seasonId) {
+    if (!isEditing && !app?.seasonId) {
       alert('Season ID не найден');
       return;
     }
 
     setIsLoading(true);
 
-    try {
-      await onCreate({
-        title: title.trim(),
-        options: validOptions.map((opt) => ({ name: opt.name.trim() })),
-        seasonId: app.seasonId,
-      });
+    const payloadOptions = validOptions.map((opt) => ({
+      name: opt.name.trim(),
+      groupId: opt.groupId || null,
+      votesNumber: opt.votesNumber || 0,
+    }));
 
-      setTitle('');
-      setOptions([{ id: generateId(), name: '' }]);
+    try {
+      if (isEditing && election) {
+        await onSubmit({ id: election.id, title: title.trim(), options: payloadOptions });
+      } else {
+        await onSubmit({ title: title.trim(), options: payloadOptions, seasonId: app?.seasonId });
+      }
+
       onClose();
     } catch (error) {
-      console.error('Error creating vote:', error);
-      alert('Ошибка при создании голосования');
+      console.error('Error saving vote:', error);
+      alert(isEditing ? 'Ошибка при сохранении голосования' : 'Ошибка при создании голосования');
     } finally {
       setIsLoading(false);
     }
-  }, [title, options, app?.seasonId, onCreate, onClose]);
+  }, [title, options, isEditing, election, app?.seasonId, onSubmit, onClose]);
 
   // Автофокус на последнем поле
   useEffect(() => {
@@ -110,7 +145,10 @@ export default function AddElectionModal({ onClose, onCreate }: AddElectionModal
 
   return (
     <Modal onClose={onClose} className={styles['modal']}>
-      <ModalHeader onClose={onClose} title="Новое голосование" />
+      <ModalHeader
+        onClose={onClose}
+        title={isEditing ? 'Редактировать голосование' : 'Новое голосование'}
+      />
       <ModalBody>
         <InputField value={title} onChange={setTitle} placeholder="Название голосования" />
         <div className={styles['modal__options']} ref={optionsContainerRef}>
@@ -122,6 +160,9 @@ export default function AddElectionModal({ onClose, onCreate }: AddElectionModal
                 onChangeName={(value) => handleChangeOption(option.id, value)}
                 placeholder={`Опция ${index + 1}`}
                 onRemove={handleRemoveOption}
+                groups={groups}
+                groupName={option.groupName}
+                onChangeGroup={(group) => handleChangeOptionGroup(option.id, group)}
               />
             </div>
           ))}
@@ -132,10 +173,10 @@ export default function AddElectionModal({ onClose, onCreate }: AddElectionModal
       </ModalBody>
       <ModalFooter>
         <PrimaryButton
-          onClick={handleCreate}
+          onClick={handleSubmit}
           disabled={isLoading || !title.trim() || options.filter((o) => o.name.trim()).length < 2}
         >
-          {isLoading ? 'Создание...' : 'Добавить'}
+          {isLoading ? 'Сохранение...' : isEditing ? 'Сохранить' : 'Добавить'}
         </PrimaryButton>
       </ModalFooter>
     </Modal>

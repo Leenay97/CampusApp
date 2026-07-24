@@ -9,6 +9,7 @@ export const CREATE_VOTE = gql`
         id
         name
         votesNumber
+        groupId
       }
     }
   }

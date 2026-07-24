@@ -1,5 +1,5 @@
 .modal {
-    min-width: 280px;
+    min-width: 480px;
     width: max-content; 
 
     &__options {
@@ -8,7 +8,7 @@
         gap: 6px;
         max-height: 285px;
         overflow-y: scroll;
-        padding-right: 10px;
+        padding-right: 30px;
     }
 
     &__add {
@@ -20,6 +20,17 @@
 
 .option {
     display: flex;
+    flex-direction: column;
     gap: 6px;
-    align-items: center;
+
+    &__row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+
+        > :first-child {
+            flex: 1;
+            min-width: 0;
+        }
+    }
 }

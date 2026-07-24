@@ -12,4 +12,12 @@ export const VoteOption = sequelize.define('VoteOption', {
       key: 'id',
     },
   },
+  groupId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'Groups',
+      key: 'id',
+    },
+  },
 });

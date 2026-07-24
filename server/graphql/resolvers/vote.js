@@ -1,4 +1,4 @@
-import { Vote, VoteOption, User } from '../../models/index.js';
+import { Vote, VoteOption, User, Group } from '../../models/index.js';
 import { requireAuth, requireAdmin, requireSelfOrStaff } from '../auth.js';
 
 const OPTIONS_ORDER = [['createdAt', 'ASC']];
@@ -44,6 +44,7 @@ export const voteResolvers = {
             name: option.name,
             votesNumber: option.votesNumber || 0,
             voteId: vote.id,
+            groupId: option.groupId || null,
           }),
         ),
       );
@@ -72,6 +73,7 @@ export const voteResolvers = {
               name: option.name,
               votesNumber: option.votesNumber || 0,
               voteId: id,
+              groupId: option.groupId || null,
             }),
           ),
         );
@@ -134,6 +136,16 @@ export const voteResolvers = {
 
       const userVotes = user.votes || {};
       const previousOptionId = userVotes[voteId] || null;
+      const isUnvoting = previousOptionId === optionId;
+
+      let option = null;
+      if (!isUnvoting) {
+        option = await VoteOption.findOne({ where: { id: optionId, voteId } });
+        if (!option) throw new Error('Опция голосования не найдена');
+        if (option.groupId && user.groupId && option.groupId === user.groupId) {
+          throw new Error('Нельзя голосовать за свою группу');
+        }
+      }
 
       if (previousOptionId) {
         const previousOption = await VoteOption.findOne({
@@ -145,10 +157,7 @@ export const voteResolvers = {
       const updatedVotes = { ...userVotes };
       let votedOptionId = null;
 
-      if (previousOptionId !== optionId) {
-        const option = await VoteOption.findOne({ where: { id: optionId, voteId } });
-        if (!option) throw new Error('Опция голосования не найдена');
-
+      if (!isUnvoting) {
         await option.increment('votesNumber');
         updatedVotes[voteId] = optionId;
         votedOptionId = optionId;
@@ -177,6 +186,13 @@ export const voteResolvers = {
         where: { voteId: vote.id },
         order: OPTIONS_ORDER,
       });
+    },
+  },
+
+  VoteOption: {
+    group: async (option) => {
+      if (!option.groupId) return null;
+      return await Group.findByPk(option.groupId);
     },
   },
 };

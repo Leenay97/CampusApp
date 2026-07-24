@@ -71,6 +71,26 @@
     z-index: 1;
 }
 
+.item__group {
+    display: block;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.item__blockedFlash {
+    position: absolute;
+    inset: 0;
+    background: rgba(220, 53, 69, 0.55);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.item_blocked {
+    .item__blockedFlash {
+        animation: item-blocked-flash 1.4s ease;
+    }
+}
+
 .item__check {
     opacity: 0;
     font-weight: 700;
@@ -94,5 +114,17 @@
     }
     100% {
         transform: scale(1);
+    }
+}
+
+@keyframes item-blocked-flash {
+    0% {
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }

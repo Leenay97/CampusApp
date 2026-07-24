@@ -117,6 +117,8 @@ Post.belongsTo(User, {
 Vote.hasMany(VoteOption, { foreignKey: 'voteId', as: 'options' });
 VoteOption.belongsTo(Vote, { foreignKey: 'voteId', as: 'vote' });
 
+VoteOption.belongsTo(Group, { foreignKey: 'groupId', as: 'group' });
+
 Season.hasMany(Vote, { foreignKey: 'seasonId', as: 'votes' });
 Vote.belongsTo(Season, { foreignKey: 'seasonId', as: 'season' });
 

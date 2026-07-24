@@ -4,6 +4,7 @@ export const voteTypeDefs = gql`
   input VoteOptionInput {
     name: String!
     votesNumber: Int
+    groupId: ID
   }
 
   enum VoteStatus {
@@ -24,6 +25,8 @@ export const voteTypeDefs = gql`
     id: ID!
     name: String!
     votesNumber: Int!
+    groupId: ID
+    group: Group
   }
 
   extend type Query {

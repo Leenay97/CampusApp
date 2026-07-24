@@ -12,6 +12,7 @@ import Checkbox from '@/components/Checkbox/Checkbox';
 import { useApp } from '@/contexts/AppContext';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { CREATE_VOTE } from '@/graphql/mutations/CreateVote';
+import { UPDATE_VOTE } from '@/graphql/mutations/UpdateVote';
 import { SET_VOTE_STATUS } from '@/graphql/mutations/SetVoteStatus';
 import { DELETE_VOTE } from '@/graphql/mutations/DeleteVote';
 import Election from '@/components/Election/Election';
@@ -22,6 +23,7 @@ import { Vote } from '@/app/types';
 
 export default function ElectionPage(): JSX.Element {
   const [openModal, setIsOpenModal] = useState(false);
+  const [editingVote, setEditingVote] = useState<Vote | null>(null);
   const [finishingVote, setFinishingVote] = useState<Vote | null>(null);
   const { app } = useApp();
 
@@ -31,6 +33,12 @@ export default function ElectionPage(): JSX.Element {
   });
 
   const [createVote] = useGlobalLoadingMutation(CREATE_VOTE, {
+    onCompleted: () => {
+      refetch();
+    },
+  });
+
+  const [updateVote] = useGlobalLoadingMutation(UPDATE_VOTE, {
     onCompleted: () => {
       refetch();
     },
@@ -79,6 +87,7 @@ export default function ElectionPage(): JSX.Element {
 
   function handleCloseModal() {
     setIsOpenModal(false);
+    setEditingVote(null);
   }
 
   if (loading)
@@ -111,10 +120,17 @@ export default function ElectionPage(): JSX.Element {
           onStart={() => setVoteStatus({ id: vote.id, status: 'ACTIVE' })}
           onFinish={() => setFinishingVote(vote)}
           onDelete={() => handleDelete(vote)}
+          onEdit={() => setEditingVote(vote)}
         />
       ))}
 
-      {openModal && <AddElectionModal onClose={handleCloseModal} onCreate={createVote} />}
+      {(openModal || editingVote) && (
+        <AddElectionModal
+          onClose={handleCloseModal}
+          onSubmit={editingVote ? updateVote : createVote}
+          election={editingVote}
+        />
+      )}
 
       {finishingVote && (
         <ConfirmModal

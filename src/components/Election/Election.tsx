@@ -16,18 +16,22 @@ const STATUS_LABELS: Record<VoteStatus, string> = {
 type Props = {
   election: Vote;
   adminMode?: boolean;
+  userGroupId?: string | null;
   onVote?: (optionId: string) => void;
   onStart?: () => void;
   onFinish?: () => void;
   onDelete?: () => void;
+  onEdit?: () => void;
 };
 export default function Election({
   election,
   adminMode = false,
+  userGroupId = null,
   onVote,
   onStart,
   onFinish,
   onDelete,
+  onEdit,
 }: Props) {
   const isFinished = election.status === 'FINISHED';
   const showResults = adminMode || isFinished;
@@ -57,12 +61,16 @@ export default function Election({
               voted={item.id === election.votedOptionId}
               disabled={adminMode || election.status !== 'ACTIVE'}
               finished={isFinished}
+              isOwnGroup={!adminMode && Boolean(userGroupId) && item.groupId === userGroupId}
               onClick={onVote ? () => onVote(item.id) : undefined}
             />
           ))}
         </div>
         {adminMode && (
           <div className={styles['controls']}>
+            {election.status === 'DRAFT' && onEdit && (
+              <SecondaryButton onClick={onEdit}>Редактировать</SecondaryButton>
+            )}
             {election.status === 'DRAFT' && onStart && (
               <SecondaryButton onClick={onStart}>Запустить</SecondaryButton>
             )}
