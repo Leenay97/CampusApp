@@ -3,7 +3,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import styles from './TransferCoinsModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { ApolloError, useLazyQuery, useQuery } from '@apollo/client';
 import { CustomSelect } from '../CustomSelect/CustomSelect';
 import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 import Subtitle from '../Subtitle/Subtitle';
@@ -30,6 +30,19 @@ type GroupSelection = {
   id: string;
   name: string;
 };
+
+// Сетевой сбой (нет graphQLErrors) означает, что мы не знаем, дошёл ли запрос
+// до сервера — перевод мог реально пройти. Явную ошибку от резолвера (например,
+// "уже отправлено, подождите") показываем как есть — сервер точно её обработал.
+function getTransferErrorMessage(err: unknown): string {
+  if (err instanceof ApolloError && err.graphQLErrors.length === 0) {
+    return 'Перевод мог уже пройти — проверьте историю coins';
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return 'Не удалось перевести coins';
+}
 
 function TransferCoinsModal({ onClose }: ModalProps) {
   const [selectedGroup, setSelectedGroup] = useState({ id: '', name: '' });
@@ -134,6 +147,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       onClose();
     } catch (err) {
       console.error(err);
+      setError(getTransferErrorMessage(err));
     } finally {
       isTransferringRef.current = false;
     }
@@ -159,6 +173,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       onClose();
     } catch (err) {
       console.error(err);
+      setError(getTransferErrorMessage(err));
     } finally {
       isTransferringRef.current = false;
     }

@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
 import { isStaff, requireAuth, requireStaff, requireAdmin, requireSelfOrStaff } from '../auth.js';
-import { logCoinTransaction } from './coinTransaction.js';
+import { logCoinTransaction, isDuplicateTransfer } from './coinTransaction.js';
 
 export const userResolvers = {
   User: {
@@ -376,6 +376,15 @@ export const userResolvers = {
       if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
       if (amount <= 0) throw new Error('Некорректная сумма');
 
+      const isDuplicate = await isDuplicateTransfer({
+        studentIds: [reciever.id],
+        counterpartyId: user.id,
+        amount,
+      });
+      if (isDuplicate) {
+        throw new Error('Такой перевод уже был отправлен только что — подождите немного');
+      }
+
       const senderIsStudent = user.userLevel === 'STUDENT';
       if (senderIsStudent) {
         if (user.coins < amount) {
@@ -424,6 +433,15 @@ export const userResolvers = {
 
       const students = await User.findAll({ where: { groupId, userLevel: 'STUDENT' } });
       if (students.length === 0) throw new Error('В группе нет студентов');
+
+      const isDuplicate = await isDuplicateTransfer({
+        studentIds: students.map((student) => student.id),
+        counterpartyId: user.id,
+        amount,
+      });
+      if (isDuplicate) {
+        throw new Error('Такой перевод группе уже был отправлен только что — подождите немного');
+      }
 
       for (const student of students) {
         student.coins += amount;

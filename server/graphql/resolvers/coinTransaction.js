@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { CoinTransaction, User } from '../../models/index.js';
 import { requireSelfOrStaff } from '../auth.js';
 
@@ -10,6 +11,25 @@ export async function logCoinTransaction({
   reason = null,
 }) {
   return await CoinTransaction.create({ studentId, amount, counterpartyId, reason });
+}
+
+const DUPLICATE_TRANSFER_WINDOW_MS = 5000;
+
+// Защита от повторной отправки перевода: если тот же отправитель только что
+// перевёл ту же сумму тому же (или тем же) получателям, считаем это
+// повтором — например, клиент не увидел ответ из-за обрыва сети и
+// пользователь нажал "Перевести" ещё раз, хотя первый перевод уже прошёл.
+export async function isDuplicateTransfer({ studentIds, counterpartyId, amount }) {
+  const recent = await CoinTransaction.findOne({
+    where: {
+      studentId: studentIds,
+      counterpartyId,
+      amount,
+      reason: 'transfer',
+      createdAt: { [Op.gte]: new Date(Date.now() - DUPLICATE_TRANSFER_WINDOW_MS) },
+    },
+  });
+  return Boolean(recent);
 }
 
 export const coinTransactionResolvers = {
