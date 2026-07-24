@@ -1,5 +1,5 @@
 'use client';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import styles from './TransferCoinsModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
@@ -38,6 +38,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
   const [coins, setCoins] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [scanCompleted, setScanCompleted] = useState(false);
+  const isTransferringRef = useRef(false);
   const { data: groupsData, loading: groupsLoading } = useQuery(GET_ACTIVE_SEASON);
   const [getUser, { data: userData, loading: userLoading }] = useLazyQuery<
     GetUserResponse,
@@ -115,6 +116,9 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       return;
     }
 
+    if (isTransferringRef.current) return;
+    isTransferringRef.current = true;
+
     try {
       await transferCoins({
         userId: user?.id,
@@ -126,6 +130,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       onClose();
     } catch (err) {
       console.error(err);
+    } finally {
+      isTransferringRef.current = false;
     }
   }
 
