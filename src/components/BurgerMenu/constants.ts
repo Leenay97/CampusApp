@@ -41,6 +41,14 @@ const AdminActivitiesSection: MenuSection = {
   ],
 };
 
+const TeacherActivitiesSection: MenuSection = {
+  title: 'Активности',
+  options: [
+    { name: 'Мастерклассы', link: '/workshops' },
+    { name: 'iPod Battle', link: '/ipod' },
+  ],
+};
+
 const TeacherSection: MenuSection = {
   title: "Teachers' stuff",
   options: [
@@ -64,7 +72,7 @@ export const StudentHeaderMenuSections: MenuSection[] = [
 
 export const TeacherHeaderMenuSections: MenuSection[] = [
   NavigationSection,
-  StudentActivitiesSection,
+  TeacherActivitiesSection,
   TeacherSection,
 ];
 

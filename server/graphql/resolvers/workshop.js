@@ -83,7 +83,7 @@ export const workshopResolvers = {
     workshopsByTeacher: async (_, { userId }, context) => {
       requireAuth(context);
       return await Workshop.findAll({
-        where: { teacherId: userId },
+        where: { teacherId: userId, type: 'WORKSHOP' },
         include: [
           { model: User, as: 'teacher' },
           {
@@ -106,8 +106,9 @@ export const workshopResolvers = {
       if (!name) throw new Error('Нет названия');
       if (!teacherId) throw new Error('Не выбран учитель');
       if (!placeId) throw new Error('Не выбрано место');
-      if (!maxStudents) throw new Error('Не выбрано кол-во студентов');
       if (!type) throw new Error('Ошибка типа');
+      // Sport Time — без самозаписи, поэтому без ограничения по вместимости
+      if (type !== 'SPORT' && !maxStudents) throw new Error('Не выбрано кол-во студентов');
       if (!date) throw new Error('Нет даты');
 
       const activeSeason = await Season.findOne({ where: { isActive: true } });
@@ -117,7 +118,7 @@ export const workshopResolvers = {
         description: description || '',
         placeId,
         teacherId,
-        maxStudents,
+        maxStudents: type === 'SPORT' ? null : maxStudents,
         seasonId: activeSeason?.id,
         maxAge: maxAge || 0,
         type,
@@ -189,6 +190,10 @@ export const workshopResolvers = {
           throw new Error('MK не найден');
         }
 
+        if (workshop.type === 'SPORT') {
+          throw new Error('Запись на Sport Time закрыта');
+        }
+
         const existingEntry = await UserWorkshop.findOne({
           where: { userId: studentId, workshopId },
         });
@@ -243,11 +248,15 @@ export const workshopResolvers = {
       const workshop = await Workshop.findByPk(workshopId);
       if (!workshop) throw new Error('Workshop not found');
 
+      // Sport Time закрывается автоматически по расписанию, без начисления коинов
+      if (workshop.type === 'SPORT') {
+        throw new Error('Sport Time закрывается автоматически');
+      }
+
       const techData = await TechnicalData.findOne();
 
-      const isSport = workshop.type === 'SPORT';
-      const coinsValue = isSport ? techData.sportTimeValue : techData.workshopValue;
-      const coinsDateField = isSport ? 'sportCoinsDate' : 'workshopCoinsDate';
+      const coinsValue = techData.workshopValue;
+      const coinsDateField = 'workshopCoinsDate';
 
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
@@ -270,13 +279,13 @@ export const workshopResolvers = {
           return logCoinTransaction({
             studentId: student.id,
             amount: coinsValue,
-            reason: isSport ? 'sport' : 'workshop',
+            reason: 'workshop',
           });
         }),
       );
 
-      const notificationTitle = isSport ? '+10 к силе' : 'Отличная работа!';
-      const notificationUrl = isSport ? '/sporttime' : '/workshops';
+      const notificationTitle = 'Отличная работа!';
+      const notificationUrl = '/workshops';
 
       // Пуши уходят в фоне, ответ мутации их не ждёт
       Promise.allSettled(

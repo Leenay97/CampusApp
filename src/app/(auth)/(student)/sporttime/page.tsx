@@ -4,30 +4,16 @@ import Workshop from '@components/Workshop/Workshop';
 import style from './SportPage.module.scss';
 import { useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
-import { User, Workshop as WorkshopType } from '@/app/types';
-import { useUser } from '@/contexts/UserContext';
+import { Workshop as WorkshopType } from '@/app/types';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
-import { JOIN_WORKSHOP } from '@/graphql/mutations/JoinWorkshop';
 import Section from '@/components/Section/Section';
 import Loader from '@/components/Loader/Loaader';
-import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import EmptyState from '@/components/EmptyState/EmptyState';
 
 export default function SportPage(): JSX.Element {
-  const { data, loading, refetch } = useQuery(queries.GET_TODAY_WORKSHOPS, {
+  const { data, loading } = useQuery(queries.GET_TODAY_WORKSHOPS, {
     variables: { isSport: true },
   });
-  const [joinWorkshop] = useGlobalLoadingMutation(JOIN_WORKSHOP);
-  const { user } = useUser();
-
-  async function handleJoin(workshopId: string) {
-    try {
-      await joinWorkshop({ studentId: user?.id, workshopId: workshopId, isSport: true });
-      refetch();
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   if (loading)
     return (
@@ -38,12 +24,7 @@ export default function SportPage(): JSX.Element {
       </CenteredContainer>
     );
 
-  const workshopsToShow = (() => {
-    const joinedWorkshop = data?.todayWorkshops.find((workshop: WorkshopType) =>
-      workshop.students.some((student: User) => student.id === user?.id),
-    );
-    return joinedWorkshop ? [joinedWorkshop] : data?.todayWorkshops;
-  })();
+  const workshopsToShow = data?.todayWorkshops;
 
   if (!workshopsToShow?.length) {
     return (
@@ -60,20 +41,19 @@ export default function SportPage(): JSX.Element {
   return (
     <CenteredContainer>
       <div className={style['workshops-wrapper']}>
-        {(workshopsToShow || []).map((workshop: WorkshopType) => (
+        {workshopsToShow.map((workshop: WorkshopType) => (
           <Workshop
             key={workshop.id}
             name={workshop.name}
             description={workshop.description}
-            students={workshop.students ?? []}
-            maxStudentAmount={workshop.maxStudents}
+            students={[]}
+            maxStudentAmount={0}
             place={workshop.place.name}
             teacher={workshop.teacher.name}
             avatar={workshop.teacher.photoUrl}
             maxAge={workshop.maxAge}
-            handleJoin={() => handleJoin(workshop.id)}
-            joined={workshop.students.some((student) => student.id === user?.id)}
             isSport
+            noButtons
           />
         ))}
       </div>

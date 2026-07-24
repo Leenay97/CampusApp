@@ -15,7 +15,6 @@ import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 export default function SportTimePage(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWorkshop, setEditingWorkshop] = useState<WorkshopType | null>(null);
-  const [showClosed, setShowClosed] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
 
   const { data: seasonData, loading: seasonLoading } = useQuery(GET_ACTIVE_SEASON);
@@ -92,7 +91,6 @@ export default function SportTimePage(): JSX.Element {
   }, [allDates, selectedDate]);
 
   const activeWorkshops = [...(data?.workshops ?? [])].filter((w) => !w.isClosed);
-  const closedWorkshops = [...(data?.workshops ?? [])].filter((w) => w.isClosed);
 
   function handleOpenModal() {
     setIsModalOpen(true);
@@ -153,36 +151,19 @@ export default function SportTimePage(): JSX.Element {
             key={workshop.id}
             name={workshop.name}
             description={workshop.description}
-            students={workshop.students}
-            maxStudentAmount={workshop.maxStudents}
+            students={[]}
+            maxStudentAmount={0}
             place={workshop.place?.name}
             teacher={workshop.teacher.name}
             avatar={workshop.teacher.photoUrl}
             isClosed={workshop.isClosed}
+            isSport
             toClose
+            noButtons
+            date={workshop?.date}
             onEdit={() => handleEditWorkshop(workshop)}
           />
         ))}
-        <PrimaryButton onClick={() => setShowClosed((prev) => !prev)}>
-          {showClosed ? 'Скрыть закрытые' : 'Показать закрытые'}
-        </PrimaryButton>
-        {showClosed &&
-          closedWorkshops.map((workshop: WorkshopType) => (
-            <Workshop
-              key={workshop.id}
-              name={workshop.name}
-              description={workshop.description}
-              students={workshop.students ?? []}
-              maxStudentAmount={workshop.maxStudents}
-              place={workshop.place?.name}
-              teacher={workshop.teacher?.name}
-              avatar={workshop.teacher?.photoUrl}
-              maxAge={workshop.maxAge}
-              onEdit={() => handleEditWorkshop(workshop)}
-              toClose
-              isClosed={workshop.isClosed}
-            />
-          ))}
       </div>
     </CenteredContainer>
   );

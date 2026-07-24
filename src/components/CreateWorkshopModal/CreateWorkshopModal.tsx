@@ -120,7 +120,7 @@ function CreateWorkshopModal({
           name,
           placeId: selectedPlace.id,
           teacherId: selectedTeacher.id,
-          maxStudents: parseInt(capacity, 10),
+          ...(sportTime ? {} : { maxStudents: parseInt(capacity, 10) }),
           maxAge: parseInt(maxAge),
           date: selectedDate,
         });
@@ -129,7 +129,7 @@ function CreateWorkshopModal({
           name,
           placeId: selectedPlace.id,
           teacherId: selectedTeacher.id,
-          maxStudents: parseInt(capacity, 10),
+          ...(sportTime ? {} : { maxStudents: parseInt(capacity, 10) }),
           maxAge: parseInt(maxAge),
           type: sportTime ? 'SPORT' : 'WORKSHOP',
           date: selectedDate,
@@ -221,10 +221,12 @@ function CreateWorkshopModal({
                 </button>
               )}
             </div>
-            <div>
-              <Subtitle>Количество человек</Subtitle>
-              <InputField value={capacity} onChange={setCapacity} />
-            </div>
+            {!sportTime && (
+              <div>
+                <Subtitle>Количество человек</Subtitle>
+                <InputField value={capacity} onChange={setCapacity} />
+              </div>
+            )}
             <div>
               <Subtitle>Минимальный возраст</Subtitle>
               <div className={styles['modal__age']}>

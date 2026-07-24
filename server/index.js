@@ -19,6 +19,7 @@ import { resolvers } from './graphql/resolvers/index.js';
 import { pubsub } from './graphql/pubsub.js';
 import { getAuthFromHeader, isStaff } from './graphql/auth.js';
 import { scheduleLivesReset } from './jobs/resetLives.js';
+import { scheduleSportTimeClose } from './jobs/closeSportTime.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -316,6 +317,7 @@ const startServer = async () => {
     console.log('✅ Tables synced');
 
     scheduleLivesReset();
+    scheduleSportTimeClose();
   } catch (error) {
     console.error('❌ Database error:', error);
   }
