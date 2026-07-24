@@ -3,11 +3,14 @@ import styles from './WorkshopCounter.module.scss';
 import { memo } from 'react';
 
 function WorkShopCounter({ number, maxNumber }: WorkshopCounterProps) {
-  const percentage = (number / maxNumber) * 100;
+  let percentage = (number / maxNumber) * 100;
+  if (number >= maxNumber) {
+    percentage = 100;
+  }
   return (
     <div className={styles['workshop-counter']}>
       <div className={styles['workshop-counter__text']}>
-        {number}/{maxNumber}
+        {number >= maxNumber ? maxNumber : number}/{maxNumber}
       </div>
       <div className={styles['workshop-counter__scale']} style={{ width: `${percentage}%` }}></div>
     </div>

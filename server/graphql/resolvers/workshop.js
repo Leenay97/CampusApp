@@ -201,6 +201,10 @@ export const workshopResolvers = {
         if (existingEntry) {
           await existingEntry.destroy();
         } else {
+          if (workshop.students.length >= workshop.maxStudents) {
+            throw new Error('Мест нет');
+          }
+
           // получаем все воркшопы того же типа
           const workshopsOfSameType = await Workshop.findAll({
             where: { type: workshop.type },
