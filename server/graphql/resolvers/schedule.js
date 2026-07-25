@@ -18,14 +18,16 @@ export const scheduleResolvers = {
       }
       existingSchedule.dayName = dayName;
       existingSchedule.schedule = schedule;
-      existingSchedule.save();
+      await existingSchedule.save();
       return existingSchedule;
     },
 
     deleteSchedule: async (_, __, context) => {
       requireAdmin(context);
       const schedule = await Schedule.findOne();
-      schedule.destroy();
+      if (!schedule) return null;
+      await schedule.destroy();
+      return schedule;
     },
   },
 };

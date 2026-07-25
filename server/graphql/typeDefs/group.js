@@ -15,7 +15,6 @@ export const groupTypeDefs = gql`
     groups: [Group]
     seasonGroups(seasonId: ID!): [Group]
     group(id: ID!): Group
-    groupByUserId(userId: ID!): Group
   }
 
   extend type Mutation {

@@ -24,6 +24,7 @@ function describeTransaction(transaction: CoinTransaction): string {
   const counterpartyName = transaction.counterparty?.name || '—';
   switch (transaction.reason) {
     case 'transfer':
+    case 'group_transfer':
       return transaction.amount > 0 ? `От: ${counterpartyName}` : `Кому: ${counterpartyName}`;
     case 'admin':
       return `Изменено: ${counterpartyName}`;

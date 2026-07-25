@@ -4,13 +4,16 @@ import { requireSelfOrStaff } from '../auth.js';
 
 // Общий хелпер: пишет одну запись в историю coins студента.
 // Вызывается рядом с каждым местом, где меняется User.coins.
-export async function logCoinTransaction({
-  studentId,
-  amount,
-  counterpartyId = null,
-  reason = null,
-}) {
-  return await CoinTransaction.create({ studentId, amount, counterpartyId, reason });
+// transaction передаём, когда запись должна коммититься/откатываться вместе
+// с самим изменением баланса (см. transferCoins).
+export async function logCoinTransaction(
+  { studentId, amount, counterpartyId = null, reason = null },
+  transaction,
+) {
+  return await CoinTransaction.create(
+    { studentId, amount, counterpartyId, reason },
+    { transaction },
+  );
 }
 
 const DUPLICATE_TRANSFER_WINDOW_MS = 5000;
@@ -19,15 +22,23 @@ const DUPLICATE_TRANSFER_WINDOW_MS = 5000;
 // перевёл ту же сумму тому же (или тем же) получателям, считаем это
 // повтором — например, клиент не увидел ответ из-за обрыва сети и
 // пользователь нажал "Перевести" ещё раз, хотя первый перевод уже прошёл.
-export async function isDuplicateTransfer({ studentIds, counterpartyId, amount }) {
+// transaction обязателен: проверку нужно делать после блокировки строк
+// отправителя, иначе два параллельных запроса оба увидят пустую историю.
+// reason разделяет личные и групповые переводы: с общим reason перевод группе
+// считался повтором личного перевода любому её участнику на ту же сумму.
+export async function isDuplicateTransfer(
+  { studentIds, counterpartyId, amount, reason = 'transfer' },
+  transaction,
+) {
   const recent = await CoinTransaction.findOne({
     where: {
       studentId: studentIds,
       counterpartyId,
       amount,
-      reason: 'transfer',
+      reason,
       createdAt: { [Op.gte]: new Date(Date.now() - DUPLICATE_TRANSFER_WINDOW_MS) },
     },
+    transaction,
   });
   return Boolean(recent);
 }

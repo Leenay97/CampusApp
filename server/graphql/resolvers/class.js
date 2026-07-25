@@ -1,4 +1,13 @@
-import { Class, Group, Lesson, Place, Season, TechnicalData, User } from '../../models/index.js';
+import {
+  Class,
+  Group,
+  Lesson,
+  Place,
+  Season,
+  TechnicalData,
+  User,
+  sequelize,
+} from '../../models/index.js';
 import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
 import { logCoinTransaction } from './coinTransaction.js';
 
@@ -152,53 +161,77 @@ export const classResolvers = {
 
     closeLesson: async (_, { classId, teacherId, studentIds }, context) => {
       requireStaff(context);
-      const existingClass = await Class.findByPk(classId);
-      if (!existingClass) throw new Error('Класс не найден');
-
-      const teacher = await User.findByPk(teacherId);
-      if (!teacher) throw new Error('Учитель не найден');
-
       const date = todayDate();
-      const alreadyClosed = await Lesson.findOne({ where: { classId, date } });
-      if (alreadyClosed) throw new Error('Урок сегодня уже проведён');
 
-      const students =
-        studentIds.length > 0 ? await User.findAll({ where: { id: studentIds } }) : [];
+      // Начисление и создание урока одной транзакцией: без блокировки строк
+      // студентов начисление читает баланс до параллельного перевода и затирает
+      // его, а проверка «урок уже проведён» без блокировки класса пропускает
+      // два одновременных закрытия и начисляет коины дважды.
+      const { awardedStudentIds, coinsValue } = await sequelize.transaction(async (t) => {
+        // Порядок блокировки везде одинаковый: сначала строки User, потом
+        // ресурс (класс / мастер-класс / группа). Иначе возможен дедлок.
+        const students =
+          studentIds.length > 0
+            ? await User.findAll({
+                where: { id: studentIds },
+                order: [['id', 'ASC']],
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+              })
+            : [];
 
-      const techData = await TechnicalData.findOne();
-      const coinsValue = techData?.lessonValue ?? 0;
+        const existingClass = await Class.findByPk(classId, {
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
+        if (!existingClass) throw new Error('Класс не найден');
 
-      const awardedStudentIds = [];
+        const teacher = await User.findByPk(teacherId, { transaction: t });
+        if (!teacher) throw new Error('Учитель не найден');
 
-      await Promise.all(
-        students.map(async (student) => {
-          if (!coinsValue || student.lessonCoinsDate === date) return null;
+        const alreadyClosed = await Lesson.findOne({ where: { classId, date }, transaction: t });
+        if (alreadyClosed) throw new Error('Урок сегодня уже проведён');
+
+        const techData = await TechnicalData.findOne({ transaction: t });
+        const coinsValue = techData?.lessonValue ?? 0;
+
+        const awardedStudentIds = [];
+
+        // Последовательно, а не Promise.all: у транзакции одно соединение,
+        // параллельные запросы по нему выполнять нельзя.
+        for (const student of students) {
+          if (!coinsValue || student.lessonCoinsDate === date) continue;
 
           student.coins += coinsValue;
           student.lessonCoinsDate = date;
-          await student.save();
+          await student.save({ transaction: t });
           awardedStudentIds.push(student.id);
-          return logCoinTransaction({
-            studentId: student.id,
-            amount: coinsValue,
-            reason: 'lesson',
-          });
-        }),
-      );
+          await logCoinTransaction(
+            { studentId: student.id, amount: coinsValue, reason: 'lesson' },
+            t,
+          );
+        }
 
+        await Lesson.create(
+          {
+            classId,
+            teacherId,
+            seasonId: existingClass.seasonId,
+            date,
+            students: students.map((student) => ({ id: student.id, name: student.name })),
+          },
+          { transaction: t },
+        );
+
+        return { awardedStudentIds, coinsValue };
+      });
+
+      // Пуши уходят после коммита и в фоне, ответ мутации их не ждёт
       Promise.allSettled(
         awardedStudentIds.map((studentId) =>
           context.sendPushNotification(studentId, 'Ты молодец!', `+${coinsValue} coins`, '/'),
         ),
       );
-
-      await Lesson.create({
-        classId,
-        teacherId,
-        seasonId: existingClass.seasonId,
-        date,
-        students: students.map((student) => ({ id: student.id, name: student.name })),
-      });
 
       return await Class.findByPk(classId, { include: classInclude });
     },

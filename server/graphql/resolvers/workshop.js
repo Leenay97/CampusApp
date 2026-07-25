@@ -194,6 +194,12 @@ export const workshopResolvers = {
           throw new Error('Запись на Sport Time закрыта');
         }
 
+        // Список на фронте уже отфильтрован по isClosed, но мутацию можно
+        // вызвать напрямую с id закрытого или вчерашнего мастер-класса.
+        if (workshop.isClosed) {
+          throw new Error('Мастеркласс уже закрыт');
+        }
+
         const existingEntry = await UserWorkshop.findOne({
           where: { userId: studentId, workshopId },
         });
@@ -249,49 +255,71 @@ export const workshopResolvers = {
 
     closeWorkshop: async (_, { studentIds, workshopId }, context) => {
       requireStaff(context);
-      const workshop = await Workshop.findByPk(workshopId);
-      if (!workshop) throw new Error('Workshop not found');
-
-      // Sport Time закрывается автоматически по расписанию, без начисления коинов
-      if (workshop.type === 'SPORT') {
-        throw new Error('Sport Time закрывается автоматически');
-      }
-
-      const techData = await TechnicalData.findOne();
-
-      const coinsValue = techData.workshopValue;
-      const coinsDateField = 'workshopCoinsDate';
 
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
         now.getDate(),
       ).padStart(2, '0')}`;
 
-      const students = await User.findAll({ where: { id: studentIds } });
+      // Начисление и закрытие одной транзакцией: без блокировки строк студентов
+      // начисление читает баланс до параллельного перевода и затирает его,
+      // а упавшая запись истории оставляет монеты без следа в CoinTransaction.
+      const { workshop, awardedStudentIds, coinsValue } = await sequelize.transaction(async (t) => {
+        // Порядок блокировки везде одинаковый: сначала строки User (по id),
+        // потом ресурс. Иначе возможен дедлок со встречными мутациями.
+        const students = studentIds?.length
+          ? await User.findAll({
+              where: { id: studentIds },
+              order: [['id', 'ASC']],
+              transaction: t,
+              lock: t.LOCK.UPDATE,
+            })
+          : [];
 
-      const awardedStudentIds = [];
+        const workshop = await Workshop.findByPk(workshopId, {
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
+        if (!workshop) throw new Error('Workshop not found');
 
-      await Promise.all(
-        students.map(async (student) => {
+        // Sport Time закрывается автоматически по расписанию, без начисления коинов
+        if (workshop.type === 'SPORT') {
+          throw new Error('Sport Time закрывается автоматически');
+        }
+
+        const techData = await TechnicalData.findOne({ transaction: t });
+
+        const coinsValue = techData.workshopValue;
+        const coinsDateField = 'workshopCoinsDate';
+
+        const awardedStudentIds = [];
+
+        // Последовательно, а не Promise.all: у транзакции одно соединение,
+        // параллельные запросы по нему выполнять нельзя.
+        for (const student of students) {
           // Коины за каждый тип активности начисляются не чаще раза в день
-          if (student[coinsDateField] === today) return null;
+          if (student[coinsDateField] === today) continue;
 
           student.coins += coinsValue;
           student[coinsDateField] = today;
-          await student.save();
+          await student.save({ transaction: t });
           awardedStudentIds.push(student.id);
-          return logCoinTransaction({
-            studentId: student.id,
-            amount: coinsValue,
-            reason: 'workshop',
-          });
-        }),
-      );
+          await logCoinTransaction(
+            { studentId: student.id, amount: coinsValue, reason: 'workshop' },
+            t,
+          );
+        }
+
+        workshop.isClosed = true;
+        await workshop.save({ transaction: t });
+
+        return { workshop, awardedStudentIds, coinsValue };
+      });
 
       const notificationTitle = 'Отличная работа!';
       const notificationUrl = '/workshops';
 
-      // Пуши уходят в фоне, ответ мутации их не ждёт
+      // Пуши уходят после коммита и в фоне, ответ мутации их не ждёт
       Promise.allSettled(
         awardedStudentIds.map((studentId) =>
           context.sendPushNotification(
@@ -303,8 +331,6 @@ export const workshopResolvers = {
         ),
       );
 
-      workshop.isClosed = true;
-      await workshop.save();
       return workshop;
     },
   },

@@ -8,6 +8,7 @@ import {
   Class,
   Place,
   LifeFineHistory,
+  sequelize,
 } from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
@@ -26,13 +27,16 @@ function todayDate() {
 
 const DUPLICATE_FINE_WINDOW_MS = 5000;
 
-async function isDuplicateFine(studentId, date) {
+// transaction обязателен: проверку нужно делать после блокировки строки
+// студента, иначе два параллельных штрафа оба увидят пустую историю.
+async function isDuplicateFine(studentId, date, transaction) {
   const recent = await LifeFineHistory.findOne({
     where: {
       studentId,
       date,
       updatedAt: { [Op.gte]: new Date(Date.now() - DUPLICATE_FINE_WINDOW_MS) },
     },
+    transaction,
   });
   return Boolean(recent);
 }
@@ -404,7 +408,9 @@ export const userResolvers = {
       }
 
       const students = await User.findAll({ where: { groupId, userLevel: 'STUDENT' } });
-      const unregistered = students.filter((student) => !student.name && !student.password);
+      // hashedPassword, а не password: поля password в модели нет, поэтому
+      // прежняя проверка на него была всегда истинной и ничего не защищала
+      const unregistered = students.filter((student) => !student.name && !student.hashedPassword);
       await User.destroy({ where: { id: unregistered.map((student) => student.id) } });
 
       return unregistered;
@@ -413,112 +419,150 @@ export const userResolvers = {
     transferCoins: async (_, { userId, recieverId, amount }, context) => {
       // Переводить можно только от собственного имени
       requireSelfOrStaff(context, userId);
-      const user = await User.findByPk(userId);
-      const reciever = await User.findByPk(recieverId);
-      if (!user) throw new Error('Отправитель не найден');
-      if (!reciever) throw new Error('Получатель не найден');
-      if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
-      if (amount <= 0) throw new Error('Некорректная сумма');
 
-      const isDuplicate = await isDuplicateTransfer({
-        studentIds: [reciever.id],
-        counterpartyId: user.id,
-        amount,
-      });
-      if (isDuplicate) {
-        throw new Error('Такой перевод уже был отправлен только что — подождите немного');
-      }
+      // Транзакция + блокировка строк: без этого два параллельных перевода от
+      // одного отправителя могут оба пройти проверку баланса по одному и тому же
+      // прочитанному значению coins и увести баланс в минус (потерянное обновление).
+      const { sender, reciever } = await sequelize.transaction(async (t) => {
+        const rows = await User.findAll({
+          where: { id: [userId, recieverId] },
+          order: [['id', 'ASC']],
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
+        const byId = new Map(rows.map((row) => [String(row.id), row]));
+        const user = byId.get(String(userId));
+        const reciever = byId.get(String(recieverId));
 
-      const senderIsStudent = user.userLevel === 'STUDENT';
-      if (senderIsStudent) {
-        if (user.coins < amount) {
-          throw new Error('Недостаточно Coins');
-        } else {
+        if (!user) throw new Error('Отправитель не найден');
+        if (!reciever) throw new Error('Получатель не найден');
+        if (user.id === reciever.id) throw new Error('Нельзя переводить себе');
+        if (amount <= 0) throw new Error('Некорректная сумма');
+
+        // Только после блокировки: до неё оба параллельных запроса видят
+        // пустую историю и оба проводят перевод, списывая сумму дважды.
+        const isDuplicate = await isDuplicateTransfer(
+          { studentIds: [recieverId], counterpartyId: userId, amount },
+          t,
+        );
+        if (isDuplicate) {
+          throw new Error('Такой перевод уже был отправлен только что — подождите немного');
+        }
+
+        const senderIsStudent = user.userLevel === 'STUDENT';
+        if (senderIsStudent) {
+          if (user.coins < amount) {
+            throw new Error('Недостаточно Coins');
+          }
           user.coins -= amount;
         }
-      }
 
-      reciever.coins += amount;
-      await user.save();
-      await reciever.save();
+        reciever.coins += amount;
+        await user.save({ transaction: t });
+        await reciever.save({ transaction: t });
 
-      if (senderIsStudent) {
-        await logCoinTransaction({
-          studentId: user.id,
-          amount: -amount,
-          counterpartyId: reciever.id,
-          reason: 'transfer',
-        });
-      }
-      await logCoinTransaction({
-        studentId: reciever.id,
-        amount,
-        counterpartyId: user.id,
-        reason: 'transfer',
+        if (senderIsStudent) {
+          await logCoinTransaction(
+            {
+              studentId: user.id,
+              amount: -amount,
+              counterpartyId: reciever.id,
+              reason: 'transfer',
+            },
+            t,
+          );
+        }
+        await logCoinTransaction(
+          { studentId: reciever.id, amount, counterpartyId: user.id, reason: 'transfer' },
+          t,
+        );
+
+        return { sender: user, reciever };
       });
 
       // Пуш уходит в фоне, ответ мутации его не ждёт
       context.sendPushNotification(
         reciever.id,
         '🪙 Тебе перевели coins',
-        `${user.name}: +${amount}`,
+        `${sender.name}: +${amount}`,
         '/',
       );
 
-      return user;
+      return sender;
     },
 
-    transferCoinsToGroup: async (_, { userId, groupId, amount }, context) => {
-      // Массовое начисление без списания у отправителя — доступно только персоналу
-      requireStaff(context);
-      const user = await User.findByPk(userId);
-      if (!user) throw new Error('Отправитель не найден');
+    transferCoinsToGroup: async (_, { groupId, amount }, context) => {
+      // Массовое начисление без списания у отправителя — доступно только персоналу.
+      // Отправителя берём из токена, а не из аргумента: иначе сотрудник может
+      // подписать начисление чужим именем — и в истории, и в пуше.
+      const { id: userId } = requireStaff(context);
       if (amount <= 0) throw new Error('Некорректная сумма');
 
-      const students = await User.findAll({ where: { groupId, userLevel: 'STUDENT' } });
-      if (students.length === 0) throw new Error('В группе нет студентов');
+      // Одна транзакция на всё начисление: иначе ошибка на середине списка
+      // оставит часть группы с монетами, а часть без, и откатить это нечем.
+      const { sender, students } = await sequelize.transaction(async (t) => {
+        const groupStudents = await User.findAll({
+          where: { groupId, userLevel: 'STUDENT' },
+          attributes: ['id'],
+          transaction: t,
+        });
+        if (groupStudents.length === 0) throw new Error('В группе нет студентов');
 
-      const isDuplicate = await isDuplicateTransfer({
-        studentIds: students.map((student) => student.id),
-        counterpartyId: user.id,
-        amount,
-      });
-      if (isDuplicate) {
-        throw new Error('Такой перевод группе уже был отправлен только что — подождите немного');
-      }
+        const studentIds = groupStudents.map((student) => student.id);
 
-      for (const student of students) {
-        student.coins += amount;
-        await student.save();
-
-        await logCoinTransaction({
-          studentId: student.id,
-          amount,
-          counterpartyId: user.id,
-          reason: 'transfer',
+        // Блокируем отправителя и студентов одним запросом в порядке id — тем же,
+        // что и в transferCoins. Общий порядок блокировки исключает взаимоблокировку
+        // встречных переводов, а сама блокировка нужна до проверки повтора ниже:
+        // без неё два параллельных запроса оба увидят пустую историю.
+        const rows = await User.findAll({
+          where: { id: [userId, ...studentIds] },
+          order: [['id', 'ASC']],
+          transaction: t,
+          lock: t.LOCK.UPDATE,
         });
 
+        const user = rows.find((row) => String(row.id) === String(userId));
+        if (!user) throw new Error('Отправитель не найден');
+
+        const isDuplicate = await isDuplicateTransfer(
+          { studentIds, counterpartyId: user.id, amount, reason: 'group_transfer' },
+          t,
+        );
+        if (isDuplicate) {
+          throw new Error('Такой перевод группе уже был отправлен только что — подождите немного');
+        }
+
+        // increment — атомарный UPDATE на уровне БД, а не read-modify-write,
+        // так что параллельные начисления этим же студентам не теряют друг друга
+        await User.increment('coins', { by: amount, where: { id: studentIds }, transaction: t });
+
+        for (const studentId of studentIds) {
+          await logCoinTransaction(
+            { studentId, amount, counterpartyId: user.id, reason: 'group_transfer' },
+            t,
+          );
+        }
+
+        // Перечитываем после increment, иначе в ответ уйдут доинкрементные coins
+        const updatedStudents = await User.findAll({
+          where: { id: studentIds },
+          transaction: t,
+        });
+
+        return { sender: user, students: updatedStudents };
+      });
+
+      // Пуши уходят после коммита и в фоне, ответ мутации их не ждёт
+      for (const student of students) {
         context.sendPushNotification(
           student.id,
           'Тебе перевели coins',
-          `${user.name}: +${amount}`,
+          `${sender.name}: +${amount}`,
           '/',
         );
       }
 
       return students;
-    },
-
-    addWorkshop: async (_, { id, workshopId }, context) => {
-      requireSelfOrStaff(context, id);
-      const user = await User.findByPk(id);
-      if (!user) throw new Error('User not found');
-
-      const workshop = await Workshop.findByPk(workshopId);
-      if (!workshop) throw new Error('Workshop not found');
-
-      await user.addWorkshop(workshop);
-      return user;
     },
 
     generatePasswordResetLink: async (_, { userId }, context) => {
@@ -579,36 +623,43 @@ export const userResolvers = {
 
     fineUser: async (_, { id }, context) => {
       requireStaff(context);
-      const user = await User.findByPk(id);
-      if (!user) throw new Error('Студент не найден');
-
       const date = todayDate();
-      if (await isDuplicateFine(id, date)) {
-        throw new Error('Этого студента только что уже штрафовали — подождите немного');
-      }
 
-      const group = await Group.findOne({ where: { id: user.groupId } });
+      // Блокировка строки студента: без неё два одновременных штрафа могут оба
+      // прочитать одно и то же значение lives и списать только одну жизнь на двоих.
+      const user = await sequelize.transaction(async (t) => {
+        const user = await User.findByPk(id, { transaction: t, lock: t.LOCK.UPDATE });
+        if (!user) throw new Error('Студент не найден');
 
-      if (!user.lives || user.lives === 0) {
-        throw new Error('У студента не осталось жизней');
-      }
-      user.lives -= 1;
+        if (await isDuplicateFine(id, date, t)) {
+          throw new Error('Этого студента только что уже штрафовали — подождите немного');
+        }
 
-      if (group) {
-        group.rubbers += 1;
-        await group.save();
-      }
+        if (!user.lives || user.lives === 0) {
+          throw new Error('У студента не осталось жизней');
+        }
+        user.lives -= 1;
+        await user.save({ transaction: t });
 
-      await user.save();
+        if (user.groupId) {
+          await Group.increment('rubbers', { by: 1, where: { id: user.groupId }, transaction: t });
+        }
 
-      const [historyEntry, created] = await LifeFineHistory.findOrCreate({
-        where: { studentId: id, date },
-        defaults: { count: 1 },
+        // История пишется здесь же: если оставить её после коммита, второй
+        // запрос успеет взять блокировку раньше записи, не увидит штрафа
+        // и спишет вторую жизнь.
+        const [historyEntry, created] = await LifeFineHistory.findOrCreate({
+          where: { studentId: id, date },
+          defaults: { count: 1 },
+          transaction: t,
+        });
+        if (!created) {
+          historyEntry.count += 1;
+          await historyEntry.save({ transaction: t });
+        }
+
+        return user;
       });
-      if (!created) {
-        historyEntry.count += 1;
-        await historyEntry.save();
-      }
 
       return user;
     },

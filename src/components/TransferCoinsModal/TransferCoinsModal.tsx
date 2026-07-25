@@ -164,7 +164,6 @@ function TransferCoinsModal({ onClose }: ModalProps) {
 
     try {
       await transferCoinsToGroup({
-        userId: user.id,
         groupId: user.group.id,
         amount: Number(coins),
       });

@@ -1,4 +1,4 @@
-import { User, Workshop, Group } from '../../models/index.js';
+import { User, Group } from '../../models/index.js';
 import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
 
 export const groupResolvers = {
@@ -18,25 +18,6 @@ export const groupResolvers = {
     group: async (_, { id }, context) => {
       requireAuth(context);
       return await Group.findByPk(id, {
-        include: [{ model: User, as: 'users' }],
-      });
-    },
-
-    groupByUserId: async (_, { userId }, context) => {
-      requireAuth(context);
-      return await Group.findOne({
-        where: { userId },
-        include: [
-          { model: Group, as: 'group' },
-          { model: Workshop, as: 'workshops' },
-        ],
-      });
-    },
-
-    groupByUserId: async (_, { userId }, context) => {
-      requireAuth(context);
-      return await Group.findOne({
-        where: { userId },
         include: [{ model: User, as: 'users' }],
       });
     },
@@ -136,6 +117,8 @@ export const groupResolvers = {
       }
 
       if (teacherIds && Array.isArray(teacherIds)) {
+        // User.groupId здесь не трогаем: группы редактируются только у ещё не
+        // запущенного сезона, а учителям groupId проставляет activateSeason.
         group.teacherIds = teacherIds;
       }
 
@@ -148,6 +131,12 @@ export const groupResolvers = {
       requireAdmin(context);
       const group = await Group.findByPk(id);
       if (!group) throw new Error('Группа не найдена');
+
+      // Иначе студенты/учителя этой группы тихо остаются без groupId
+      const membersCount = await User.count({ where: { groupId: id } });
+      if (membersCount > 0) {
+        throw new Error('Нельзя удалить группу: в ней ещё есть студенты или учителя');
+      }
 
       await group.destroy();
       return group;

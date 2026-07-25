@@ -85,8 +85,7 @@ export const userTypeDefs = gql`
     uploadAvatar(file: Upload!, userId: ID!): User!
     deleteAvatar(userId: ID!): User!
     transferCoins(userId: ID!, recieverId: ID!, amount: Int!): User
-    transferCoinsToGroup(userId: ID!, groupId: ID!, amount: Int!): [User]
-    addWorkshop(id: ID!, workshopId: ID!): User
+    transferCoinsToGroup(groupId: ID!, amount: Int!): [User]
     fineUser(id: ID!): User
     generatePasswordResetLink(userId: ID!): String!
     resetPassword(token: String!, password: String!, confirmPassword: String!): Boolean!
