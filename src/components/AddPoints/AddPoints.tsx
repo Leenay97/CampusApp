@@ -40,9 +40,11 @@ function AddPoints({ groups, onSave }: AddPointsProps) {
   }
   return (
     <Section>
-      <Title>Добавить очки</Title>
-      <div className={styles['save-btn']}>
-        <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
+      <div className={styles['header']}>
+        <Title noMargin>Добавить очки</Title>
+        <div className={styles['save-btn']}>
+          <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
+        </div>
       </div>
 
       {changedGroups.map((team, index) => {

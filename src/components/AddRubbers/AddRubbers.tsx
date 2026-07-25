@@ -40,9 +40,11 @@ function AddRubbers({ groups, onSave }: AddRubbersProps) {
   }
   return (
     <Section>
-      <Title>Добавить резиночки</Title>
-      <div className={styles['save-btn']}>
-        <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
+      <div className={styles['header']}>
+        <Title noMargin>Добавить резиночки</Title>
+        <div className={styles['save-btn']}>
+          <SecondaryButton onClick={handleSave}>Сохранить</SecondaryButton>
+        </div>
       </div>
 
       {changedGroups.map((team, index) => {

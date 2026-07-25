@@ -26,7 +26,10 @@ export const AdminPanelGroups: MenuGroup[] = [
   },
   {
     title: 'Ивенты',
-    options: [{ name: 'Maze Runner', link: '/admin/panel/events' }],
+    options: [
+      { name: 'Maze Runner', link: '/admin/panel/events' },
+      { name: 'Голосования', link: '/admin/panel/election' },
+    ],
   },
   {
     title: 'Прочее',
@@ -35,7 +38,6 @@ export const AdminPanelGroups: MenuGroup[] = [
       { name: 'История домиков', link: '/admin/panel/house-history' },
       { name: 'История резиночек', link: '/admin/panel/life-fines' },
       { name: 'Тех. данные', link: '/admin/panel/technical-data' },
-      { name: 'Голосования', link: '/admin/panel/election' },
       { name: 'Пуш-уведомления', link: '/teacher/push' },
     ],
   },
@@ -47,13 +49,6 @@ export const AdminPanelGroups: MenuGroup[] = [
       { name: 'Архив сезонов', link: '/admin/panel/season-archive' },
       { name: 'Языковые группы', link: '/admin/panel/classes' },
       { name: 'Места', link: '/admin/panel/places' },
-      { name: 'Cтуденты', link: '/admin/panel/students' },
-    ],
-  },
-  {
-    title: 'Общее',
-    options: [
-      { name: 'Учителя', link: '/admin/panel/teachers' },
       { name: 'Cтуденты', link: '/admin/panel/students' },
     ],
   },

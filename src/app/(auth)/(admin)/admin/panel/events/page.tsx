@@ -66,7 +66,7 @@ export default function AdminEventsPage() {
         <div>
           <Subtitle>Код (4-8 цифр)</Subtitle>
           <InputField
-            width="200px"
+            width="240px"
             maxLength={8}
             value={code}
             error={code.length > 0 && !isCodeValid ? 'Только цифры, от 4 до 8 символов' : undefined}
@@ -91,7 +91,7 @@ export default function AdminEventsPage() {
 
         <div>
           <Subtitle>Кодовое слово (показывается группе после разгадки)</Subtitle>
-          <InputField width="280px" value={codeword} onChange={setCodeword} />
+          <InputField width="240px" value={codeword} onChange={setCodeword} />
         </div>
 
         <Checkbox
