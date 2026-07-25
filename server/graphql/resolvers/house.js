@@ -1,5 +1,12 @@
-import { Group, House, User } from '../../models/index.js';
+import { Group, House, HouseGradeHistory, User } from '../../models/index.js';
 import { requireAuth, requireAdmin } from '../auth.js';
+
+function todayDate() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+    now.getDate(),
+  ).padStart(2, '0')}`;
+}
 
 export const houseResolvers = {
   Query: {
@@ -34,6 +41,13 @@ export const houseResolvers = {
         ],
       });
     },
+    houseGradeHistory: async (_, __, context) => {
+      requireAdmin(context);
+      return await HouseGradeHistory.findAll({
+        include: [{ model: House, as: 'house' }],
+        order: [['date', 'DESC']],
+      });
+    },
   },
   Mutation: {
     createHouse: async (_, { number }, context) => {
@@ -57,6 +71,18 @@ export const houseResolvers = {
       }
 
       await existingHouse.save();
+
+      if (grade !== undefined && grade !== null) {
+        const date = todayDate();
+        const [historyEntry] = await HouseGradeHistory.findOrCreate({
+          where: { houseId: id, date },
+          defaults: { grade },
+        });
+        if (historyEntry.grade !== grade) {
+          historyEntry.grade = grade;
+          await historyEntry.save();
+        }
+      }
 
       return existingHouse;
     },

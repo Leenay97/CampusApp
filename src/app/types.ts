@@ -86,6 +86,15 @@ export type Season = {
 export type House = {
   number: string;
   id: string;
+  grade?: number;
+  users?: Pick<User, 'id' | 'name' | 'group'>[];
+};
+
+export type HouseGradeHistoryEntry = {
+  id: string;
+  date: string;
+  grade: number;
+  house: House;
 };
 
 export type User = {

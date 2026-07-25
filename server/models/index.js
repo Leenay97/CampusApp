@@ -10,6 +10,7 @@ import { IpodPair } from './IpodPair.js';
 import { IpodMatch } from './IpodMatch.js';
 import { IpodTournament } from './IpodTournament.js';
 import { House } from './House.js';
+import { HouseGradeHistory } from './HouseGradeHistory.js';
 import { Post } from './Post.js';
 import { Class } from './Class.js';
 import { Lesson } from './Lesson.js';
@@ -68,6 +69,9 @@ Workshop.belongsToMany(User, {
 
 House.hasMany(User, { foreignKey: 'houseId', as: 'users' });
 User.belongsTo(House, { foreignKey: 'houseId', as: 'house' });
+
+House.hasMany(HouseGradeHistory, { foreignKey: 'houseId', as: 'gradeHistory' });
+HouseGradeHistory.belongsTo(House, { foreignKey: 'houseId', as: 'house' });
 
 User.belongsToMany(Class, {
   through: 'TeacherClasses',
@@ -151,6 +155,7 @@ export {
   Schedule,
   TechnicalData,
   House,
+  HouseGradeHistory,
   Post,
   Class,
   Lesson,

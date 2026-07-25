@@ -8,9 +8,17 @@ export const houseTypeDefs = gql`
     grade: Int
   }
 
+  type HouseGradeHistoryEntry {
+    id: ID!
+    date: String
+    grade: Int
+    house: House
+  }
+
   extend type Query {
     houses: [House]
     house(id: ID!): House
+    houseGradeHistory: [HouseGradeHistoryEntry]
   }
 
   extend type Mutation {
