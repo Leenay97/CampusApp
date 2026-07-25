@@ -69,9 +69,7 @@ function Workshop({
       {!noButtons && (
         <>
           {joined ? (
-            <SecondaryButton disabled={isFull && !toClose} onClick={handleJoin}>
-              Отменить
-            </SecondaryButton>
+            <SecondaryButton onClick={handleJoin}>Отменить</SecondaryButton>
           ) : (
             <PrimaryButton disabled={isFull && !toClose} onClick={handleJoin}>
               {toClose ? 'Закрыть' : 'Записаться'}
