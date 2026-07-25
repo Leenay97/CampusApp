@@ -18,6 +18,11 @@ export const GET_USER = gql`
       class {
         id
         name
+        place {
+          id
+          name
+          color
+        }
       }
       englishLevel
     }

@@ -4,6 +4,9 @@ import styles from './ScheduleBuilderRow.module.scss';
 import { InputField } from '@/components/InputField/InputField';
 import ActionButton from '@/components/ActionButton/ActionButton';
 import { EMOJI_CHOICES, getActivityIcon } from '../constants';
+import { useUser } from '@/contexts/UserContext';
+
+const CHAT_ROOM_PATTERN = /chat\s*room/i;
 
 export type ScheduleRowState = 'past' | 'now' | 'future';
 
@@ -26,8 +29,13 @@ export default function ScheduleBuilderRow({
 }: Props) {
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
+  const { user } = useUser();
 
   const icon = schedule.icon || getActivityIcon(schedule.activity);
+  const isChatRoom = CHAT_ROOM_PATTERN.test(schedule.activity ?? '');
+  const placeName = user?.class?.place?.name;
+
+  console.log(user);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -110,7 +118,12 @@ export default function ScheduleBuilderRow({
       </div>
       <div className={styles['schedule-row__card']}>
         <div className={styles['schedule-row__emoji']}>{icon}</div>
-        <div className={styles['schedule-row__activity']}>{schedule.activity}</div>
+        <div className={styles['schedule-row__text']}>
+          <div className={styles['schedule-row__activity']}>{schedule.activity}</div>
+          {isChatRoom && placeName && (
+            <div className={styles['schedule-row__place']}>Место: {placeName}</div>
+          )}
+        </div>
       </div>
     </div>
   );

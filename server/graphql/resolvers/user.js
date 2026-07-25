@@ -1,4 +1,4 @@
-import { User, Workshop, Group, Season, House, Class } from '../../models/index.js';
+import { User, Workshop, Group, Season, House, Class, Place } from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -54,7 +54,7 @@ export const userResolvers = {
         include: [
           { model: Group, as: 'group' },
           { model: Workshop, as: 'attendingWorkshops' },
-          { model: Class, as: 'class' },
+          { model: Class, as: 'class', include: [{ model: Place, as: 'place' }] },
         ],
       });
     },

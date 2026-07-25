@@ -74,10 +74,23 @@
         font-size: 17px;
     }
 
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
     &__activity {
         color: var(--color-dark-blue);
         font-size: 15px;
         font-weight: 700;
+        line-height: 1.3;
+    }
+
+    &__place {
+        color: #4a90be;
+        font-size: 12px;
+        font-weight: 600;
         line-height: 1.3;
     }
 
