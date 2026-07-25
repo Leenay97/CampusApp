@@ -17,6 +17,10 @@ import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
 import ModalFooter from '../Modal/ModalFooter';
 import CoinHistoryModal from '../CoinHistoryModal/CoinHistoryModal';
+import ConfirmEditStudentModal, {
+  FieldDiff,
+} from '../ConfirmEditStudentModal/ConfirmEditStudentModal';
+import { formatDateForDisplay } from '@/utils/age';
 import styles from './EditStudentModal.module.scss';
 
 type ModalProps = {
@@ -37,6 +41,7 @@ type SelectOption = {
 
 function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
   const [showHistory, setShowHistory] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [name, setName] = useState<string>('');
   const [coins, setCoins] = useState<string>(student.coins ? String(student.coins) : '0');
   const [englishLevel, setEnglishLevel] = useState<EnglishLevelOption>({
@@ -114,6 +119,24 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
       console.error(err);
     }
   }
+  const diffFields: FieldDiff[] = [
+    { label: 'Имя', oldValue: student?.name ?? '', newValue: name ?? '' },
+    { label: 'Группа', oldValue: student?.group?.name ?? '', newValue: group.name ?? '' },
+    { label: 'Класс', oldValue: student?.class?.name ?? '', newValue: englishClass.name ?? '' },
+    { label: 'Домик', oldValue: student?.house?.number ?? '', newValue: house.name ?? '' },
+    {
+      label: 'Уровень английского',
+      oldValue: student?.englishLevel ?? '',
+      newValue: englishLevel.name ?? '',
+    },
+    { label: 'Coins', oldValue: String(student?.coins ?? 0), newValue: String(Number(coins) || 0) },
+    {
+      label: 'Дата рождения',
+      oldValue: formatDateForDisplay(student?.birthday),
+      newValue: formatDateForDisplay(birthday),
+    },
+  ];
+
   const englishLevelOptions: EnglishLevelOption[] = [
     { id: 'A1', name: 'A1' },
     { id: 'A2', name: 'A2' },
@@ -185,10 +208,18 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
       <ModalFooter>
         <SecondaryButton onClick={() => setShowHistory(true)}>История coins</SecondaryButton>
         <SecondaryButton onClick={onClose}>Отмена</SecondaryButton>
-        <PrimaryButton onClick={handleUpdate}>Принять</PrimaryButton>
+        <PrimaryButton onClick={() => setShowConfirm(true)}>Принять</PrimaryButton>
       </ModalFooter>
       {showHistory && (
         <CoinHistoryModal studentId={student.id} onClose={() => setShowHistory(false)} />
+      )}
+      {showConfirm && (
+        <ConfirmEditStudentModal
+          studentName={student?.name}
+          fields={diffFields}
+          onConfirm={handleUpdate}
+          onBack={() => setShowConfirm(false)}
+        />
       )}
     </Modal>
   );

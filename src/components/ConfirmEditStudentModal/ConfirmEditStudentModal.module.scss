@@ -1,0 +1,43 @@
+.modal-body {
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.label {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.value--changed {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+  background-color: var(--accent-yellow);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.old-value {
+  opacity: 0.6;
+  text-decoration: line-through;
+  font-weight: 400;
+  margin-right: 4px;
+}
+
+.arrow {
+  margin-right: 4px;
+}

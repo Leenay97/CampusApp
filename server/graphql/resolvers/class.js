@@ -1,11 +1,11 @@
-import { Class, Lesson, Place, Season, TechnicalData, User } from '../../models/index.js';
+import { Class, Group, Lesson, Place, Season, TechnicalData, User } from '../../models/index.js';
 import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
 import { logCoinTransaction } from './coinTransaction.js';
 
 const classInclude = [
   { model: Place, as: 'place' },
   { model: User, as: 'teachers' },
-  { model: User, as: 'students' },
+  { model: User, as: 'students', include: [{ model: Group, as: 'group' }] },
 ];
 
 function todayDate() {
