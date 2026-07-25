@@ -1,9 +1,9 @@
 'use client';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import styles from './FineStudentModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { ApolloError, useLazyQuery, useQuery } from '@apollo/client';
 import { CustomSelect } from '../CustomSelect/CustomSelect';
 import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
 import Subtitle from '../Subtitle/Subtitle';
@@ -28,6 +28,16 @@ type GroupSelection = {
   name: string;
 };
 
+function getFineErrorMessage(err: unknown): string {
+  if (err instanceof ApolloError && err.graphQLErrors.length === 0) {
+    return 'Штраф мог уже пройти — проверьте жизни студента';
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return 'Ошибка при штрафе';
+}
+
 function FineStudentModal({ onClose }: FineStudentModalProps) {
   const [selectedGroup, setSelectedGroup] = useState({ id: '', name: '' });
   const [selectedStudent, setSelectedStudent] = useState({ id: '', name: '' });
@@ -35,6 +45,7 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
   const [error, setError] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [scanCompleted, setScanCompleted] = useState(false);
+  const isFiningRef = useRef(false);
   const { data: groupsData, loading: groupsLoading } = useQuery(GET_ACTIVE_SEASON);
   const [getUser, { data: userData, loading: userLoading }] = useLazyQuery<
     GetUserResponse,
@@ -108,13 +119,18 @@ function FineStudentModal({ onClose }: FineStudentModalProps) {
       return;
     }
 
+    if (isFiningRef.current) return;
+    isFiningRef.current = true;
+
     try {
       await fineUser({ id: selectedStudent.id });
       setError('');
       onClose();
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : 'Ошибка при штрафе');
+      setError(getFineErrorMessage(err));
+    } finally {
+      isFiningRef.current = false;
     }
   }
 

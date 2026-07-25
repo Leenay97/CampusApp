@@ -4,6 +4,7 @@ import styles from './LifeFineHistoryTable.module.scss';
 export type GroupFineRow = {
   group: { id: string; name: string };
   total: number;
+  allTimeTotal: number;
   students: string[];
 };
 
@@ -86,16 +87,20 @@ export default function LifeFineHistoryTable({ rows }: LifeFineHistoryTableProps
           >
             Студенты
           </div>
+          <div className={`${styles['history__cell']} ${styles['history__cell--header']}`}>
+            Всего
+          </div>
 
-          {sortedRows.map(({ group, total, students }) => (
+          {sortedRows.map(({ group, total, allTimeTotal, students }) => (
             <div key={group.id} className={styles['history__row']}>
               <div className={`${styles['history__cell']} ${styles['history__student']}`}>
                 {group.name}
               </div>
-              <div className={styles['history__cell']}>{total || '—'}</div>
+              <div className={styles['history__cell']}>{total}</div>
               <div className={`${styles['history__cell']} ${styles['history__student']}`}>
                 {students.length > 0 ? students.join(', ') : '—'}
               </div>
+              <div className={styles['history__cell']}>{allTimeTotal}</div>
             </div>
           ))}
         </div>

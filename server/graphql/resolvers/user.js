@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import {
   User,
   Workshop,
@@ -21,6 +22,19 @@ function todayDate() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
     now.getDate(),
   ).padStart(2, '0')}`;
+}
+
+const DUPLICATE_FINE_WINDOW_MS = 5000;
+
+async function isDuplicateFine(studentId, date) {
+  const recent = await LifeFineHistory.findOne({
+    where: {
+      studentId,
+      date,
+      updatedAt: { [Op.gte]: new Date(Date.now() - DUPLICATE_FINE_WINDOW_MS) },
+    },
+  });
+  return Boolean(recent);
 }
 
 export const userResolvers = {
@@ -561,6 +575,12 @@ export const userResolvers = {
       requireStaff(context);
       const user = await User.findByPk(id);
       if (!user) throw new Error('Студент не найден');
+
+      const date = todayDate();
+      if (await isDuplicateFine(id, date)) {
+        throw new Error('Этого студента только что уже штрафовали — подождите немного');
+      }
+
       const group = await Group.findOne({ where: { id: user.groupId } });
 
       if (!user.lives || user.lives === 0) {
@@ -575,7 +595,6 @@ export const userResolvers = {
 
       await user.save();
 
-      const date = todayDate();
       const [historyEntry, created] = await LifeFineHistory.findOrCreate({
         where: { studentId: id, date },
         defaults: { count: 1 },
