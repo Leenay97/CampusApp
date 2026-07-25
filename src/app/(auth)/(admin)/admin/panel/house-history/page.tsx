@@ -84,7 +84,7 @@ export default function HouseHistoryPage() {
   return (
     <CenteredContainer noPaddingTop>
       <Section>
-        <Title>История домиков</Title>
+        <Title noMargin>История домиков</Title>
         <div className={styles['date-select']}>
           <Subtitle noMargin>Дата</Subtitle>
           <InputField

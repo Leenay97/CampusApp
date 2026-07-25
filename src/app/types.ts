@@ -87,7 +87,7 @@ export type House = {
   number: string;
   id: string;
   grade?: number;
-  users?: Pick<User, 'id' | 'name' | 'group'>[];
+  users?: Pick<User, 'id' | 'name' | 'russianName' | 'group'>[];
 };
 
 export type HouseGradeHistoryEntry = {
@@ -95,6 +95,13 @@ export type HouseGradeHistoryEntry = {
   date: string;
   grade: number;
   house: House;
+};
+
+export type LifeFineHistoryEntry = {
+  id: string;
+  date: string;
+  count: number;
+  student: User;
 };
 
 export type User = {

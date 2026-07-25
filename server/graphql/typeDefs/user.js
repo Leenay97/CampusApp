@@ -27,6 +27,13 @@ export const userTypeDefs = gql`
     group: Group
   }
 
+  type LifeFineHistoryEntry {
+    id: ID!
+    date: String
+    count: Int
+    student: User
+  }
+
   extend type Query {
     students(groupId: ID): [User]
     teachers: [User]
@@ -35,6 +42,7 @@ export const userTypeDefs = gql`
     usersByWorkshop(workshopId: ID!): [User]
     seasonStudents: [User!]
     teacherRegistrationToken: String!
+    lifeFineHistory: [LifeFineHistoryEntry]
   }
 
   extend type Mutation {

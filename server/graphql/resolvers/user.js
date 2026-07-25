@@ -1,4 +1,13 @@
-import { User, Workshop, Group, Season, House, Class, Place } from '../../models/index.js';
+import {
+  User,
+  Workshop,
+  Group,
+  Season,
+  House,
+  Class,
+  Place,
+  LifeFineHistory,
+} from '../../models/index.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -6,6 +15,13 @@ import path from 'path';
 import fs from 'fs';
 import { isStaff, requireAuth, requireStaff, requireAdmin, requireSelfOrStaff } from '../auth.js';
 import { logCoinTransaction, isDuplicateTransfer } from './coinTransaction.js';
+
+function todayDate() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+    now.getDate(),
+  ).padStart(2, '0')}`;
+}
 
 export const userResolvers = {
   User: {
@@ -102,6 +118,14 @@ export const userResolvers = {
     teacherRegistrationToken: async (_, __, context) => {
       requireAdmin(context);
       return process.env.TEACHER_REGISTRATION_TOKEN;
+    },
+
+    lifeFineHistory: async (_, __, context) => {
+      requireAdmin(context);
+      return await LifeFineHistory.findAll({
+        include: [{ model: User, as: 'student', include: [{ model: Group, as: 'group' }] }],
+        order: [['date', 'DESC']],
+      });
     },
   },
 
@@ -550,6 +574,16 @@ export const userResolvers = {
       }
 
       await user.save();
+
+      const date = todayDate();
+      const [historyEntry, created] = await LifeFineHistory.findOrCreate({
+        where: { studentId: id, date },
+        defaults: { count: 1 },
+      });
+      if (!created) {
+        historyEntry.count += 1;
+        await historyEntry.save();
+      }
 
       return user;
     },

@@ -33,6 +33,7 @@ export const AdminPanelGroups: MenuGroup[] = [
     options: [
       { name: 'Управление домиками', link: '/admin/panel/houses' },
       { name: 'История домиков', link: '/admin/panel/house-history' },
+      { name: 'История резиночек', link: '/admin/panel/life-fines' },
       { name: 'Тех. данные', link: '/admin/panel/technical-data' },
       { name: 'Голосования', link: '/admin/panel/election' },
       { name: 'Пуш-уведомления', link: '/teacher/push' },

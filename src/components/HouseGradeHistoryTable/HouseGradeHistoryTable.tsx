@@ -111,7 +111,9 @@ export default function HouseGradeHistoryTable({
             const grade = gradeByHouseId[house.id];
             const gradeData = grade ? grades[grade] : null;
             const avgGrade = avgGradeByHouseId[house.id];
-            const studentNames = house.users?.map((student) => student.name).join(', ');
+            const studentNames = house.users
+              ?.map((student) => student.name || student.russianName)
+              .join(', ');
             const groupNames = Array.from(
               new Set((house.users ?? []).map((student) => student.group?.name).filter(Boolean)),
             ).join(', ');

@@ -1,12 +1,12 @@
 import { gql } from '@apollo/client';
 
-export const GET_HOUSES = gql`
-  query GetHouses {
-    houses {
+export const GET_LIFE_FINE_HISTORY = gql`
+  query GetLifeFineHistory {
+    lifeFineHistory {
       id
-      number
-      grade
-      users {
+      date
+      count
+      student {
         id
         name
         russianName
