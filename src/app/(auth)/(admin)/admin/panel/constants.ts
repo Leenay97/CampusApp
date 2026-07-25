@@ -38,7 +38,7 @@ export const AdminPanelGroups: MenuGroup[] = [
       { name: 'История домиков', link: '/admin/panel/house-history' },
       { name: 'История резиночек', link: '/admin/panel/life-fines' },
       { name: 'Тех. данные', link: '/admin/panel/technical-data' },
-      { name: 'Пуш-уведомления', link: '/teacher/push' },
+      { name: 'Пуш-уведомления', link: '/admin/panel/push' },
     ],
   },
   {

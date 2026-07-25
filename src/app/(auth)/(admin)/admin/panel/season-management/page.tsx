@@ -14,6 +14,7 @@ import { ACTIVATE_SEASON } from '@/graphql/mutations/ActivateSeason';
 import { ARCHIVE_SEASON } from '@/graphql/mutations/ArchiveSeason';
 import Loader from '@/components/Loader/Loaader';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
+import DesktopOnly from '@/components/DesktopOnly/DesktopOnly';
 
 function SeasonManagementPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -61,22 +62,24 @@ function SeasonManagementPage() {
   return (
     <CenteredContainer wide noPaddingTop>
       <Section>
-        <Title>Season Management</Title>
-        <PrimaryButton className={styles['add-season-btn']} onClick={handleOpenModal}>
-          Добавить сезон
-        </PrimaryButton>
-        {isCreateModalOpen && (
-          <AddSeasonModal
-            onClose={() => setIsCreateModalOpen(false)}
-            onSubmit={handleSeasonCreated}
+        <DesktopOnly>
+          <Title>Season Management</Title>
+          <PrimaryButton className={styles['add-season-btn']} onClick={handleOpenModal}>
+            Добавить сезон
+          </PrimaryButton>
+          {isCreateModalOpen && (
+            <AddSeasonModal
+              onClose={() => setIsCreateModalOpen(false)}
+              onSubmit={handleSeasonCreated}
+            />
+          )}
+          <SeasonsTable
+            onRefetchSeason={refetch}
+            onArchive={handleArchiveSeason}
+            onActivate={handleActivateSeason}
+            seasons={data?.seasons}
           />
-        )}
-        <SeasonsTable
-          onRefetchSeason={refetch}
-          onArchive={handleArchiveSeason}
-          onActivate={handleActivateSeason}
-          seasons={data?.seasons}
-        />
+        </DesktopOnly>
       </Section>
     </CenteredContainer>
   );

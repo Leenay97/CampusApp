@@ -16,6 +16,7 @@ import Subtitle from '@/components/Subtitle/Subtitle';
 import Title from '@/components/Title/Title';
 import { GET_ARCHIVED_SEASONS } from '@/graphql/queries/GetArchivedSeasons';
 import { GET_ARCHIVED_SEASON } from '@/graphql/queries/GetArchivedSeason';
+import DesktopOnly from '@/components/DesktopOnly/DesktopOnly';
 
 type ArchivedPerson = {
   id: string;
@@ -331,59 +332,61 @@ export default function SeasonArchivePage() {
   return (
     <CenteredContainer wide noPadding>
       <Section>
-        <div className={styles['wrapper']}>
-          <Title noMargin>Архив сезонов</Title>
-          {!seasonItems.length && <p className={styles['empty']}>Архивных сезонов пока нет</p>}
-          <CustomSelect
-            items={seasonItems}
-            placeholder="Выберите сезон"
-            onChange={handleChangeSeason}
-          />
+        <DesktopOnly>
+          <div className={styles['wrapper']}>
+            <Title noMargin>Архив сезонов</Title>
+            {!seasonItems.length && <p className={styles['empty']}>Архивных сезонов пока нет</p>}
+            <CustomSelect
+              items={seasonItems}
+              placeholder="Выберите сезон"
+              onChange={handleChangeSeason}
+            />
 
-          {seasonLoading && <Loader />}
+            {seasonLoading && <Loader />}
 
-          {season && !seasonLoading && (
-            <>
-              <div>
-                <Subtitle>Мастерклассы</Subtitle>
-                <CustomSelect
-                  items={teacherItems}
-                  initValue={teacher}
-                  placeholder="Все учителя"
-                  onChange={(item) => setTeacher(item.id)}
-                  hasCleanButton
-                />
-              </div>
-              <WorkshopsTable workshops={filteredWorkshops} />
-
-              <Subtitle>Sport Time</Subtitle>
-              <WorkshopsTable workshops={filteredSporttimes} />
-
-              <Subtitle>Уроки английского</Subtitle>
-              <LessonCountsTable lessonCounts={season.lessonCounts ?? []} />
-
-              <div>
-                <Subtitle>Студенты</Subtitle>
-                <div className={styles['row']}>
-                  <InputField
-                    value={studentSearch}
-                    onChange={setStudentSearch}
-                    width="240px"
-                    placeholder="Поиск по имени"
-                  />
+            {season && !seasonLoading && (
+              <>
+                <div>
+                  <Subtitle>Мастерклассы</Subtitle>
                   <CustomSelect
-                    items={season.groups}
-                    initValue={group.name}
-                    placeholder="Все группы"
-                    onChange={setGroup}
+                    items={teacherItems}
+                    initValue={teacher}
+                    placeholder="Все учителя"
+                    onChange={(item) => setTeacher(item.id)}
                     hasCleanButton
                   />
                 </div>
-              </div>
-              <StudentsTable rows={studentRows} />
-            </>
-          )}
-        </div>
+                <WorkshopsTable workshops={filteredWorkshops} />
+
+                <Subtitle>Sport Time</Subtitle>
+                <WorkshopsTable workshops={filteredSporttimes} />
+
+                <Subtitle>Уроки английского</Subtitle>
+                <LessonCountsTable lessonCounts={season.lessonCounts ?? []} />
+
+                <div>
+                  <Subtitle>Студенты</Subtitle>
+                  <div className={styles['row']}>
+                    <InputField
+                      value={studentSearch}
+                      onChange={setStudentSearch}
+                      width="240px"
+                      placeholder="Поиск по имени"
+                    />
+                    <CustomSelect
+                      items={season.groups}
+                      initValue={group.name}
+                      placeholder="Все группы"
+                      onChange={setGroup}
+                      hasCleanButton
+                    />
+                  </div>
+                </div>
+                <StudentsTable rows={studentRows} />
+              </>
+            )}
+          </div>
+        </DesktopOnly>
       </Section>
     </CenteredContainer>
   );

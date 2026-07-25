@@ -1,0 +1,25 @@
+@import '@app/globals.css';
+
+.banner {
+    display: none;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: rgba(74, 144, 190, 0.12);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: center;
+}
+
+.content {
+    display: contents;
+}
+
+@media (max-width: 700px) {
+    .banner {
+        display: block;
+    }
+
+    .content {
+        display: none;
+    }
+}

@@ -23,6 +23,7 @@ import Subtitle from '@/components/Subtitle/Subtitle';
 import Loader from '@/components/Loader/Loaader';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { UPDATE_GROUP } from '@/graphql/mutations/UpdateGroup';
+import DesktopOnly from '@/components/DesktopOnly/DesktopOnly';
 
 export default function PlacesPage() {
   const { data, loading } = useQuery(GET_ACTIVE_SEASON);
@@ -127,31 +128,33 @@ export default function PlacesPage() {
   return (
     <CenteredContainer wide noPaddingTop>
       <Section>
-        <div ref={gridRef}>
-          <Title>Расписание групповых мест</Title>
-          <PlacesGrid
-            groups={groups}
-            dates={dates}
-            places={selectedPlaces.length ? selectedPlaces : places}
-            grid={grid}
-            setGrid={setGrid}
-            onAutofill={handleAutoFill}
-          />
-        </div>
-        <div>
-          <Subtitle>Выбрать места для заполнения (иначе будут использованы все)</Subtitle>
-          <MultipleSelect<Place>
-            items={teamPlaces}
-            value={selectedPlaces}
-            onChange={setSelectedPlaces}
-          />
-        </div>
-        <div className={styles['places-buttons']}>
-          <PrimaryButton width="500px" onClick={handleSave}>
-            Сохранить
-          </PrimaryButton>
-          <SecondaryButton onClick={handleDownloadPNG}>Скачать PNG</SecondaryButton>
-        </div>
+        <DesktopOnly>
+          <div ref={gridRef}>
+            <Title>Расписание групповых мест</Title>
+            <PlacesGrid
+              groups={groups}
+              dates={dates}
+              places={selectedPlaces.length ? selectedPlaces : places}
+              grid={grid}
+              setGrid={setGrid}
+              onAutofill={handleAutoFill}
+            />
+          </div>
+          <div>
+            <Subtitle>Выбрать места для заполнения (иначе будут использованы все)</Subtitle>
+            <MultipleSelect<Place>
+              items={teamPlaces}
+              value={selectedPlaces}
+              onChange={setSelectedPlaces}
+            />
+          </div>
+          <div className={styles['places-buttons']}>
+            <PrimaryButton width="500px" onClick={handleSave}>
+              Сохранить
+            </PrimaryButton>
+            <SecondaryButton onClick={handleDownloadPNG}>Скачать PNG</SecondaryButton>
+          </div>
+        </DesktopOnly>
       </Section>
       <Section>
         <AddPlaceForm onCreate={handleCreate} color={color} changeColor={setColor} />
