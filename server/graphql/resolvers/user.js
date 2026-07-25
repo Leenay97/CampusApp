@@ -356,16 +356,22 @@ export const userResolvers = {
 
       user.name = name !== undefined ? name : user.name;
       user.russianName = russianName !== undefined ? russianName : user.russianName;
-      user.groupId = groupId !== undefined ? groupId : user.groupId;
-      user.houseId = houseId !== undefined ? houseId : user.houseId;
+      user.groupId = groupId || user.groupId;
+      user.houseId = houseId || user.houseId;
+      user.classId = classId || user.classId;
       user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
-      user.classId = classId !== undefined ? classId : user.classId;
       user.birthday = birthday !== undefined ? birthday : user.birthday;
       const coinsDelta = coins !== undefined ? coins - (user.coins ?? 0) : 0;
       user.coins = coins !== undefined ? coins : user.coins;
-      user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
 
       await user.save();
+      await user.reload({
+        include: [
+          { model: Group, as: 'group' },
+          { model: House, as: 'house' },
+          { model: Class, as: 'class' },
+        ],
+      });
 
       if (coinsDelta !== 0) {
         await logCoinTransaction({

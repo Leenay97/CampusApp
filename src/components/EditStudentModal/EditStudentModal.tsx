@@ -106,10 +106,10 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
       await updateUser({
         id: student.id,
         name: name || null,
-        groupId: group.id || null,
-        classId: englishClass.id || null,
+        groupId: group.id || undefined,
+        classId: englishClass.id || undefined,
         coins: Number(coins) || null,
-        houseId: house.id || null,
+        houseId: house.id || undefined,
         englishLevel: englishLevel.id || null,
         birthday: birthday || null,
       });
