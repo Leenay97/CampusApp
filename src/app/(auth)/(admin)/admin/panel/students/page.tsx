@@ -56,9 +56,10 @@ export default function StudentsPage() {
       <Section>
         <Title>Студенты</Title>
         <div className={styles['row']}>
-          <InputField value={name} onChange={setName} width="240px" placeholder="Имя" />
+          <InputField value={name} onChange={setName} width="240px" placeholder="Name" />
           <CustomSelect
             items={groupsData?.activeSeason.groups}
+            placeholder="Team"
             onChange={setGroup}
             initValue={group.name}
             hasCleanButton

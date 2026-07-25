@@ -28,6 +28,10 @@
     &:last-child {
       border-bottom: none;
     }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
   }
 
   &__cell {
@@ -39,8 +43,27 @@
   }
 
   &__edit {
-    height: 12px;
-    width: 12px;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    border-radius: 50%;
+    background-color: rgba(74, 144, 190, 0.12);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color 0.2s,
+      transform 0.15s;
+
+    &:hover {
+      background-color: rgba(74, 144, 190, 0.25);
+      transform: scale(1.08);
+    }
+
+    &:active {
+      transform: scale(0.94);
+    }
   }
 
   .sortable {
@@ -58,5 +81,45 @@
     padding: 40px;
     color: #9e9e9e;
     font-size: 16px;
+  }
+
+  @media (max-width: 900px) {
+    overflow-x: visible;
+
+    &__table {
+      min-width: 0;
+    }
+
+    &__header {
+      display: none;
+    }
+
+    &__row {
+      display: flex;
+      flex-direction: column;
+      padding: 4px 0;
+    }
+
+    &__cell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      overflow: visible;
+      white-space: normal;
+      text-align: right;
+      padding: 8px 15px;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-primary);
+        text-align: left;
+      }
+    }
+
+    &__edit {
+      align-self: flex-end;
+    }
   }
 }

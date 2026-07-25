@@ -150,19 +150,34 @@ export default function StudentsTable({ students, refetch }: StudentsTableProps)
 
         {sortedStudents.map((student) => (
           <div key={student.id} className={styles['students__row']}>
-            <div className={styles['students__cell']}>{student?.russianName || '—'}</div>
-            <div className={styles['students__cell']}>{student?.name || '—'}</div>
-            <div className={styles['students__cell']}>{student?.group?.name || '—'}</div>
+            <div className={styles['students__cell']} data-label="Русское имя">
+              {student?.russianName || '—'}
+            </div>
+            <div className={styles['students__cell']} data-label="Имя">
+              {student?.name || '—'}
+            </div>
+            <div className={styles['students__cell']} data-label="Группа">
+              {student?.group?.name || '—'}
+            </div>
             <div
               className={styles['students__cell']}
+              data-label="Возраст"
               title={formatDateForDisplay(student?.birthday)}
             >
               {calculateAge(student?.birthday) ?? '—'}
             </div>
-            <div className={styles['students__cell']}>{student?.house?.number || '—'}</div>
-            <div className={styles['students__cell']}>{student?.class?.name || '—'}</div>
-            <div className={styles['students__cell']}>{student?.englishLevel || '—'}</div>
-            <div className={styles['students__cell']}>{student?.coins || '0'}</div>
+            <div className={styles['students__cell']} data-label="Домик">
+              {student?.house?.number || '—'}
+            </div>
+            <div className={styles['students__cell']} data-label="Класс">
+              {student?.class?.name || '—'}
+            </div>
+            <div className={styles['students__cell']} data-label="Level">
+              {student?.englishLevel || '—'}
+            </div>
+            <div className={styles['students__cell']} data-label="Coins">
+              {student?.coins || '0'}
+            </div>
             <EditButton
               className={styles['students__edit']}
               onClick={() => setSelectedStudent(student)}
