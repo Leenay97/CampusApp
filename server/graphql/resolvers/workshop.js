@@ -165,9 +165,93 @@ export const workshopResolvers = {
       // Студент записывает только себя; персонал может записать любого
       requireSelfOrStaff(context, studentId);
       try {
-        const [student, workshop] = await Promise.all([
-          User.findByPk(studentId),
-          Workshop.findByPk(workshopId, {
+        return await sequelize.transaction(async (transaction) => {
+          const student = await User.findByPk(studentId, { transaction });
+
+          if (!student) {
+            throw new Error('Студент не найден');
+          }
+
+          if (student.userLevel !== 'STUDENT') {
+            throw new Error('Записаться может только студент');
+          }
+
+          const workshop = await Workshop.findByPk(workshopId, { transaction });
+
+          if (!workshop) {
+            throw new Error('MK не найден');
+          }
+
+          if (workshop.type === 'SPORT') {
+            throw new Error('Запись на Sport Time закрыта');
+          }
+
+          // Список на фронте уже отфильтрован по isClosed, но мутацию можно
+          // вызвать напрямую с id закрытого или вчерашнего мастер-класса.
+          if (workshop.isClosed) {
+            throw new Error('Мастеркласс уже закрыт');
+          }
+
+          // Кнопка работает как переключатель, поэтому намерение (записаться или
+          // отменить) определяем по состоянию ДО блокировок — по тому самому,
+          // которое пользователь видел на экране. Если прочитать запись уже под
+          // блокировкой, то при двойном клике второй запрос увидит результат
+          // первого и снимет запись, хотя пользователь хотел записаться.
+          const existingEntry = await UserWorkshop.findOne({
+            where: { userId: studentId, workshopId },
+            transaction,
+          });
+
+          if (existingEntry) {
+            // Отмена записи: мест не занимает, блокировки не нужны.
+            await UserWorkshop.destroy({
+              where: { userId: studentId, workshopId },
+              transaction,
+            });
+          } else {
+            // Блокировка студента, затем мастер-класса — тот же порядок, что в
+            // closeWorkshop, иначе встречные мутации могут заблокировать друг друга.
+            // Блокировка студента не даёт записать его в два МК одновременно.
+            await User.findByPk(studentId, { transaction, lock: transaction.LOCK.UPDATE });
+
+            const lockedWorkshop = await Workshop.findByPk(workshopId, {
+              transaction,
+              lock: transaction.LOCK.UPDATE,
+            });
+
+            // Считаем из БД под блокировкой: без неё параллельные запросы читают
+            // одно и то же число свободных мест и записываются сверх лимита.
+            const studentsCount = await UserWorkshop.count({
+              where: { workshopId },
+              transaction,
+            });
+
+            if (studentsCount >= lockedWorkshop.maxStudents) {
+              throw new Error('Мест нет');
+            }
+
+            // получаем все воркшопы того же типа
+            const workshopsOfSameType = await Workshop.findAll({
+              where: { type: workshop.type },
+              attributes: ['id'],
+              transaction,
+            });
+
+            const workshopIds = workshopsOfSameType.map((w) => w.id);
+
+            // удаляем записи только этого типа
+            await UserWorkshop.destroy({
+              where: {
+                userId: studentId,
+                workshopId: workshopIds,
+              },
+              transaction,
+            });
+
+            await UserWorkshop.create({ userId: studentId, workshopId }, { transaction });
+          }
+
+          return await Workshop.findByPk(workshopId, {
             include: [
               {
                 model: User,
@@ -175,75 +259,9 @@ export const workshopResolvers = {
                 through: { attributes: [] },
               },
             ],
-          }),
-        ]);
-
-        if (!student) {
-          throw new Error('Студент не найден');
-        }
-
-        if (student.userLevel !== 'STUDENT') {
-          throw new Error('Записаться может только студент');
-        }
-
-        if (!workshop) {
-          throw new Error('MK не найден');
-        }
-
-        if (workshop.type === 'SPORT') {
-          throw new Error('Запись на Sport Time закрыта');
-        }
-
-        // Список на фронте уже отфильтрован по isClosed, но мутацию можно
-        // вызвать напрямую с id закрытого или вчерашнего мастер-класса.
-        if (workshop.isClosed) {
-          throw new Error('Мастеркласс уже закрыт');
-        }
-
-        const existingEntry = await UserWorkshop.findOne({
-          where: { userId: studentId, workshopId },
+            transaction,
+          });
         });
-
-        if (existingEntry) {
-          await existingEntry.destroy();
-        } else {
-          if (workshop.students.length >= workshop.maxStudents) {
-            throw new Error('Мест нет');
-          }
-
-          // получаем все воркшопы того же типа
-          const workshopsOfSameType = await Workshop.findAll({
-            where: { type: workshop.type },
-            attributes: ['id'],
-          });
-
-          const workshopIds = workshopsOfSameType.map((w) => w.id);
-
-          // удаляем записи только этого типа
-          await UserWorkshop.destroy({
-            where: {
-              userId: studentId,
-              workshopId: workshopIds,
-            },
-          });
-
-          await UserWorkshop.create({
-            userId: studentId,
-            workshopId,
-          });
-        }
-
-        const updatedWorkshop = await Workshop.findByPk(workshopId, {
-          include: [
-            {
-              model: User,
-              as: 'students',
-              through: { attributes: [] },
-            },
-          ],
-        });
-
-        return updatedWorkshop;
       } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
           throw new Error('Вы уже записаны на этот мастеркласс');

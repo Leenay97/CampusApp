@@ -59,6 +59,12 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
 
   const loading = seasonLoading || classesLoading || housesLoading;
 
+  // Ноль — законный баланс, поэтому `Number(coins) || null` здесь недопустим:
+  // он превращал выставленный вручную 0 в null, и баланс уходил в NULL.
+  // Пустое или нечисловое поле означает «не менять».
+  const parsedCoins = coins.trim() === '' ? NaN : Number(coins);
+  const coinsToSend = Number.isFinite(parsedCoins) ? parsedCoins : undefined;
+
   const transformedHouses =
     housesData?.houses?.map((house: House) => ({
       id: house.id,
@@ -108,7 +114,7 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
         name: name || null,
         groupId: group.id || undefined,
         classId: englishClass.id || undefined,
-        coins: Number(coins) || null,
+        coins: coinsToSend,
         houseId: house.id || undefined,
         englishLevel: englishLevel.id || null,
         birthday: birthday || null,
@@ -129,7 +135,11 @@ function EditStudentModal({ student, onSubmit, onClose }: ModalProps) {
       oldValue: student?.englishLevel ?? '',
       newValue: englishLevel.name ?? '',
     },
-    { label: 'Coins', oldValue: String(student?.coins ?? 0), newValue: String(Number(coins) || 0) },
+    {
+      label: 'Coins',
+      oldValue: String(student?.coins ?? 0),
+      newValue: String(coinsToSend ?? student?.coins ?? 0),
+    },
     {
       label: 'Дата рождения',
       oldValue: formatDateForDisplay(student?.birthday),

@@ -365,8 +365,13 @@ export const userResolvers = {
       user.classId = classId || user.classId;
       user.englishLevel = englishLevel !== undefined ? englishLevel : user.englishLevel;
       user.birthday = birthday !== undefined ? birthday : user.birthday;
-      const coinsDelta = coins !== undefined ? coins - (user.coins ?? 0) : 0;
-      user.coins = coins !== undefined ? coins : user.coins;
+      // null не должен стирать баланс: клиент присылал его вместо нуля, coins
+      // уходил в NULL, и после этого SQL-инкремент в групповых начислениях молча
+      // перестаёт работать (NULL + N = NULL). Ноль при этом — законное значение,
+      // поэтому проверяем именно на число, а не на truthy.
+      const coinsProvided = typeof coins === 'number' && Number.isFinite(coins);
+      const coinsDelta = coinsProvided ? coins - (user.coins ?? 0) : 0;
+      user.coins = coinsProvided ? coins : user.coins;
 
       await user.save();
       await user.reload({
@@ -531,6 +536,11 @@ export const userResolvers = {
         if (isDuplicate) {
           throw new Error('Такой перевод группе уже был отправлен только что — подождите немного');
         }
+
+        // NULL + N в SQL даёт NULL, поэтому такой студент молча не получил бы
+        // начисление, хотя запись в историю ниже всё равно появилась бы.
+        // Строки уже заблокированы выше, так что гонки здесь нет.
+        await User.update({ coins: 0 }, { where: { id: studentIds, coins: null }, transaction: t });
 
         // increment — атомарный UPDATE на уровне БД, а не read-modify-write,
         // так что параллельные начисления этим же студентам не теряют друг друга
