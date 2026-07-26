@@ -165,6 +165,38 @@
         }
     }
 
+    &--pinned {
+        border: 1px solid #4a90be;
+    }
+
+    &__pinned-label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #4a90be;
+        font-size: 12px;
+        font-weight: normal;
+    }
+
+    &__pin {
+        position: absolute;
+        right: 80px;
+        border: none;
+        background-color: white;
+        border-radius: 5px;
+        height: var(--input-button-height);
+        width: var(--input-button-height);
+        margin: auto 10px;
+        color: var(--text-primary);
+        opacity: 0.5;
+        cursor: pointer;
+
+        &--active {
+            color: #4a90be;
+            opacity: 1;
+        }
+    }
+
     &__edit {
         position: absolute;
         right: 50px;

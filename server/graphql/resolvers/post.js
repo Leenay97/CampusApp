@@ -31,6 +31,10 @@ export const postResolvers = {
             attributes: ['name', 'photoUrl'],
           },
         ],
+        order: [
+          ['isPinned', 'DESC'],
+          ['createdAt', 'DESC'],
+        ],
       });
 
       const currentUser = await User.findByPk(auth.id);
@@ -175,6 +179,16 @@ export const postResolvers = {
         ...post.toJSON(),
         myReaction: nextEmoji,
       };
+    },
+
+    setPostPinned: async (_, { id, isPinned }, context) => {
+      requireStaff(context);
+      const post = await Post.findByPk(id);
+      if (!post) throw new Error('Пост не найден');
+
+      await post.update({ isPinned });
+
+      return post;
     },
   },
 

@@ -7,4 +7,6 @@ export const Post = sequelize.define('Post', {
   authorId: { type: DataTypes.UUID },
   // Счётчики реакций вида { "👍🏻": 3, "❤️": 1 }
   reactions: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
+  // Закреплённые посты показываются в начале ленты
+  isPinned: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 });

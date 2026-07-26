@@ -72,6 +72,7 @@ export type Post = {
   author: User;
   reactions?: ReactionCount[];
   myReaction?: string | null;
+  isPinned?: boolean;
 };
 
 export type Season = {

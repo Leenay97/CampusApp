@@ -15,6 +15,7 @@ export const postTypeDefs = gql`
     authorId: ID!
     reactions: [ReactionCount!]!
     myReaction: String
+    isPinned: Boolean!
   }
 
   extend type Query {
@@ -28,5 +29,6 @@ export const postTypeDefs = gql`
     uploadPostImage(file: Upload!): String!
     deletePostImage(url: String!): Boolean!
     setPostReaction(postId: ID!, emoji: String!): Post
+    setPostPinned(id: ID!, isPinned: Boolean!): Post
   }
 `;

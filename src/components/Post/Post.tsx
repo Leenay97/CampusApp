@@ -6,6 +6,8 @@ import styles from './Post.module.scss';
 import EditButton from '../EditButton/EditButton';
 import DeleteButton from '../DeleteButton/DeleteButton';
 import { SET_POST_REACTION } from '@/graphql/mutations/SetPostReaction';
+import { SET_POST_PINNED } from '@/graphql/mutations/SetPostPinned';
+import PinIcon from '@/modules/icons/PinIcon';
 
 const REACTIONS = ['👍🏻', '🤣', '👹', '❤️', '🎉', '😭'];
 
@@ -18,6 +20,7 @@ type PostProps = {
 
 export default function Post({ post, isEditable = false, onEdit, onDelete }: PostProps) {
   const [setReaction] = useMutation(SET_POST_REACTION);
+  const [setPinned] = useMutation(SET_POST_PINNED);
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +42,21 @@ export default function Post({ post, isEditable = false, onEdit, onDelete }: Pos
     hour: '2-digit',
     minute: '2-digit',
   });
+
+  function handleTogglePin() {
+    const nextPinned = !post.isPinned;
+
+    setPinned({
+      variables: { id: post.id, isPinned: nextPinned },
+      optimisticResponse: {
+        setPostPinned: {
+          __typename: 'Post',
+          id: post.id,
+          isPinned: nextPinned,
+        },
+      },
+    });
+  }
 
   function handlePick(emoji: string) {
     handleReact(emoji);
@@ -77,9 +95,25 @@ export default function Post({ post, isEditable = false, onEdit, onDelete }: Pos
   }
 
   return (
-    <div className={styles['post']}>
+    <div className={`${styles['post']} ${post.isPinned ? styles['post--pinned'] : ''}`}>
       <div className={styles['post__header']}>
         {post.title}
+        {post.isPinned && (
+          <div className={styles['post__pinned-label']}>
+            <PinIcon width={12} height={12} />
+            Закреплено
+          </div>
+        )}
+        {isEditable && (
+          <button
+            type="button"
+            title={post.isPinned ? 'Открепить' : 'Закрепить'}
+            className={`${styles['post__pin']} ${post.isPinned ? styles['post__pin--active'] : ''}`}
+            onClick={handleTogglePin}
+          >
+            <PinIcon width={20} height={20} />
+          </button>
+        )}
         {isEditable && (
           <EditButton className={styles['post__edit']} onClick={() => onEdit?.(post)} />
         )}

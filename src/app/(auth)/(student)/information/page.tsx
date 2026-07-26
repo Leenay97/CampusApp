@@ -77,9 +77,12 @@ export default function InfoPage() {
     refetch();
   }
 
+  // Закреплённые посты идут первыми, внутри групп — по дате
   const sortedPosts = useMemo(() => {
     if (!data?.posts) return [];
-    return [...data.posts].sort((a, b) => b.createdAt - a.createdAt);
+    return [...data.posts].sort(
+      (a, b) => Number(!!b.isPinned) - Number(!!a.isPinned) || b.createdAt - a.createdAt,
+    );
   }, [data]);
 
   if (loading) {
