@@ -4,13 +4,16 @@ import Checkbox from '@/components/Checkbox/Checkbox';
 import { InputField } from '@/components/InputField/InputField';
 import Loader from '@/components/Loader/Loaader';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
+import SecondaryButton from '@/components/SecondaryButton/SecondaryButton';
 import Section from '@/components/Section/Section';
 import Subtitle from '@/components/Subtitle/Subtitle';
 import Title from '@/components/Title/Title';
 import { UPDATE_MAZE_RUNNER_EVENT } from '@/graphql/mutations/UpdateMazeRunnerEvent';
 import { GET_MAZE_RUNNER_EVENT } from '@/graphql/queries/GetMazeRunnerEvent';
+import { GET_MAZE_RUNNER_RESULTS } from '@/graphql/queries/GetMazeRunnerResults';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
-import { MazeRunnerEvent } from '@/app/types';
+import { MazeRunnerEvent, MazeRunnerResult } from '@/app/types';
+import MazeRunnerResultsTable from '@/components/MazeRunnerResultsTable/MazeRunnerResultsTable';
 import { useQuery } from '@apollo/client';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -18,6 +21,7 @@ const CODE_RE = /^\d{4,8}$/;
 
 export default function AdminEventsPage() {
   const { data, loading, refetch } = useQuery(GET_MAZE_RUNNER_EVENT);
+  const { data: resultsData, refetch: refetchResults } = useQuery(GET_MAZE_RUNNER_RESULTS);
   const [updateEvent] = useGlobalLoadingMutation(UPDATE_MAZE_RUNNER_EVENT);
 
   const [code, setCode] = useState('');
@@ -26,6 +30,10 @@ export default function AdminEventsPage() {
   const [isActive, setIsActive] = useState(false);
 
   const event: MazeRunnerEvent | undefined = useMemo(() => data?.mazeRunnerEvent, [data]);
+  const results: MazeRunnerResult[] = useMemo(
+    () => resultsData?.mazeRunnerResults ?? [],
+    [resultsData],
+  );
 
   useEffect(() => {
     if (event) {
@@ -44,6 +52,7 @@ export default function AdminEventsPage() {
     try {
       await updateEvent({ code, isCyclic, codeword, isActive });
       refetch();
+      refetchResults();
     } catch (err) {
       console.error(err);
     }
@@ -109,6 +118,13 @@ export default function AdminEventsPage() {
         <PrimaryButton disabled={!isCodeValid} onClick={handleSave}>
           Сохранить
         </PrimaryButton>
+      </Section>
+
+      <Section>
+        <Title noMargin>Результаты</Title>
+        <SecondaryButton onClick={() => refetchResults()}>Обновить</SecondaryButton>
+
+        <MazeRunnerResultsTable results={results} />
       </Section>
     </CenteredContainer>
   );

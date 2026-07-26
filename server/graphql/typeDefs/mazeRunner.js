@@ -20,9 +20,18 @@ export const mazeRunnerTypeDefs = gql`
     codeword: String
   }
 
+  # Итог текущего запуска по каждой группе активного сезона
+  type MazeRunnerResult {
+    groupId: ID!
+    groupName: String!
+    isSolved: Boolean!
+    solvedAt: String
+  }
+
   extend type Query {
     mazeRunnerEvent: MazeRunnerEvent
     mazeRunnerStatus: MazeRunnerStatus!
+    mazeRunnerResults: [MazeRunnerResult!]!
   }
 
   extend type Mutation {

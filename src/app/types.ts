@@ -226,6 +226,13 @@ export type MazeRunnerEvent = {
   isActive: boolean;
 };
 
+export type MazeRunnerResult = {
+  groupId: string;
+  groupName: string;
+  isSolved: boolean;
+  solvedAt: string | null;
+};
+
 export type MazeRunnerStatus = {
   isActive: boolean;
   codeLength: number | null;

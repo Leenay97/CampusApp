@@ -1,4 +1,4 @@
-import { MazeRunnerEvent, MazeRunnerAttempt, User } from '../../models/index.js';
+import { MazeRunnerEvent, MazeRunnerAttempt, User, Group, Season } from '../../models/index.js';
 import { requireAuth, requireAdmin } from '../auth.js';
 
 const LOCK_DURATION_MS = 2 * 60 * 1000;
@@ -9,6 +9,10 @@ const CODE_RE = /^\d{4,8}$/;
 function isCyclicMatch(guess, code) {
   if (guess.length !== code.length) return false;
   return (code + code).includes(guess);
+}
+
+function solvedAtTime(result) {
+  return result.solvedAt ? new Date(result.solvedAt).getTime() : 0;
 }
 
 function buildStatus(event, attempt) {
@@ -38,6 +42,36 @@ export const mazeRunnerResolvers = {
 
       const attempt = await MazeRunnerAttempt.findOne({ where: { groupId: user.groupId } });
       return buildStatus(event, attempt);
+    },
+    mazeRunnerResults: async (_, __, context) => {
+      requireAdmin(context);
+
+      const activeSeason = await Season.findOne({ where: { isActive: true } });
+      if (!activeSeason) return [];
+
+      const groups = await Group.findAll({ where: { seasonId: activeSeason.id } });
+      const attempts = await MazeRunnerAttempt.findAll({
+        where: { groupId: groups.map((group) => group.id) },
+      });
+      const attemptByGroupId = new Map(attempts.map((attempt) => [attempt.groupId, attempt]));
+
+      return groups
+        .map((group) => {
+          const attempt = attemptByGroupId.get(group.id);
+          const isSolved = attempt?.isSolved ?? false;
+          return {
+            groupId: group.id,
+            groupName: group.name,
+            isSolved,
+            solvedAt: isSolved ? (attempt.solvedAt ?? null) : null,
+          };
+        })
+        .sort((a, b) => {
+          // Сначала разгадавшие — по времени разгадки, затем остальные по имени
+          if (a.isSolved !== b.isSolved) return a.isSolved ? -1 : 1;
+          if (a.isSolved) return solvedAtTime(a) - solvedAtTime(b);
+          return a.groupName.localeCompare(b.groupName, 'ru');
+        });
     },
   },
   Mutation: {

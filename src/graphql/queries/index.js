@@ -32,6 +32,7 @@ import { GET_TEACHER_REGISTRATION_TOKEN } from './GetTeacherRegistrationToken';
 import { GET_COIN_HISTORY } from './GetCoinHistory';
 import { GET_MAZE_RUNNER_EVENT } from './GetMazeRunnerEvent';
 import { GET_MAZE_RUNNER_STATUS } from './GetMazeRunnerStatus';
+import { GET_MAZE_RUNNER_RESULTS } from './GetMazeRunnerResults';
 
 export const queries = {
   GET_GROUPS,
@@ -69,5 +70,6 @@ export const queries = {
   GET_COIN_HISTORY,
   GET_MAZE_RUNNER_EVENT,
   GET_MAZE_RUNNER_STATUS,
+  GET_MAZE_RUNNER_RESULTS,
 };
 export default queries;
