@@ -1,7 +1,7 @@
 'use client';
 import { User } from '@/app/types';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
-import CloseWorkshopModal from '@/components/CloseWorkshopModal/CloseWorkshopModal';
+import CloseLessonModal from '@/components/CloseLessonModal/CloseLessonModal';
 import Loader from '@/components/Loader/Loaader';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Section from '@/components/Section/Section';
@@ -15,17 +15,56 @@ import { useQuery } from '@apollo/client';
 import { Fragment, useState } from 'react';
 import styles from './LessonsPage.module.scss';
 
+const MAX_BACKDATE_DAYS = 7;
+
 type ClassItem = {
   id: string;
   name: string;
-  isClosedToday: boolean;
+  closedDates: string[];
   place?: { name: string };
   teachers: User[];
   students: User[];
 };
 
+type ActiveLesson = {
+  classId: string;
+  isBackdated: boolean;
+};
+
+function formatLocalDate(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+    date.getDate(),
+  ).padStart(2, '0')}`;
+}
+
+// Все прошедшие дни окна: уже закрытые показываем неактивными, а не прячем
+function pastDateOptions(closedDates: string[]) {
+  const options = [];
+
+  for (let daysAgo = 1; daysAgo <= MAX_BACKDATE_DAYS; daysAgo++) {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - daysAgo);
+
+    const value = formatLocalDate(date);
+
+    options.push({
+      value,
+      label: date.toLocaleDateString('ru-RU', {
+        weekday: 'short',
+        day: '2-digit',
+        month: '2-digit',
+      }),
+      disabled: closedDates.includes(value),
+    });
+  }
+
+  return options;
+}
+
 export default function LessonsPage() {
-  const [activeClassId, setActiveClassId] = useState<string | null>(null);
+  // От isBackdated зависит, спрашивает модалка дату или закрывает урок за сегодня
+  const [activeLesson, setActiveLesson] = useState<ActiveLesson | null>(null);
   const { user } = useUser();
   const { data, loading, refetch } = useQuery(GET_CLASSES_BY_TEACHER, {
     variables: { teacherId: user?.id },
@@ -34,20 +73,18 @@ export default function LessonsPage() {
 
   const [closeLesson] = useGlobalLoadingMutation(CLOSE_LESSON);
 
-  async function handleCloseLesson(studentIds: string[]) {
+  async function handleCloseLesson(studentIds: string[], date?: string) {
     try {
-      await closeLesson({ classId: activeClassId, teacherId: user?.id, studentIds });
+      await closeLesson({ classId: activeLesson?.classId, teacherId: user?.id, studentIds, date });
       refetch();
-      setActiveClassId(null);
+      setActiveLesson(null);
     } catch {
       console.error('Error');
     }
   }
 
-  // Закрытый урок исчезает до полуночи, потом класс снова появляется в списке
-  const openClasses = (data?.classesByTeacher ?? []).filter(
-    (classItem: ClassItem) => !classItem.isClosedToday,
-  );
+  const classes: ClassItem[] = data?.classesByTeacher ?? [];
+  const today = formatLocalDate(new Date());
 
   if (loading)
     return (
@@ -63,39 +100,64 @@ export default function LessonsPage() {
       <Section>
         <Title noMargin>Lessons</Title>
       </Section>
-      {openClasses.length <= 0 && (
+      {classes.length <= 0 && (
         <Section>
-          <Subtitle noMargin>Уроков на сегодня нет</Subtitle>
+          <Subtitle noMargin>Уроков нет</Subtitle>
         </Section>
       )}
-      {openClasses.map((classItem: ClassItem) => (
-        <Fragment key={classItem.id}>
-          <Section>
-            <div className={styles['lesson-card']}>
-              <Subtitle noMargin>{classItem.name}</Subtitle>
-              <div className={styles['lesson-card__row']}>
-                Место: {classItem.place?.name ?? '—'}
-              </div>
-              <div className={styles['lesson-card__row']}>
-                Студенты ({classItem.students.length}):{' '}
-                {classItem.students.map((student) => student.name).join(', ') || '—'}
-              </div>
-              <PrimaryButton onClick={() => setActiveClassId(classItem.id)}>
-                Завершить урок
-              </PrimaryButton>
-            </div>
-          </Section>
+      {classes.map((classItem) => {
+        const isClosedToday = classItem.closedDates.includes(today);
+        const pastDates = pastDateOptions(classItem.closedDates);
+        const hasMissedDates = pastDates.some((option) => !option.disabled);
 
-          {activeClassId === classItem.id && (
-            <CloseWorkshopModal
-              title="Завершить урок"
-              students={classItem.students}
-              onSubmit={handleCloseLesson}
-              onClose={() => setActiveClassId(null)}
-            />
-          )}
-        </Fragment>
-      ))}
+        return (
+          <Fragment key={classItem.id}>
+            <Section>
+              <div className={styles['lesson-card']}>
+                <Subtitle noMargin>{classItem.name}</Subtitle>
+                <div className={styles['lesson-card__row']}>
+                  Место: {classItem.place?.name ?? '—'}
+                </div>
+                <div className={styles['lesson-card__row']}>
+                  Студенты ({classItem.students.length}):{' '}
+                  {classItem.students.map((student) => student.name).join(', ') || '—'}
+                </div>
+
+                {isClosedToday ? (
+                  <>
+                    <div className={styles['lesson-card__status']}>Урок закрыт</div>
+                    {hasMissedDates && (
+                      <PrimaryButton
+                        onClick={() =>
+                          setActiveLesson({ classId: classItem.id, isBackdated: true })
+                        }
+                      >
+                        Начислить за прошлую дату
+                      </PrimaryButton>
+                    )}
+                  </>
+                ) : (
+                  <PrimaryButton
+                    onClick={() => setActiveLesson({ classId: classItem.id, isBackdated: false })}
+                  >
+                    Завершить урок
+                  </PrimaryButton>
+                )}
+              </div>
+            </Section>
+
+            {activeLesson?.classId === classItem.id && (
+              <CloseLessonModal
+                title={activeLesson.isBackdated ? 'Начислить за прошлую дату' : 'Завершить урок'}
+                students={classItem.students}
+                dateOptions={activeLesson.isBackdated ? pastDates : undefined}
+                onSubmit={handleCloseLesson}
+                onClose={() => setActiveLesson(null)}
+              />
+            )}
+          </Fragment>
+        );
+      })}
     </CenteredContainer>
   );
 }

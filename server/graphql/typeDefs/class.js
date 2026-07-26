@@ -7,7 +7,7 @@ export const classTypeDefs = gql`
     students: [User]
     teachers: [User]
     place: Place
-    isClosedToday: Boolean!
+    closedDates: [String!]!
   }
 
   extend type Query {
@@ -21,6 +21,6 @@ export const classTypeDefs = gql`
     createClass(name: String!, placeId: ID!, teacherIds: [ID!]!, studentIds: [ID!]): Class
     updateClass(id: ID!, name: String, placeId: ID, teacherIds: [ID!], studentIds: [ID!]): Class
     deleteClass(id: ID!): Class
-    closeLesson(classId: ID!, teacherId: ID!, studentIds: [ID!]!): Class
+    closeLesson(classId: ID!, teacherId: ID!, studentIds: [ID!]!, date: String): Class
   }
 `;

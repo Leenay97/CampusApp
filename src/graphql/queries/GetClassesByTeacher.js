@@ -5,7 +5,7 @@ export const GET_CLASSES_BY_TEACHER = gql`
     classesByTeacher(teacherId: $teacherId) {
       id
       name
-      isClosedToday
+      closedDates
       place {
         id
         name

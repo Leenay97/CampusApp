@@ -1,0 +1,40 @@
+@import '@app/globals.css';
+
+.close-lesson-modal {
+    width: 280px;
+
+    &__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__dates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    &__date {
+        padding: 4px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 13px;
+        cursor: pointer;
+
+        &--active {
+            border-color: var(--primary-button-color);
+            background: var(--primary-button-color);
+            color: var(--text-secondary);
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: default;
+            text-decoration: line-through;
+        }
+    }
+}

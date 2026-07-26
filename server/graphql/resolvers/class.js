@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import {
   Class,
   Group,
@@ -17,11 +18,50 @@ const classInclude = [
   { model: User, as: 'students', include: [{ model: Group, as: 'group' }] },
 ];
 
-function todayDate() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
-    now.getDate(),
+// На сколько дней назад можно закрыть пропущенный урок
+const MAX_BACKDATE_DAYS = 15;
+
+function formatDate(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+    date.getDate(),
   ).padStart(2, '0')}`;
+}
+
+function todayDate() {
+  return formatDate(new Date());
+}
+
+// Дата приходит с клиента строкой: без проверки формата она уходит в DATEONLY
+// и роняет запрос ошибкой Postgres
+function normalizeDate(date) {
+  if (!date) return todayDate();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error('Некорректная дата урока');
+
+  const parsed = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsed.getTime()) || formatDate(parsed) !== date) {
+    throw new Error('Некорректная дата урока');
+  }
+  return date;
+}
+
+function earliestCloseDate() {
+  const earliest = new Date();
+  earliest.setHours(0, 0, 0, 0);
+  earliest.setDate(earliest.getDate() - MAX_BACKDATE_DAYS);
+  return formatDate(earliest);
+}
+
+// Границы обязательны: будущей датой учитель начислил бы coins вперёд, а без
+// нижней — сразу за любое число пропущенных дней.
+// Строки YYYY-MM-DD сравниваются лексикографически как даты.
+function resolveCloseDate(date) {
+  const closeDate = normalizeDate(date);
+  if (closeDate > todayDate()) throw new Error('Нельзя закрыть урок будущей датой');
+  if (closeDate < earliestCloseDate()) {
+    throw new Error(`Урок можно закрыть задним числом не старше ${MAX_BACKDATE_DAYS} дней`);
+  }
+
+  return closeDate;
 }
 
 export const classResolvers = {
@@ -75,12 +115,14 @@ export const classResolvers = {
   },
 
   Class: {
-    // Урок закрыт сегодня — снова «откроется» после полуночи, когда сменится дата
-    isClosedToday: async (parent) => {
-      const lesson = await Lesson.findOne({
-        where: { classId: parent.id, date: todayDate() },
+    // Даты проведённых уроков в окне закрытия задним числом. Одного поля хватает
+    // и на статус «закрыт сегодня», и на список ещё не закрытых прошлых дней.
+    closedDates: async (parent) => {
+      const lessons = await Lesson.findAll({
+        where: { classId: parent.id, date: { [Op.gte]: earliestCloseDate() } },
+        order: [['date', 'DESC']],
       });
-      return Boolean(lesson);
+      return lessons.map((lesson) => lesson.date);
     },
   },
 
@@ -159,9 +201,9 @@ export const classResolvers = {
       return existingClass;
     },
 
-    closeLesson: async (_, { classId, teacherId, studentIds }, context) => {
+    closeLesson: async (_, { classId, teacherId, studentIds, date: requestedDate }, context) => {
       requireStaff(context);
-      const date = todayDate();
+      const date = resolveCloseDate(requestedDate);
 
       // Начисление и создание урока одной транзакцией: без блокировки строк
       // студентов начисление читает баланс до параллельного перевода и затирает
@@ -189,8 +231,22 @@ export const classResolvers = {
         const teacher = await User.findByPk(teacherId, { transaction: t });
         if (!teacher) throw new Error('Учитель не найден');
 
-        const alreadyClosed = await Lesson.findOne({ where: { classId, date }, transaction: t });
-        if (alreadyClosed) throw new Error('Урок сегодня уже проведён');
+        // Все уроки за эту дату сразу: они отвечают и на «класс уже закрыт», и на
+        // «студент уже получил coins за этот день». Дату урока нельзя держать в
+        // User.lessonCoinsDate: при закрытии задним числом это поле уехало бы в
+        // прошлое и разрешило повторное начисление за сегодня.
+        // Читаем после блокировки студентов, иначе параллельное закрытие другого
+        // класса ещё не видно.
+        const lessonsOnDate = await Lesson.findAll({ where: { date }, transaction: t });
+        if (lessonsOnDate.some((lesson) => String(lesson.classId) === String(classId))) {
+          throw new Error('Урок за эту дату уже закрыт');
+        }
+
+        const awardedEarlierIds = new Set(
+          lessonsOnDate.flatMap((lesson) =>
+            (lesson.students ?? []).map((student) => String(student.id)),
+          ),
+        );
 
         const techData = await TechnicalData.findOne({ transaction: t });
         const coinsValue = techData?.lessonValue ?? 0;
@@ -200,10 +256,9 @@ export const classResolvers = {
         // Последовательно, а не Promise.all: у транзакции одно соединение,
         // параллельные запросы по нему выполнять нельзя.
         for (const student of students) {
-          if (!coinsValue || student.lessonCoinsDate === date) continue;
+          if (!coinsValue || awardedEarlierIds.has(String(student.id))) continue;
 
           student.coins += coinsValue;
-          student.lessonCoinsDate = date;
           await student.save({ transaction: t });
           awardedStudentIds.push(student.id);
           await logCoinTransaction(
