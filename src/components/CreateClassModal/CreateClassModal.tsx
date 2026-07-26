@@ -34,7 +34,7 @@ type ModalProps = {
   onSubmit: () => void;
 };
 
-const MAX_TEACHERS = 3;
+const MAX_TEACHERS = 5;
 
 function CreateClassModal({ classToEdit, onClose, onSubmit }: ModalProps) {
   const [selectedTeachers, setSelectedTeachers] = useState<User[]>(classToEdit?.teachers ?? []);
@@ -153,7 +153,7 @@ function CreateClassModal({ classToEdit, onClose, onSubmit }: ModalProps) {
               <InputField value={name} onChange={setName} />
             </div>
             <div>
-              <Subtitle>Учителя (1–3)</Subtitle>
+              <Subtitle>Учителя (1–{MAX_TEACHERS})</Subtitle>
               <MultipleSelect
                 value={selectedTeachers}
                 items={teachers}

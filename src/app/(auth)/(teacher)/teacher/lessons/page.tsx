@@ -2,6 +2,7 @@
 import { User } from '@/app/types';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import CloseLessonModal from '@/components/CloseLessonModal/CloseLessonModal';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import Loader from '@/components/Loader/Loaader';
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import Section from '@/components/Section/Section';
@@ -9,13 +10,14 @@ import Subtitle from '@/components/Subtitle/Subtitle';
 import Title from '@/components/Title/Title';
 import { useUser } from '@/contexts/UserContext';
 import { CLOSE_LESSON } from '@/graphql/mutations/CloseLesson';
-import { GET_CLASSES_BY_TEACHER } from '@/graphql/queries/GetClassesByTeacher';
+import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
+import { GET_LESSON_CLASSES } from '@/graphql/queries/GetLessonClasses';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { useQuery } from '@apollo/client';
 import { Fragment, useState } from 'react';
 import styles from './LessonsPage.module.scss';
 
-const MAX_BACKDATE_DAYS = 7;
+const MAX_BACKDATE_DAYS = 15;
 
 type ClassItem = {
   id: string;
@@ -26,9 +28,26 @@ type ClassItem = {
   students: User[];
 };
 
+function sortOwnFirst(classes: ClassItem[], teacherId?: string) {
+  return [...classes].sort((first, second) => {
+    const isFirstOwn = first.teachers.some((teacher) => teacher.id === teacherId);
+    const isSecondOwn = second.teachers.some((teacher) => teacher.id === teacherId);
+    if (isFirstOwn !== isSecondOwn) return isFirstOwn ? -1 : 1;
+    return first.name.localeCompare(second.name);
+  });
+}
+
 type ActiveLesson = {
   classId: string;
   isBackdated: boolean;
+};
+
+// Урок, который выбрали закрыть: ждёт подтверждения перед начислением коинов
+type PendingClose = {
+  classId: string;
+  className: string;
+  studentIds: string[];
+  date?: string;
 };
 
 function formatLocalDate(date: Date) {
@@ -37,8 +56,18 @@ function formatLocalDate(date: Date) {
   ).padStart(2, '0')}`;
 }
 
-// Все прошедшие дни окна: уже закрытые показываем неактивными, а не прячем
-function pastDateOptions(closedDates: string[]) {
+function formatHumanDate(date: string, today: string) {
+  const readable = new Date(`${date}T00:00:00`).toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+  return date === today ? `${readable} (сегодня)` : readable;
+}
+
+// Все прошедшие дни окна: уже закрытые показываем неактивными, а не прячем.
+// seasonStart отсекает дни до начала сезона — уроков там не было
+function pastDateOptions(closedDates: string[], seasonStart?: string) {
   const options = [];
 
   for (let daysAgo = 1; daysAgo <= MAX_BACKDATE_DAYS; daysAgo++) {
@@ -47,6 +76,7 @@ function pastDateOptions(closedDates: string[]) {
     date.setDate(date.getDate() - daysAgo);
 
     const value = formatLocalDate(date);
+    if (seasonStart && value < seasonStart) break;
 
     options.push({
       value,
@@ -65,26 +95,46 @@ function pastDateOptions(closedDates: string[]) {
 export default function LessonsPage() {
   // От isBackdated зависит, спрашивает модалка дату или закрывает урок за сегодня
   const [activeLesson, setActiveLesson] = useState<ActiveLesson | null>(null);
+  const [pendingClose, setPendingClose] = useState<PendingClose | null>(null);
   const { user } = useUser();
-  const { data, loading, refetch } = useQuery(GET_CLASSES_BY_TEACHER, {
-    variables: { teacherId: user?.id },
-    skip: !user?.id,
-  });
+  const { data, loading, refetch } = useQuery(GET_LESSON_CLASSES);
+  const { data: seasonData } = useQuery(GET_ACTIVE_SEASON);
 
   const [closeLesson] = useGlobalLoadingMutation(CLOSE_LESSON);
 
-  async function handleCloseLesson(studentIds: string[], date?: string) {
+  // Галочки и дата выбраны — спрашиваем подтверждение, коины начисляем только после него
+  function handleSubmitSelection(studentIds: string[], date?: string) {
+    const classItem = classes.find((item) => item.id === activeLesson?.classId);
+    if (!classItem) return;
+
+    setPendingClose({ classId: classItem.id, className: classItem.name, studentIds, date });
+    setActiveLesson(null);
+  }
+
+  async function handleConfirmClose() {
+    if (!pendingClose) return;
+
     try {
-      await closeLesson({ classId: activeLesson?.classId, teacherId: user?.id, studentIds, date });
+      await closeLesson({
+        classId: pendingClose.classId,
+        teacherId: user?.id,
+        studentIds: pendingClose.studentIds,
+        date: pendingClose.date,
+      });
       refetch();
-      setActiveLesson(null);
     } catch {
       console.error('Error');
     }
+    setPendingClose(null);
   }
 
-  const classes: ClassItem[] = data?.classesByTeacher ?? [];
+  const classes = sortOwnFirst(data?.classes ?? [], user?.id);
   const today = formatLocalDate(new Date());
+  // startDate приходит таймстампом-строкой, как на других страницах с датами сезона
+  const seasonStartTimestamp = Number(seasonData?.activeSeason?.startDate);
+  const seasonStart = seasonStartTimestamp
+    ? formatLocalDate(new Date(seasonStartTimestamp))
+    : undefined;
 
   if (loading)
     return (
@@ -107,7 +157,7 @@ export default function LessonsPage() {
       )}
       {classes.map((classItem) => {
         const isClosedToday = classItem.closedDates.includes(today);
-        const pastDates = pastDateOptions(classItem.closedDates);
+        const pastDates = pastDateOptions(classItem.closedDates, seasonStart);
         const hasMissedDates = pastDates.some((option) => !option.disabled);
 
         return (
@@ -119,9 +169,12 @@ export default function LessonsPage() {
                   Место: {classItem.place?.name ?? '—'}
                 </div>
                 <div className={styles['lesson-card__row']}>
+                  Учителя: {classItem.teachers.map((teacher) => teacher.name).join(', ') || '—'}
+                </div>
+                {/* <div className={styles['lesson-card__row']}>
                   Студенты ({classItem.students.length}):{' '}
                   {classItem.students.map((student) => student.name).join(', ') || '—'}
-                </div>
+                </div> */}
 
                 {isClosedToday ? (
                   <>
@@ -132,7 +185,7 @@ export default function LessonsPage() {
                           setActiveLesson({ classId: classItem.id, isBackdated: true })
                         }
                       >
-                        Начислить за прошлую дату
+                        Закрыть прошедший урок
                       </PrimaryButton>
                     )}
                   </>
@@ -151,13 +204,28 @@ export default function LessonsPage() {
                 title={activeLesson.isBackdated ? 'Начислить за прошлую дату' : 'Завершить урок'}
                 students={classItem.students}
                 dateOptions={activeLesson.isBackdated ? pastDates : undefined}
-                onSubmit={handleCloseLesson}
+                onSubmit={handleSubmitSelection}
                 onClose={() => setActiveLesson(null)}
               />
             )}
           </Fragment>
         );
       })}
+
+      {pendingClose && (
+        <ConfirmModal
+          title="Вы уверены что хотите закрыть урок?"
+          confirmText="Закрыть урок"
+          onConfirm={handleConfirmClose}
+          onClose={() => setPendingClose(null)}
+        >
+          <div className={styles['confirm-row']}>Класс: {pendingClose.className}</div>
+          <div className={styles['confirm-row']}>
+            Дата: {formatHumanDate(pendingClose.date ?? today, today)}
+          </div>
+          <div className={styles['confirm-row']}>Закрывает: {user?.name ?? '—'}</div>
+        </ConfirmModal>
+      )}
     </CenteredContainer>
   );
 }

@@ -21,6 +21,9 @@ const classInclude = [
 // На сколько дней назад можно закрыть пропущенный урок
 const MAX_BACKDATE_DAYS = 15;
 
+// Учителей на класс: должно хватать на всю ротацию по расписанию
+const MAX_TEACHERS = 5;
+
 function formatDate(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
     date.getDate(),
@@ -44,21 +47,30 @@ function normalizeDate(date) {
   return date;
 }
 
-function earliestCloseDate() {
+// Нижняя граница закрытия: окно в MAX_BACKDATE_DAYS, но не раньше старта сезона —
+// до сезона уроков не было, такие даты предлагать и принимать незачем
+async function earliestCloseDate() {
   const earliest = new Date();
   earliest.setHours(0, 0, 0, 0);
   earliest.setDate(earliest.getDate() - MAX_BACKDATE_DAYS);
-  return formatDate(earliest);
+
+  const activeSeason = await Season.findOne({ where: { isActive: true } });
+  const seasonStart = activeSeason?.startDate ? formatDate(new Date(activeSeason.startDate)) : null;
+  const windowStart = formatDate(earliest);
+
+  return seasonStart && seasonStart > windowStart ? seasonStart : windowStart;
 }
 
 // Границы обязательны: будущей датой учитель начислил бы coins вперёд, а без
 // нижней — сразу за любое число пропущенных дней.
 // Строки YYYY-MM-DD сравниваются лексикографически как даты.
-function resolveCloseDate(date) {
+async function resolveCloseDate(date) {
   const closeDate = normalizeDate(date);
   if (closeDate > todayDate()) throw new Error('Нельзя закрыть урок будущей датой');
-  if (closeDate < earliestCloseDate()) {
-    throw new Error(`Урок можно закрыть задним числом не старше ${MAX_BACKDATE_DAYS} дней`);
+
+  const earliest = await earliestCloseDate();
+  if (closeDate < earliest) {
+    throw new Error(`Урок можно закрыть задним числом не старше чем с ${earliest}`);
   }
 
   return closeDate;
@@ -119,7 +131,7 @@ export const classResolvers = {
     // и на статус «закрыт сегодня», и на список ещё не закрытых прошлых дней.
     closedDates: async (parent) => {
       const lessons = await Lesson.findAll({
-        where: { classId: parent.id, date: { [Op.gte]: earliestCloseDate() } },
+        where: { classId: parent.id, date: { [Op.gte]: await earliestCloseDate() } },
         order: [['date', 'DESC']],
       });
       return lessons.map((lesson) => lesson.date);
@@ -132,8 +144,8 @@ export const classResolvers = {
       if (!teacherIds || teacherIds.length === 0) {
         throw new Error('Не указаны учителя');
       }
-      if (teacherIds.length > 3) {
-        throw new Error('Не больше 3 учителей');
+      if (teacherIds.length > MAX_TEACHERS) {
+        throw new Error(`Не больше ${MAX_TEACHERS} учителей`);
       }
 
       const activeSeason = await Season.findOne({ where: { isActive: true } });
@@ -164,7 +176,9 @@ export const classResolvers = {
 
       if (teacherIds) {
         if (teacherIds.length === 0) throw new Error('Не указаны учителя');
-        if (teacherIds.length > 3) throw new Error('Не больше 3 учителей');
+        if (teacherIds.length > MAX_TEACHERS) {
+          throw new Error(`Не больше ${MAX_TEACHERS} учителей`);
+        }
         await existingClass.setTeachers(teacherIds);
       }
 
@@ -203,7 +217,7 @@ export const classResolvers = {
 
     closeLesson: async (_, { classId, teacherId, studentIds, date: requestedDate }, context) => {
       requireStaff(context);
-      const date = resolveCloseDate(requestedDate);
+      const date = await resolveCloseDate(requestedDate);
 
       // Начисление и создание урока одной транзакцией: без блокировки строк
       // студентов начисление читает баланс до параллельного перевода и затирает
