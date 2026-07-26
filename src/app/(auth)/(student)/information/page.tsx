@@ -19,6 +19,7 @@ import DOMPurify from 'dompurify';
 
 export default function InfoPage() {
   const { user } = useUser();
+  const isStaff = !!user && user.userLevel !== UserLevel.Student;
   const [showCreator, setShowCreator] = useState(false);
   const [editingPost, setEditingPost] = useState<PostType | null>(null);
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
@@ -97,15 +98,13 @@ export default function InfoPage() {
 
   return (
     <CenteredContainer>
-      {user?.userLevel !== 'STUDENT' && (
-        <PrimaryButton onClick={() => setShowCreator(true)}>Добавить пост</PrimaryButton>
-      )}
+      {isStaff && <PrimaryButton onClick={() => setShowCreator(true)}>Добавить пост</PrimaryButton>}
 
       {sortedPosts.map((post: PostType) => (
         <Post
           key={post.id}
           post={post}
-          isEditable={user?.userLevel !== UserLevel.Student}
+          isEditable={isStaff}
           onEdit={handleEditPost}
           onDelete={handleDeleteRequest}
         />

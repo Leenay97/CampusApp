@@ -3,11 +3,12 @@ import DOMPurify from 'dompurify';
 import { useMutation } from '@apollo/client';
 import { useEffect, useRef, useState } from 'react';
 import styles from './Post.module.scss';
-import EditButton from '../EditButton/EditButton';
-import DeleteButton from '../DeleteButton/DeleteButton';
 import { SET_POST_REACTION } from '@/graphql/mutations/SetPostReaction';
 import { SET_POST_PINNED } from '@/graphql/mutations/SetPostPinned';
 import PinIcon from '@/modules/icons/PinIcon';
+import EditIcon from '@/modules/icons/EditIcon';
+import DeleteIcon from '@/modules/icons/DeleteIcon';
+import DotsIcon from '@/modules/icons/DotsIcon';
 
 const REACTIONS = ['👍🏻', '🤣', '👹', '❤️', '🎉', '😭'];
 
@@ -22,7 +23,9 @@ export default function Post({ post, isEditable = false, onEdit, onDelete }: Pos
   const [setReaction] = useMutation(SET_POST_REACTION);
   const [setPinned] = useMutation(SET_POST_PINNED);
   const [showPicker, setShowPicker] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!showPicker) return;
@@ -34,6 +37,17 @@ export default function Post({ post, isEditable = false, onEdit, onDelete }: Pos
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showPicker]);
+
+  useEffect(() => {
+    if (!showMenu) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
 
   const formattedDate = new Date(Number(post.createdAt)).toLocaleString('ru-RU', {
     day: '2-digit',
@@ -97,28 +111,64 @@ export default function Post({ post, isEditable = false, onEdit, onDelete }: Pos
   return (
     <div className={`${styles['post']} ${post.isPinned ? styles['post--pinned'] : ''}`}>
       <div className={styles['post__header']}>
-        {post.title}
-        {post.isPinned && (
-          <div className={styles['post__pinned-label']}>
-            <PinIcon width={12} height={12} />
-            Закреплено
+        <div className={styles['post__heading']}>
+          <span className={styles['post__title']}>{post.title}</span>
+          {post.isPinned && (
+            <div className={styles['post__pinned-label']}>
+              <PinIcon width={12} height={12} />
+              Закреплено
+            </div>
+          )}
+        </div>
+        {isEditable && (
+          <div className={styles['post__menu-wrapper']} ref={menuRef}>
+            <button
+              type="button"
+              title="Действия"
+              aria-label="Действия с постом"
+              className={styles['post__menu-toggle']}
+              onClick={() => setShowMenu((v) => !v)}
+            >
+              <DotsIcon width={20} height={20} />
+            </button>
+            {showMenu && (
+              <div className={styles['post__menu']}>
+                <button
+                  type="button"
+                  className={styles['post__menu-item']}
+                  onClick={() => {
+                    handleTogglePin();
+                    setShowMenu(false);
+                  }}
+                >
+                  <PinIcon width={16} height={16} />
+                  {post.isPinned ? 'Открепить' : 'Закрепить'}
+                </button>
+                <button
+                  type="button"
+                  className={styles['post__menu-item']}
+                  onClick={() => {
+                    onEdit?.(post);
+                    setShowMenu(false);
+                  }}
+                >
+                  <EditIcon width={16} height={16} stroke="currentColor" />
+                  Редактировать
+                </button>
+                <button
+                  type="button"
+                  className={`${styles['post__menu-item']} ${styles['post__menu-item--danger']}`}
+                  onClick={() => {
+                    onDelete?.(post.id);
+                    setShowMenu(false);
+                  }}
+                >
+                  <DeleteIcon width={16} height={16} stroke="currentColor" />
+                  Удалить
+                </button>
+              </div>
+            )}
           </div>
-        )}
-        {isEditable && (
-          <button
-            type="button"
-            title={post.isPinned ? 'Открепить' : 'Закрепить'}
-            className={`${styles['post__pin']} ${post.isPinned ? styles['post__pin--active'] : ''}`}
-            onClick={handleTogglePin}
-          >
-            <PinIcon width={20} height={20} />
-          </button>
-        )}
-        {isEditable && (
-          <EditButton className={styles['post__edit']} onClick={() => onEdit?.(post)} />
-        )}
-        {isEditable && (
-          <DeleteButton className={styles['post__delete']} onClick={() => onDelete?.(post.id)} />
         )}
       </div>
       <div
