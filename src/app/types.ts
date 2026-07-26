@@ -212,6 +212,7 @@ export type IpodMatch = {
   date: string;
   pairs: IpodPair[];
   winner?: IpodPair | null;
+  isDraw?: boolean;
 };
 
 export type IpodRoundName = {

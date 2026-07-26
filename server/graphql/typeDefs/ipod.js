@@ -16,6 +16,7 @@ export const ipodTypeDefs = gql`
     date: String
     pairs: [IpodPair]!
     winner: IpodPair
+    isDraw: Boolean!
   }
 
   type IpodRoundName {

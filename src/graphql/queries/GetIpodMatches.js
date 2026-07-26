@@ -22,6 +22,7 @@ export const GET_IPOD_MATCHES = gql`
       winner {
         id
       }
+      isDraw
     }
   }
 `;

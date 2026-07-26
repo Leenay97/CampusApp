@@ -1,6 +1,8 @@
 import { IpodPair, IpodMatch, IpodTournament, User, Group } from '../../models/index.js';
 import { requireAuth, requireStaff, requireAdmin } from '../auth.js';
 
+const DRAW_ID = 'DRAW';
+
 async function getCurrentRound(seasonId) {
   const tournament = await IpodTournament.findOne({ where: { seasonId } });
   return tournament?.currentRound ?? 1;
@@ -13,8 +15,6 @@ function formatRoundNames(roundNames) {
   }));
 }
 
-// Пары, доступные для матчей текущего тура: в туре 1 — ещё нигде не сыгравшие,
-// в туре 2+ — победители предыдущего тура, ещё не сыгравшие в текущем
 async function getEligiblePairsForRound(seasonId, round) {
   if (round === 1) {
     const [pairs, matches] = await Promise.all([
@@ -29,11 +29,17 @@ async function getEligiblePairsForRound(seasonId, round) {
     IpodMatch.findAll({ where: { seasonId, round: round - 1 } }),
     IpodMatch.findAll({ where: { seasonId, round } }),
   ]);
-  const winnerIds = previousRoundMatches
-    .filter((match) => match.winnerId)
-    .map((match) => match.winnerId);
+
+  const advancedIds = previousRoundMatches.flatMap((match) => {
+    if (match.winnerId === DRAW_ID) {
+      return match.pairIds;
+    }
+    return match.winnerId ? [match.winnerId] : [];
+  });
+
   const usedThisRoundIds = new Set(currentRoundMatches.flatMap((match) => match.pairIds));
-  const eligibleIds = winnerIds.filter((id) => !usedThisRoundIds.has(id));
+  const eligibleIds = advancedIds.filter((id) => !usedThisRoundIds.has(id));
+
   if (!eligibleIds.length) return [];
 
   return await IpodPair.findAll({ where: { id: eligibleIds } });
@@ -134,7 +140,7 @@ export const ipodResolvers = {
       requireAdmin(context);
       const match = await IpodMatch.findByPk(id);
       if (!match) throw new Error('Матч не найден');
-      if (!match.pairIds.includes(winnerId)) {
+      if (!match.pairIds.includes(winnerId) && winnerId !== DRAW_ID) {
         throw new Error('Победитель должен быть участником матча');
       }
 
@@ -143,7 +149,12 @@ export const ipodResolvers = {
         throw new Error('Тур уже закрыт — нельзя изменить победителя');
       }
 
-      match.winnerId = winnerId;
+      if (winnerId === DRAW_ID) {
+        match.winnerId = DRAW_ID;
+      } else {
+        match.winnerId = winnerId;
+      }
+
       await match.save();
       return match;
     },
@@ -170,9 +181,10 @@ export const ipodResolvers = {
       const currentRoundMatches = await IpodMatch.findAll({
         where: { seasonId, round: currentRound },
       });
+
       const hasUnresolvedMatch = currentRoundMatches.some((match) => !match.winnerId);
       if (hasUnresolvedMatch) {
-        throw new Error('Не у всех матчей этого тура определён победитель');
+        throw new Error('Не у всех матчей этого тура определён результат');
       }
 
       const [tournament] = await IpodTournament.findOrCreate({
@@ -225,8 +237,9 @@ export const ipodResolvers = {
       return await IpodPair.findAll({ where: { id: match.pairIds } });
     },
     winner: async (match) => {
-      if (!match.winnerId) return null;
+      if (!match.winnerId || match.winnerId === DRAW_ID) return null;
       return await IpodPair.findByPk(match.winnerId);
     },
+    isDraw: (match) => match.winnerId === DRAW_ID,
   },
 };

@@ -70,6 +70,9 @@ export default function IpodPage() {
     pairId: string;
     pairName: string;
   } | null>(null);
+  const [drawPendingConfirm, setDrawPendingConfirm] = useState<{
+    matchId: string;
+  } | null>(null);
   const [matchDate, setMatchDate] = useState(todayDateString());
   const [matchDatePendingEdit, setMatchDatePendingEdit] = useState<{
     matchId: string;
@@ -145,12 +148,12 @@ export default function IpodPage() {
     return roundNames.find((entry) => entry.round === round)?.name ?? `Тур ${round}`;
   }
 
-  // Учителя и студенты видят только решённые матчи и матчи сегодняшнего дня —
-  // остальное (незавершённые матчи прошлых/будущих дней) видит только админ
   const visibleMatches = useMemo(() => {
     if (isAdmin) return matches;
-    return matches.filter((match) => match.winner || isMatchToday(match));
+    return matches.filter((match) => match.winner || match.isDraw || isMatchToday(match));
   }, [matches, isAdmin]);
+
+  console.log(matchesData);
 
   const matchesByRound = useMemo(() => {
     const map = new Map<number, IpodMatch[]>();
@@ -166,7 +169,8 @@ export default function IpodPage() {
     [matches, currentRound],
   );
   const canAdvanceRound =
-    currentRoundMatches.length > 0 && currentRoundMatches.every((match) => match.winner);
+    currentRoundMatches.length > 0 &&
+    currentRoundMatches.every((match) => match.winner || match.isDraw);
 
   function toggleWaitingPair(pairId: string) {
     setSelectedWaitingPairIds((prev) => {
@@ -224,6 +228,19 @@ export default function IpodPage() {
         winnerId: winnerPendingConfirm.pairId,
       });
       setWinnerPendingConfirm(null);
+    } catch {
+      return;
+    }
+  }
+
+  async function handleConfirmSetDraw() {
+    if (!drawPendingConfirm) return;
+    try {
+      await setIpodMatchWinner({
+        id: drawPendingConfirm.matchId,
+        winnerId: 'DRAW',
+      });
+      setDrawPendingConfirm(null);
     } catch {
       return;
     }
@@ -449,6 +466,23 @@ export default function IpodPage() {
                             </div>
                           );
                         })}
+                        {isAdmin && match.round === currentRound && (
+                          <div className={styles['ipod__tie-actions']}>
+                            {match.isDraw ? (
+                              <div className={styles['ipod__tie-badge_active']}>Tie 🤝</div>
+                            ) : (
+                              <div
+                                className={styles['ipod__tie-badge']}
+                                onClick={() => setDrawPendingConfirm({ matchId: match.id })}
+                              >
+                                Tie
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {!isAdmin && match.isDraw && (
+                          <div className={styles['ipod__tie-badge_active']}>Tie 🤝</div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -503,6 +537,17 @@ export default function IpodPage() {
           <ModalFooter>
             <SecondaryButton onClick={() => setWinnerPendingConfirm(null)}>Отмена</SecondaryButton>
             <PrimaryButton onClick={handleConfirmSetWinner}>Подтвердить</PrimaryButton>
+          </ModalFooter>
+        </Modal>
+      )}
+
+      {drawPendingConfirm && (
+        <Modal onClose={() => setDrawPendingConfirm(null)}>
+          <ModalHeader title="Ничья" onClose={() => setDrawPendingConfirm(null)} />
+          <ModalBody>Установить ничью в этом матче?</ModalBody>
+          <ModalFooter>
+            <SecondaryButton onClick={() => setDrawPendingConfirm(null)}>Отмена</SecondaryButton>
+            <PrimaryButton onClick={handleConfirmSetDraw}>Подтвердить</PrimaryButton>
           </ModalFooter>
         </Modal>
       )}
