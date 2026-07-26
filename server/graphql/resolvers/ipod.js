@@ -182,6 +182,10 @@ export const ipodResolvers = {
         where: { seasonId, round: currentRound },
       });
 
+      if (!currentRoundMatches.length) {
+        throw new Error('Нельзя закрыть тур без матчей');
+      }
+
       const hasUnresolvedMatch = currentRoundMatches.some((match) => !match.winnerId);
       if (hasUnresolvedMatch) {
         throw new Error('Не у всех матчей этого тура определён результат');

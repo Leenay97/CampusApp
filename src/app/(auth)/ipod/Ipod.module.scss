@@ -77,6 +77,26 @@
     margin-bottom: 20px;
   }
 
+  &__dropped {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  &__dropped-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    span {
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--color-red);
+      overflow-wrap: anywhere;
+    }
+  }
+
   &__matches {
     display: flex;
     flex-direction: column;

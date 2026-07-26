@@ -73,6 +73,7 @@ export default function IpodPage() {
   const [drawPendingConfirm, setDrawPendingConfirm] = useState<{
     matchId: string;
   } | null>(null);
+  const [isDroppedPairsConfirmOpen, setIsDroppedPairsConfirmOpen] = useState(false);
   const [matchDate, setMatchDate] = useState(todayDateString());
   const [matchDatePendingEdit, setMatchDatePendingEdit] = useState<{
     matchId: string;
@@ -152,8 +153,6 @@ export default function IpodPage() {
     if (isAdmin) return matches;
     return matches.filter((match) => match.winner || match.isDraw || isMatchToday(match));
   }, [matches, isAdmin]);
-
-  console.log(matchesData);
 
   const matchesByRound = useMemo(() => {
     const map = new Map<number, IpodMatch[]>();
@@ -246,10 +245,19 @@ export default function IpodPage() {
     }
   }
 
+  function handleAdvanceRoundClick() {
+    if (waitingPairs.length) {
+      setIsDroppedPairsConfirmOpen(true);
+      return;
+    }
+    handleAdvanceRound();
+  }
+
   async function handleAdvanceRound() {
     if (!seasonId) return;
     try {
       await advanceIpodRound({ seasonId });
+      setIsDroppedPairsConfirmOpen(false);
     } catch {
       return;
     }
@@ -383,7 +391,7 @@ export default function IpodPage() {
 
         {isAdmin && (
           <div className={styles['ipod__advance']}>
-            <PrimaryButton disabled={!canAdvanceRound} onClick={handleAdvanceRound}>
+            <PrimaryButton disabled={!canAdvanceRound} onClick={handleAdvanceRoundClick}>
               Закрыть «{getRoundName(currentRound)}» и начать «{getRoundName(currentRound + 1)}»
             </PrimaryButton>
           </div>
@@ -466,22 +474,17 @@ export default function IpodPage() {
                             </div>
                           );
                         })}
-                        {isAdmin && match.round === currentRound && (
-                          <div className={styles['ipod__tie-actions']}>
-                            {match.isDraw ? (
-                              <div className={styles['ipod__tie-badge_active']}>Tie 🤝</div>
-                            ) : (
-                              <div
-                                className={styles['ipod__tie-badge']}
-                                onClick={() => setDrawPendingConfirm({ matchId: match.id })}
-                              >
-                                Tie
-                              </div>
-                            )}
-                          </div>
+                        {/* Ничью видно всем и в любом туре, кнопка — только админу в текущем */}
+                        {match.isDraw && (
+                          <div className={styles['ipod__tie-badge_active']}>Draw 🤝</div>
                         )}
-                        {!isAdmin && match.isDraw && (
-                          <div className={styles['ipod__tie-badge_active']}>Tie 🤝</div>
+                        {!match.isDraw && isAdmin && match.round === currentRound && (
+                          <div
+                            className={styles['ipod__tie-badge']}
+                            onClick={() => setDrawPendingConfirm({ matchId: match.id })}
+                          >
+                            Draw
+                          </div>
                         )}
                       </div>
                     </div>
@@ -548,6 +551,33 @@ export default function IpodPage() {
           <ModalFooter>
             <SecondaryButton onClick={() => setDrawPendingConfirm(null)}>Отмена</SecondaryButton>
             <PrimaryButton onClick={handleConfirmSetDraw}>Подтвердить</PrimaryButton>
+          </ModalFooter>
+        </Modal>
+      )}
+
+      {isDroppedPairsConfirmOpen && (
+        <Modal onClose={() => setIsDroppedPairsConfirmOpen(false)}>
+          <ModalHeader
+            title="Есть несыгравшие команды"
+            onClose={() => setIsDroppedPairsConfirmOpen(false)}
+          />
+          <ModalBody>
+            <div className={styles['ipod__dropped']}>
+              <span>
+                Эти команды не сыграли в туре «{getRoundName(currentRound)}» и выбудут из турнира:
+              </span>
+              <div className={styles['ipod__dropped-list']}>
+                {waitingPairs.map((pair) => (
+                  <span key={pair.id}>{pair.name}</span>
+                ))}
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <SecondaryButton onClick={() => setIsDroppedPairsConfirmOpen(false)}>
+              Отмена
+            </SecondaryButton>
+            <PrimaryButton onClick={handleAdvanceRound}>Закрыть тур</PrimaryButton>
           </ModalFooter>
         </Modal>
       )}
