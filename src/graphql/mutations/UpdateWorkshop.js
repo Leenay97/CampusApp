@@ -10,6 +10,7 @@ export const UPDATE_WORKSHOP = gql`
     $maxStudents: Int
     $maxAge: Int
     $date: String
+    $image: String
   ) {
     updateWorkshop(
       id: $id
@@ -20,12 +21,14 @@ export const UPDATE_WORKSHOP = gql`
       maxStudents: $maxStudents
       maxAge: $maxAge
       date: $date
+      image: $image
     ) {
       id
       name
       description
       placeId
       maxStudents
+      image
     }
   }
 `;

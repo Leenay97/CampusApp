@@ -13,6 +13,7 @@ export const workshopTypeDefs = gql`
     maxAge: Int
     date: String
     isClosed: Boolean
+    image: String
   }
 
   extend type Query {
@@ -33,6 +34,7 @@ export const workshopTypeDefs = gql`
       maxAge: Int
       type: String!
       date: String!
+      image: String
     ): Workshop
     updateWorkshop(
       id: ID!
@@ -43,7 +45,10 @@ export const workshopTypeDefs = gql`
       maxStudents: Int
       maxAge: Int
       date: String
+      image: String
     ): Workshop
+    uploadWorkshopImage(file: Upload!): String!
+    deleteWorkshopImage(url: String!): Boolean!
     joinWorkshop(studentId: ID!, workshopId: ID!, isSport: Boolean): Workshop
     closeWorkshop(studentIds: [ID!]!, workshopId: ID!): Workshop
   }

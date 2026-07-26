@@ -10,6 +10,7 @@ export const CREATE_WORKSHOP = gql`
     $maxAge: Int
     $type: String!
     $date: String!
+    $image: String
   ) {
     createWorkshop(
       name: $name
@@ -20,12 +21,14 @@ export const CREATE_WORKSHOP = gql`
       maxAge: $maxAge
       type: $type
       date: $date
+      image: $image
     ) {
       id
       name
       description
       placeId
       maxStudents
+      image
     }
   }
 `;

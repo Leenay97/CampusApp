@@ -52,7 +52,10 @@
 
     
   &__description {
-    font-size: 12px;
+    font-size: 14px;
+    padding: 5px;
+    letter-spacing: -0.2px;
+    overflow-wrap: break-word;
     color: #666;
   }
   &__place {
@@ -75,5 +78,34 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+  }
+
+  &__info-section {
+    max-height: 0;
+    overflow: hidden;
+    transition: 0.3s all ease-in-out;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+
+    &_open {
+      max-height: 1000px;
+      margin-top: 10px;
+    }
+  }
+
+  &__info-btn {
+    text-align: center;
+    padding: 5px 10px;
+    background-color: rgb(120, 192, 227);
+    color: white;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
   }
 }

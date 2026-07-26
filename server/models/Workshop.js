@@ -10,4 +10,5 @@ export const Workshop = sequelize.define('Workshop', {
   isClosed: { type: DataTypes.BOOLEAN, defaultValue: false },
   date: { type: DataTypes.DATE, allowNull: false },
   maxAge: { type: DataTypes.INTEGER, allowNull: true },
+  image: { type: DataTypes.STRING, allowNull: true },
 });

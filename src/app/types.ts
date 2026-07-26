@@ -33,6 +33,7 @@ export type Workshop = {
   place: Pick<Place, 'name' | 'id'>;
   isClosed: boolean;
   date: Date;
+  image?: string;
 };
 
 export type Place = {

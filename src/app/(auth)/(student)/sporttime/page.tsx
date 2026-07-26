@@ -46,6 +46,7 @@ export default function SportPage(): JSX.Element {
             key={workshop.id}
             name={workshop.name}
             description={workshop.description}
+            image={workshop.image}
             students={[]}
             maxStudentAmount={0}
             place={workshop.place.name}

@@ -1,12 +1,14 @@
 'use client';
-import { memo, useState, ChangeEvent } from 'react';
+import { memo, useRef, useState, ChangeEvent } from 'react';
+import Image from 'next/image';
 import styles from './CreateWorkshopModal.module.scss';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import { InputField } from '../InputField/InputField';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
+import { DELETE_WORKSHOP_IMAGE } from '@/graphql/mutations/DeleteWorkshopImage';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import { Place, User, Workshop as WorkshopType } from '@/app/types';
 import { CustomSelect } from '@components/CustomSelect/CustomSelect';
@@ -16,6 +18,8 @@ import Modal from '../Modal/Modal';
 import ModalFooter from '../Modal/ModalFooter';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
+
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 type WorkshopDate = {
   label: string;
@@ -55,8 +59,11 @@ function CreateWorkshopModal({
   const [capacity, setCapacity] = useState<string>(
     workshop?.maxStudents ? String(workshop.maxStudents) : '',
   );
+  const [description, setDescription] = useState<string>(workshop?.description ?? '');
+  const [image, setImage] = useState<string | undefined>(workshop?.image);
   const [isAddingPlace, setIsAddingPlace] = useState(false);
   const [newPlaceName, setNewPlaceName] = useState('');
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: teachersData, loading: teachersLoading } = useQuery(queries.GET_TEACHERS);
 
@@ -69,6 +76,14 @@ function CreateWorkshopModal({
   const [createWorkshop] = useGlobalLoadingMutation(mutations.CREATE_WORKSHOP);
   const [updateWorkshop] = useGlobalLoadingMutation(mutations.UPDATE_WORKSHOP);
   const [createPlace] = useGlobalLoadingMutation(mutations.CREATE_PLACE);
+  const [uploadWorkshopImage, { loading: imageUploading }] = useGlobalLoadingMutation<{
+    uploadWorkshopImage: string;
+  }>(mutations.UPLOAD_WORKSHOP_IMAGE);
+  // Без глобального лоадера: чистка файлов должна проходить незаметно
+  const [deleteWorkshopImage] = useMutation(DELETE_WORKSHOP_IMAGE);
+
+  // Картинки, загруженные за эту сессию редактирования, но не обязательно сохранённые
+  const uploadedImagesRef = useRef<string[]>([]);
 
   const loading = teachersLoading || placesLoading;
 
@@ -84,15 +99,55 @@ function CreateWorkshopModal({
     setSelectedPlace(place);
   }
 
+  // Удаляет с сервера картинки, загруженные в этой сессии, но не оставленные в поле image
+  function cleanupUnusedImages(finalImage?: string) {
+    uploadedImagesRef.current
+      .filter((url) => url !== finalImage)
+      .forEach((url) => {
+        deleteWorkshopImage({ variables: { url } }).catch((error) =>
+          console.error('Ошибка удаления картинки:', error),
+        );
+      });
+    uploadedImagesRef.current = [];
+  }
+
   function handleClose() {
+    // Мастеркласс не сохранён — все загруженные в этой сессии картинки не нужны
+    cleanupUnusedImages();
     onClose();
     setSelectedTeacher({} as User);
     setSelectedPlace({} as Place);
     setName('');
     setCapacity('');
     setMaxAge('');
+    setDescription('');
+    setImage(undefined);
     setIsAddingPlace(false);
     setNewPlaceName('');
+  }
+
+  async function handleImageSelect(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Файл не должен превышать 5MB');
+      return;
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      alert('Поддерживаются только JPEG, PNG и WEBP');
+      return;
+    }
+
+    try {
+      const data = await uploadWorkshopImage({ file });
+      uploadedImagesRef.current.push(data.uploadWorkshopImage);
+      setImage(data.uploadWorkshopImage);
+    } catch (error) {
+      console.error('Error uploading workshop image:', error);
+    }
   }
 
   async function handleCreatePlace() {
@@ -118,6 +173,10 @@ function CreateWorkshopModal({
         await updateWorkshop({
           id: workshop.id,
           name,
+          description,
+          // явный null, а не undefined — иначе Apollo не передаст поле на сервер,
+          // и сервер расценит это как "не менять", а не как "убрать картинку"
+          image: image ?? null,
           placeId: selectedPlace.id,
           teacherId: selectedTeacher.id,
           ...(sportTime ? {} : { maxStudents: parseInt(capacity, 10) }),
@@ -127,6 +186,8 @@ function CreateWorkshopModal({
       } else {
         await createWorkshop({
           name,
+          description,
+          image: image ?? null,
           placeId: selectedPlace.id,
           teacherId: selectedTeacher.id,
           ...(sportTime ? {} : { maxStudents: parseInt(capacity, 10) }),
@@ -135,6 +196,7 @@ function CreateWorkshopModal({
           date: selectedDate,
         });
       }
+      cleanupUnusedImages(image);
       onSubmit();
     } catch (error) {
       console.error(editMode ? 'Error updating workshop:' : 'Error creating workshop:', error);
@@ -147,7 +209,7 @@ function CreateWorkshopModal({
         title={`${editMode ? 'Редактировать' : 'Добавить'} ${sportTime ? 'Sport Time' : 'мастеркласс'}`}
         onClose={onClose}
       />
-      <ModalBody>
+      <ModalBody className={styles['modal__body']}>
         {loading && <Loader />}
         {!loading && (
           <>
@@ -176,11 +238,11 @@ function CreateWorkshopModal({
               </div>
             )}
             <div>
-              <Subtitle>Название</Subtitle>
+              <Subtitle>Название*</Subtitle>
               <InputField value={name} onChange={setName} />
             </div>
             <div>
-              <Subtitle>Учитель</Subtitle>
+              <Subtitle>Учитель*</Subtitle>
               <CustomSelect
                 items={teachers}
                 initValue={selectedTeacher?.name}
@@ -188,7 +250,7 @@ function CreateWorkshopModal({
               />
             </div>
             <div>
-              <Subtitle>Место</Subtitle>
+              <Subtitle>Место*</Subtitle>
               <CustomSelect
                 items={places}
                 initValue={selectedPlace?.name}
@@ -223,7 +285,7 @@ function CreateWorkshopModal({
             </div>
             {!sportTime && (
               <div>
-                <Subtitle>Количество человек</Subtitle>
+                <Subtitle>Количество человек*</Subtitle>
                 <InputField value={capacity} onChange={setCapacity} />
               </div>
             )}
@@ -233,6 +295,51 @@ function CreateWorkshopModal({
                 <InputField maxLength={2} width="40px" value={maxAge} onChange={setMaxAge} />+
               </div>
             </div>
+            {!sportTime && (
+              <>
+                <div>
+                  <Subtitle>Описание</Subtitle>
+                  <textarea
+                    className={styles['modal__textarea']}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="О чём этот мастеркласс?"
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Subtitle>Картинка</Subtitle>
+                  {image ? (
+                    <div className={styles['modal__image-preview']}>
+                      <div className={styles['modal__image-preview-frame']}>
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_API_URL}${image}`}
+                          alt="Превью мастеркласса"
+                          fill
+                          unoptimized
+                          className={styles['modal__image-preview-img']}
+                        />
+                      </div>
+                      <SecondaryButton onClick={() => setImage(undefined)}>Удалить</SecondaryButton>
+                    </div>
+                  ) : (
+                    <SecondaryButton
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={imageUploading}
+                    >
+                      {imageUploading ? 'Загрузка...' : '+ Добавить картинку'}
+                    </SecondaryButton>
+                  )}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageSelect}
+                    hidden
+                  />
+                </div>
+              </>
+            )}
           </>
         )}
       </ModalBody>

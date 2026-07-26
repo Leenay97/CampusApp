@@ -63,6 +63,7 @@ export default function WorkShopsPage(): JSX.Element {
             key={workshop.id}
             name={workshop.name}
             description={workshop.description}
+            image={workshop.image}
             students={workshop.students ?? []}
             maxStudentAmount={workshop.maxStudents}
             place={workshop.place.name}

@@ -6,6 +6,8 @@ import { DELETE_GROUP } from './DeleteGroup';
 import { UPDATE_GROUP } from './UpdateGroup';
 import { CREATE_WORKSHOP } from './CreateWorkshop';
 import { UPDATE_WORKSHOP } from './UpdateWorkshop';
+import { UPLOAD_WORKSHOP_IMAGE } from './UploadWorkshopImage';
+import { DELETE_WORKSHOP_IMAGE } from './DeleteWorkshopImage';
 import { CREATE_SEASON } from './CreateSeason';
 import { ACTIVATE_SEASON } from './ActivateSeason';
 import { ARCHIVE_SEASON } from './ArchiveSeason';
@@ -65,6 +67,8 @@ export const mutations = {
   DELETE_GROUP,
   CREATE_WORKSHOP,
   UPDATE_WORKSHOP,
+  UPLOAD_WORKSHOP_IMAGE,
+  DELETE_WORKSHOP_IMAGE,
   CREATE_SEASON,
   ACTIVATE_SEASON,
   ARCHIVE_SEASON,

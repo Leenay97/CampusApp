@@ -1,11 +1,12 @@
 'use client';
 import { Workshop as WorkshopType } from './types';
 import styles from './Workshop.module.scss';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import WorkshopCounter from './WorkshopCounter/WorkshopCounter';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import EditButton from '@components/EditButton/EditButton';
+import Image from 'next/image';
 
 function Workshop({
   name,
@@ -22,11 +23,17 @@ function Workshop({
   isSport,
   noButtons,
   date,
+  image,
   handleJoin,
   onEdit,
 }: WorkshopType) {
   const studentCount = students?.length ?? 0;
   const isFull = studentCount >= (maxStudentAmount ?? 0);
+  const [imageExpanded, setIsImageExpanded] = useState(false);
+
+  function toggleImage() {
+    setIsImageExpanded((prev) => !prev);
+  }
 
   if (isClosed) {
     return (
@@ -48,7 +55,6 @@ function Workshop({
       {onEdit && <EditButton className={styles['workshop__edit']} onClick={onEdit} />}
       <div className={styles['workshop__name']}>{name}</div>
       {place && <div className={styles['workshop__place']}>{place}</div>}
-      {description && <div className={styles['workshop__description']}>{description}</div>}
       <div className={styles['workshop__teacher']}>
         <div
           className={styles['teacher-photo']}
@@ -63,6 +69,27 @@ function Workshop({
       {toClose && date && (
         <div className={styles['workshop__place']}>
           {new Date(Number(date)).toLocaleDateString()}
+        </div>
+      )}
+
+      {(image || description) && (
+        <div>
+          <div className={styles['workshop__info-btn']} onClick={toggleImage}>
+            {imageExpanded ? 'Понятно' : 'А что это?'}
+          </div>
+
+          <div
+            className={`${styles['workshop__info-section']} ${imageExpanded && styles['workshop__info-section_open']}`}
+          >
+            {image && (
+              <img
+                src={`${process.env.NEXT_PUBLIC_API_URL}${image}`}
+                alt={name}
+                className={styles['workshop__image']}
+              />
+            )}
+            {description && <div className={styles['workshop__description']}>{description}</div>}
+          </div>
         </div>
       )}
 

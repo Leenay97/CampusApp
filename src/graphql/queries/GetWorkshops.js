@@ -23,6 +23,7 @@ export const GET_WORKSHOPS = gql`
       maxStudents
       maxAge
       isClosed
+      image
     }
   }
 `;

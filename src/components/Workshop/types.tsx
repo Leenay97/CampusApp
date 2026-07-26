@@ -15,6 +15,7 @@ export type Workshop = {
   noButtons?: boolean;
   isSport?: boolean;
   date?: Date;
+  image?: string;
   handleJoin?: () => void;
   onEdit?: () => void;
 };

@@ -1,9 +1,19 @@
+import path from 'path';
+import fs from 'fs';
 import { Op } from 'sequelize';
 import { Place, Season, TechnicalData, User, Workshop, sequelize } from '../../models/index.js';
 import { requireAuth, requireStaff, requireSelfOrStaff } from '../auth.js';
 import { logCoinTransaction } from './coinTransaction.js';
 
 const UserWorkshop = sequelize.models.UserWorkshop;
+
+function deleteWorkshopImageFile(url) {
+  if (!url) return;
+  const filePath = path.join(process.cwd(), 'uploads', 'workshops', path.basename(url));
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+}
 
 export const workshopResolvers = {
   Query: {
@@ -99,7 +109,7 @@ export const workshopResolvers = {
   Mutation: {
     createWorkshop: async (
       _,
-      { name, description, placeId, teacherId, maxStudents, maxAge, type, date },
+      { name, description, placeId, teacherId, maxStudents, maxAge, type, date, image },
       context,
     ) => {
       requireStaff(context);
@@ -123,13 +133,14 @@ export const workshopResolvers = {
         maxAge: maxAge || 0,
         type,
         date,
+        image: image || null,
       });
       return workshop;
     },
 
     updateWorkshop: async (
       _,
-      { id, name, description, placeId, teacherId, maxStudents, maxAge, date },
+      { id, name, description, placeId, teacherId, maxStudents, maxAge, date, image },
       context,
     ) => {
       requireStaff(context);
@@ -144,6 +155,12 @@ export const workshopResolvers = {
       if (maxStudents !== undefined) updates.maxStudents = maxStudents;
       if (maxAge !== undefined) updates.maxAge = maxAge;
       if (date !== undefined) updates.date = date;
+      if (image !== undefined) {
+        if (workshop.image && workshop.image !== image) {
+          deleteWorkshopImageFile(workshop.image);
+        }
+        updates.image = image;
+      }
 
       await workshop.update(updates);
 
@@ -159,6 +176,56 @@ export const workshopResolvers = {
           { model: Place, as: 'place', attributes: ['id', 'name'] },
         ],
       });
+    },
+
+    uploadWorkshopImage: async (_, { file }, context) => {
+      requireStaff(context);
+
+      // graphql-upload-minimal может отдать файл в разных обёртках (см. uploadAvatar)
+      let uploadData;
+      if (file.file && file.file.createReadStream) {
+        uploadData = file.file;
+      } else if (file.promise && typeof file.promise.then === 'function') {
+        uploadData = await file.promise;
+      } else if (file.createReadStream) {
+        uploadData = file;
+      } else {
+        throw new Error('Invalid file upload object');
+      }
+
+      const { createReadStream, mimetype } = uploadData;
+
+      const extByMime = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
+      const ext = extByMime[mimetype];
+      if (!ext) throw new Error('Only JPEG, PNG, WEBP images are allowed');
+
+      const uploadDir = path.join(process.cwd(), 'uploads', 'workshops');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}${ext}`;
+      const filePath = path.join(uploadDir, uniqueName);
+
+      await new Promise((resolve, reject) => {
+        const stream = createReadStream();
+        const outStream = fs.createWriteStream(filePath);
+        stream.pipe(outStream);
+        stream.on('error', reject);
+        outStream.on('finish', resolve);
+      });
+
+      return `/uploads/workshops/${uniqueName}`;
+    },
+
+    // Чистка картинок, загруженных в модалке, но не попавших в итоге в мастеркласс
+    deleteWorkshopImage: async (_, { url }, context) => {
+      requireStaff(context);
+      if (!/^\/uploads\/workshops\/[\w.-]+$/.test(url)) {
+        throw new Error('Некорректный url картинки');
+      }
+      deleteWorkshopImageFile(url);
+      return true;
     },
 
     joinWorkshop: async (_, { studentId, workshopId }, context) => {
