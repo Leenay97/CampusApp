@@ -21,6 +21,8 @@ import Modal from '../Modal/Modal';
 import ModalHeader from '../Modal/ModalHeader';
 import ModalBody from '../Modal/ModalBody';
 import ModalFooter from '../Modal/ModalFooter';
+import RadioGroup from '../RadioGroup/RadioGroup';
+import { GET_TECHICAL_DATA } from '@/graphql/queries/GetTechnicalData';
 
 type ModalProps = {
   onClose: () => void;
@@ -30,6 +32,17 @@ type GroupSelection = {
   id: string;
   name: string;
 };
+
+// Пресеты для персонала: выбранный подставляет и комментарий, и сумму из тех.
+// данных. Поля не прячем, а блокируем — учитель видит, что уйдёт в историю.
+const COMMENT_PRESETS = [
+  { value: 'custom', label: 'Обычный', comment: '', valueField: null },
+  { value: 'workshop', label: 'Workshop', comment: 'Workshop', valueField: 'workshopValue' },
+  { value: 'sport', label: 'Sporttime', comment: 'Sporttime', valueField: 'sportTimeValue' },
+  { value: 'lesson', label: 'Lesson', comment: 'Lesson', valueField: 'lessonValue' },
+] as const;
+
+const COMMENT_MAX_LENGTH = 200;
 
 // Сетевой сбой (нет graphQLErrors) означает, что мы не знаем, дошёл ли запрос
 // до сервера — перевод мог реально пройти. Явную ошибку от резолвера (например,
@@ -50,6 +63,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [coins, setCoins] = useState('');
+  const [customComment, setCustomComment] = useState('');
+  const [commentPreset, setCommentPreset] = useState('custom');
   const [showScanner, setShowScanner] = useState(false);
   const [scanCompleted, setScanCompleted] = useState(false);
   const [groupTransferMode, setGroupTransferMode] = useState(false);
@@ -74,6 +89,23 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     useGlobalLoadingMutation(TRANSFER_COINS);
   const [transferCoinsToGroup, { loading: transferGroupLoading }] =
     useGlobalLoadingMutation(TRANSFER_COINS_TO_GROUP);
+
+  const isStaff = user?.userLevel === 'TEACHER' || user?.userLevel === 'ADMIN';
+
+  // Тарифы нужны только для пресетов, а их видит лишь персонал
+  const { data: technicalData } = useQuery(GET_TECHICAL_DATA, { skip: !isStaff });
+
+  const preset = COMMENT_PRESETS.find((item) => item.value === commentPreset);
+  const comment = commentPreset === 'custom' ? customComment : (preset?.comment ?? '');
+
+  // Сумму за workshop/sporttime/lesson берём из тех. данных. Если тариф там не
+  // задан (null или 0), поле остаётся обычным — иначе перевести было бы нечем,
+  // а кнопка при сумме '0' осталась бы активной и упёрлась в ошибку сервера.
+  const presetAmount = preset?.valueField
+    ? technicalData?.technicalData?.[preset.valueField] || ''
+    : '';
+  const amount = commentPreset === 'custom' ? coins : String(presetAmount);
+  const amountLocked = commentPreset !== 'custom' && amount !== '';
 
   useEffect(() => {
     if (userData?.user && !scanCompleted) {
@@ -128,7 +160,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
   }
 
   async function transfer() {
-    if (!selectedStudent.id || !coins) {
+    if (!selectedStudent.id || !amount) {
       setError('Выберите студента и укажите сумму');
       return;
     }
@@ -140,7 +172,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
       await transferCoins({
         userId: user?.id,
         recieverId: selectedStudent.id,
-        amount: Number(coins),
+        amount: Number(amount),
+        comment,
       });
       setCoins('');
       setError('');
@@ -154,7 +187,7 @@ function TransferCoinsModal({ onClose }: ModalProps) {
   }
 
   async function transferToGroup() {
-    if (!user?.group?.id || !coins) {
+    if (!user?.group?.id || !amount) {
       setError('Укажите сумму');
       return;
     }
@@ -165,7 +198,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     try {
       await transferCoinsToGroup({
         groupId: user.group.id,
-        amount: Number(coins),
+        amount: Number(amount),
+        comment,
       });
       setCoins('');
       setError('');
@@ -182,6 +216,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
     setGroupTransferMode((prev) => !prev);
     setError('');
     setCoins('');
+    setCustomComment('');
+    setCommentPreset('custom');
   }
 
   function handleError(error: unknown) {
@@ -196,6 +232,32 @@ function TransferCoinsModal({ onClose }: ModalProps) {
   }
 
   const showLoader = userLoading || groupsLoading;
+
+  // Группе начисляют только за Sport Time — остальные пресеты там не нужны
+  const presetOptions = groupTransferMode
+    ? COMMENT_PRESETS.filter((preset) => preset.value === 'custom' || preset.value === 'sport')
+    : COMMENT_PRESETS;
+
+  const commentSection = (
+    <div className={styles['comment']}>
+      <Subtitle noMargin>Комментарий</Subtitle>
+      {isStaff && (
+        <RadioGroup
+          name="comment-preset"
+          value={commentPreset}
+          options={presetOptions}
+          onChange={setCommentPreset}
+        />
+      )}
+      <InputField
+        value={comment}
+        onChange={setCustomComment}
+        disabled={commentPreset !== 'custom'}
+        maxLength={COMMENT_MAX_LENGTH}
+        placeholder="Необязательно"
+      />
+    </div>
+  );
 
   if (showScanner) {
     return (
@@ -236,12 +298,15 @@ function TransferCoinsModal({ onClose }: ModalProps) {
             <div>
               <Subtitle>{user?.group?.name}</Subtitle>
               <InputField
-                value={coins}
+                value={amount}
                 onChange={setCoins}
+                disabled={amountLocked}
                 type="number"
                 placeholder="Введите сумму"
               />
             </div>
+
+            {commentSection}
 
             {error && <div className={styles['error']}>{error}</div>}
           </>
@@ -276,15 +341,20 @@ function TransferCoinsModal({ onClose }: ModalProps) {
             )}
 
             {selectedGroup.id && selectedStudent.id && (
-              <div>
-                <Subtitle>Сумма</Subtitle>
-                <InputField
-                  value={coins}
-                  onChange={setCoins}
-                  type="number"
-                  placeholder="Введите сумму"
-                />
-              </div>
+              <>
+                <div>
+                  <Subtitle>Сумма</Subtitle>
+                  <InputField
+                    value={amount}
+                    onChange={setCoins}
+                    disabled={amountLocked}
+                    type="number"
+                    placeholder="Введите сумму"
+                  />
+                </div>
+
+                {commentSection}
+              </>
             )}
 
             {error && <div className={styles['error']}>{error}</div>}
@@ -300,8 +370,8 @@ function TransferCoinsModal({ onClose }: ModalProps) {
           onClick={groupTransferMode ? transferToGroup : transfer}
           disabled={
             groupTransferMode
-              ? !coins || transferGroupLoading
-              : !selectedStudent.id || !coins || transferCoinsLoading
+              ? !amount || transferGroupLoading
+              : !selectedStudent.id || !amount || transferCoinsLoading
           }
         >
           Перевести

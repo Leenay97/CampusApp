@@ -1,5 +1,5 @@
 'use client';
-import { memo } from 'react';
+import { memo, ReactNode } from 'react';
 import { useQuery } from '@apollo/client';
 import styles from './CoinHistoryModal.module.scss';
 import { GET_COIN_HISTORY } from '@/graphql/queries/GetCoinHistory';
@@ -20,14 +20,18 @@ type GetCoinHistoryResponse = {
   coinHistory: CoinTransaction[];
 };
 
-function describeTransaction(transaction: CoinTransaction): string {
-  const counterpartyName = transaction.counterparty?.name || '—';
+function describeTransaction(transaction: CoinTransaction): ReactNode {
+  const counterparty = (
+    <span className={styles['item__counterparty']}>{transaction.counterparty?.name || '—'}</span>
+  );
+  const direction = transaction.amount > 0 ? <>От: {counterparty}</> : <>Кому: {counterparty}</>;
+
   switch (transaction.reason) {
     case 'transfer':
     case 'group_transfer':
-      return transaction.amount > 0 ? `От: ${counterpartyName}` : `Кому: ${counterpartyName}`;
+      return direction;
     case 'admin':
-      return `Изменено: ${counterpartyName}`;
+      return <>Изменено: {counterparty}</>;
     case 'workshop':
       return 'Workshop';
     case 'sport':
@@ -35,6 +39,18 @@ function describeTransaction(transaction: CoinTransaction): string {
     case 'lesson':
       return 'English lesson';
     default:
+      // Комментарий к переводу лежит в reason вместо служебного кода.
+      // Отправителя не теряем: он важнее всего в переводах между студентами.
+      if (transaction.reason) {
+        return transaction.counterparty ? (
+          <>
+            <div>{direction}</div>
+            <div className={styles['item__comment']}>{transaction.reason}</div>
+          </>
+        ) : (
+          transaction.reason
+        );
+      }
       return '—';
   }
 }

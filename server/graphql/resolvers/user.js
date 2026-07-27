@@ -16,7 +16,7 @@ import jwt from 'jsonwebtoken';
 import path from 'path';
 import fs from 'fs';
 import { isStaff, requireAuth, requireStaff, requireAdmin, requireSelfOrStaff } from '../auth.js';
-import { logCoinTransaction, isDuplicateTransfer } from './coinTransaction.js';
+import { logCoinTransaction, isDuplicateTransfer, normalizeComment } from './coinTransaction.js';
 
 function todayDate() {
   const now = new Date();
@@ -423,9 +423,12 @@ export const userResolvers = {
       return unregistered;
     },
 
-    transferCoins: async (_, { userId, recieverId, amount }, context) => {
+    transferCoins: async (_, { userId, recieverId, amount, comment }, context) => {
       // Переводить можно только от собственного имени
       requireSelfOrStaff(context, userId);
+
+      // Комментарий занимает место служебного reason; без него всё как раньше
+      const reason = normalizeComment(comment) || 'transfer';
 
       // Транзакция + блокировка строк: без этого два параллельных перевода от
       // одного отправителя могут оба пройти проверку баланса по одному и тому же
@@ -449,7 +452,7 @@ export const userResolvers = {
         // Только после блокировки: до неё оба параллельных запроса видят
         // пустую историю и оба проводят перевод, списывая сумму дважды.
         const isDuplicate = await isDuplicateTransfer(
-          { studentIds: [recieverId], counterpartyId: userId, amount },
+          { studentIds: [recieverId], counterpartyId: userId, amount, reason },
           t,
         );
         if (isDuplicate) {
@@ -474,13 +477,13 @@ export const userResolvers = {
               studentId: user.id,
               amount: -amount,
               counterpartyId: reciever.id,
-              reason: 'transfer',
+              reason,
             },
             t,
           );
         }
         await logCoinTransaction(
-          { studentId: reciever.id, amount, counterpartyId: user.id, reason: 'transfer' },
+          { studentId: reciever.id, amount, counterpartyId: user.id, reason },
           t,
         );
 
@@ -498,12 +501,14 @@ export const userResolvers = {
       return sender;
     },
 
-    transferCoinsToGroup: async (_, { groupId, amount }, context) => {
+    transferCoinsToGroup: async (_, { groupId, amount, comment }, context) => {
       // Массовое начисление без списания у отправителя — доступно только персоналу.
       // Отправителя берём из токена, а не из аргумента: иначе сотрудник может
       // подписать начисление чужим именем — и в истории, и в пуше.
       const { id: userId } = requireStaff(context);
       if (amount <= 0) throw new Error('Некорректная сумма');
+
+      const reason = normalizeComment(comment) || 'group_transfer';
 
       // Одна транзакция на всё начисление: иначе ошибка на середине списка
       // оставит часть группы с монетами, а часть без, и откатить это нечем.
@@ -532,7 +537,7 @@ export const userResolvers = {
         if (!user) throw new Error('Отправитель не найден');
 
         const isDuplicate = await isDuplicateTransfer(
-          { studentIds, counterpartyId: user.id, amount, reason: 'group_transfer' },
+          { studentIds, counterpartyId: user.id, amount, reason },
           t,
         );
         if (isDuplicate) {
@@ -549,10 +554,7 @@ export const userResolvers = {
         await User.increment('coins', { by: amount, where: { id: studentIds }, transaction: t });
 
         for (const studentId of studentIds) {
-          await logCoinTransaction(
-            { studentId, amount, counterpartyId: user.id, reason: 'group_transfer' },
-            t,
-          );
+          await logCoinTransaction({ studentId, amount, counterpartyId: user.id, reason }, t);
         }
 
         // Перечитываем после increment, иначе в ответ уйдут доинкрементные coins

@@ -1,0 +1,74 @@
+@import '@app/globals.css';
+@import '@app/variables.css';
+
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        font-size: 14px;
+        color: var(--text-primary);
+        border: 1px solid #ccc;
+        border-radius: var(--border-radius-l);
+        cursor: pointer;
+        user-select: none;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover {
+            border-color: var(--primary-button-color);
+        }
+    }
+
+    // Выбранный пункт подсвечиваем целиком, а не только кружок — так на
+    // телефоне видно, какой коммент уйдёт, без вглядывания в точку
+    &__item--checked {
+        border-color: var(--primary-button-color);
+        background-color: #eaf3f9;
+        font-weight: 500;
+    }
+
+    // Нативный кружок прячем, но оставляем в потоке: он держит фокус и
+    // клавиатурное управление стрелками
+    &__input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    &__mark {
+        position: relative;
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #ccc;
+        border-radius: 50%;
+        transition: border-color 0.15s ease;
+    }
+
+    &__input:checked+&__mark {
+        border-color: var(--primary-button-color);
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-button-color);
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    &__input:focus-visible+&__mark {
+        outline: 2px solid var(--primary-button-color);
+        outline-offset: 2px;
+    }
+}

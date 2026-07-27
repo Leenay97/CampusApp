@@ -47,6 +47,16 @@
     font-size: 14px;
   }
 
+  &__counterparty {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__comment {
+    font-size: 13px;
+    opacity: 0.75;
+  }
+
   &__amount {
     &--positive {
       color: #2e9e4f;

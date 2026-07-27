@@ -13,6 +13,7 @@ type InputFieldProps = {
   type?: string;
   min?: string;
   max?: string;
+  disabled?: boolean;
   style?: CSSProperties;
   onChange: (value: string) => void;
 };
@@ -27,6 +28,7 @@ export function InputField({
   type,
   min,
   max,
+  disabled,
   style,
   onChange,
 }: InputFieldProps) {
@@ -45,6 +47,7 @@ export function InputField({
           maxLength={maxLength}
           min={min}
           max={max}
+          disabled={disabled}
           style={isPassword ? { ...style, paddingRight: 36 } : style}
           onChange={(e) => onChange(e.target.value)}
         />
