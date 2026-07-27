@@ -10,14 +10,23 @@ import { Workshop as WorkshopType } from '@/app/types';
 import CenteredContainer from '@/components/CenteredContainer/CenteredContainer';
 import Section from '@/components/Section/Section';
 import Loader from '@/components/Loader/Loaader';
+import CloseWorkshopModal from '@/components/CloseWorkshopModal/CloseWorkshopModal';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { GET_ACTIVE_SEASON } from '@/graphql/queries/GetActiveSeason';
+import { CLOSE_WORKSHOP } from '@/graphql/mutations/CloseWorkshop';
+import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
+import { useUser } from '@/contexts/UserContext';
 
 export default function WorkShopsPage(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWorkshop, setEditingWorkshop] = useState<WorkshopType | null>(null);
   const [showClosed, setShowClosed] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [workshopPendingConfirm, setWorkshopPendingConfirm] = useState<WorkshopType | null>(null);
+  const [closingWorkshop, setClosingWorkshop] = useState<WorkshopType | null>(null);
 
+  const { user } = useUser();
+  const [closeWorkshop] = useGlobalLoadingMutation(CLOSE_WORKSHOP);
   const { data: seasonData, loading: seasonLoading } = useQuery(GET_ACTIVE_SEASON);
   const { data, loading, refetch } = useQuery(queries.GET_WORKSHOPS, {
     variables: { isSport: false },
@@ -120,6 +129,30 @@ export default function WorkShopsPage(): JSX.Element {
     setSelectedDate(e.target.value);
   }
 
+  function handleCloseRequest(workshop: WorkshopType) {
+    if (workshop.teacher?.id && workshop.teacher.id === user?.id) {
+      setClosingWorkshop(workshop);
+      return;
+    }
+    setWorkshopPendingConfirm(workshop);
+  }
+
+  function handleConfirmForeignWorkshop() {
+    setClosingWorkshop(workshopPendingConfirm);
+    setWorkshopPendingConfirm(null);
+  }
+
+  async function handleCloseWorkshop(studentIds: string[]) {
+    if (!closingWorkshop) return;
+    try {
+      await closeWorkshop({ studentIds, workshopId: closingWorkshop.id });
+      setClosingWorkshop(null);
+      refetch();
+    } catch {
+      return;
+    }
+  }
+
   if (loading || seasonLoading)
     return (
       <CenteredContainer>
@@ -133,7 +166,7 @@ export default function WorkShopsPage(): JSX.Element {
     <CenteredContainer noPaddingTop>
       <div className={style['workshops-wrapper']}>
         <PrimaryButton onClick={handleOpenModal} width="100%">
-          Добавить мастеркласс
+          Добавить мастер-класс
         </PrimaryButton>
 
         {(isModalOpen || editingWorkshop) && (
@@ -160,6 +193,7 @@ export default function WorkShopsPage(): JSX.Element {
             avatar={workshop.teacher.photoUrl}
             isClosed={workshop.isClosed}
             toClose
+            handleJoin={() => handleCloseRequest(workshop)}
             onEdit={() => handleEditWorkshop(workshop)}
           />
         ))}
@@ -184,6 +218,29 @@ export default function WorkShopsPage(): JSX.Element {
               isClosed={workshop.isClosed}
             />
           ))}
+
+        {workshopPendingConfirm && (
+          <ConfirmModal
+            title="Закрыть чужой мастер-класс"
+            confirmText="Закрыть"
+            onConfirm={handleConfirmForeignWorkshop}
+            onClose={() => setWorkshopPendingConfirm(null)}
+          >
+            Вы не вели мастер-класс «{workshopPendingConfirm.name}»
+            {workshopPendingConfirm.teacher?.name
+              ? ` (ведущий — ${workshopPendingConfirm.teacher.name})`
+              : ''}
+            . Точно хотите его закрыть?
+          </ConfirmModal>
+        )}
+
+        {closingWorkshop && (
+          <CloseWorkshopModal
+            students={closingWorkshop.students ?? []}
+            onSubmit={handleCloseWorkshop}
+            onClose={() => setClosingWorkshop(null)}
+          />
+        )}
       </div>
     </CenteredContainer>
   );

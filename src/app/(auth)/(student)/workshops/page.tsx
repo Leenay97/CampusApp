@@ -48,7 +48,7 @@ export default function WorkShopsPage(): JSX.Element {
       <CenteredContainer>
         <EmptyState
           image="/img/workshop.png"
-          title="Мастерклассов еще нет"
+          title="Мастер-классов еще нет"
           subtitle="Загляни сюда чуть позже"
         />
       </CenteredContainer>

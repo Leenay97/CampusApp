@@ -72,10 +72,12 @@ export const userResolvers = {
         ],
       });
     },
-    // Публичный: страница регистрации учителей ("Найди себя").
-    teachers: async () => {
+    // Публичный: страница регистрации учителей ("Найди себя"), поэтому админы
+    // сюда не попадают по умолчанию — только по явному includeAdmins,
+    // который запрашивают формы мастерклассов и Sport Time.
+    teachers: async (_, { includeAdmins }) => {
       return await User.findAll({
-        where: { userLevel: 'TEACHER' },
+        where: { userLevel: includeAdmins ? ['TEACHER', 'ADMIN'] : 'TEACHER' },
         include: [
           { model: Group, as: 'group' },
           { model: Workshop, as: 'teachingWorkshops' },

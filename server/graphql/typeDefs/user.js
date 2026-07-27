@@ -36,7 +36,7 @@ export const userTypeDefs = gql`
 
   extend type Query {
     students(groupId: ID): [User]
-    teachers: [User]
+    teachers(includeAdmins: Boolean): [User]
     user(id: ID!): User
     usersByGroup(groupId: ID!): [User]
     usersByWorkshop(workshopId: ID!): [User]

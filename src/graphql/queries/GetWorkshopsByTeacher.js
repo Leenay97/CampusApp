@@ -20,7 +20,9 @@ export const GET_WORKSHOPS_BY_TEACHER = gql`
         name
       }
       maxStudents
+      maxAge
       isClosed
+      image
     }
   }
 `;

@@ -331,7 +331,7 @@ export const workshopResolvers = {
         });
       } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
-          throw new Error('Вы уже записаны на этот мастеркласс');
+          throw new Error('Вы уже записаны на этот мастер-класс');
         }
 
         throw new Error(error.message);

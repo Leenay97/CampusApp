@@ -10,7 +10,7 @@ import queries from '@/graphql/queries';
 import mutations from '@/graphql/mutations';
 import { DELETE_WORKSHOP_IMAGE } from '@/graphql/mutations/DeleteWorkshopImage';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
-import { Place, User, Workshop as WorkshopType } from '@/app/types';
+import { Place, User, UserLevel, Workshop as WorkshopType } from '@/app/types';
 import { CustomSelect } from '@components/CustomSelect/CustomSelect';
 import Subtitle from '../Subtitle/Subtitle';
 import Loader from '../Loader/Loaader';
@@ -65,7 +65,9 @@ function CreateWorkshopModal({
   const [newPlaceName, setNewPlaceName] = useState('');
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: teachersData, loading: teachersLoading } = useQuery(queries.GET_TEACHERS);
+  const { data: teachersData, loading: teachersLoading } = useQuery(
+    queries.GET_TEACHERS_WITH_ADMINS,
+  );
 
   const {
     data: placesData,
@@ -88,6 +90,18 @@ function CreateWorkshopModal({
   const loading = teachersLoading || placesLoading;
 
   const teachers = teachersData?.teachers ?? [];
+
+  // Пометка только для списка: у админов и учителей встречаются одинаковые имена.
+  // В сохранение уходит id, так что суффикс никуда дальше не попадает.
+  const teacherOptions = teachers.map((teacher: User) =>
+    teacher.userLevel === UserLevel.Admin
+      ? { ...teacher, name: `${teacher.name} (ADMIN)` }
+      : teacher,
+  );
+
+  const selectedTeacherLabel =
+    teacherOptions.find((teacher: User) => teacher.id === selectedTeacher?.id)?.name ??
+    selectedTeacher?.name;
 
   const places = placesData?.places ?? [];
 
@@ -244,8 +258,8 @@ function CreateWorkshopModal({
             <div>
               <Subtitle>Учитель*</Subtitle>
               <CustomSelect
-                items={teachers}
-                initValue={selectedTeacher?.name}
+                items={teacherOptions}
+                initValue={selectedTeacherLabel}
                 onChange={handleChangeTeacher}
               />
             </div>

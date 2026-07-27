@@ -1,5 +1,6 @@
 import { GET_GROUPS } from './GetGroups';
 import { GET_TEACHERS } from './GetTeachers';
+import { GET_TEACHERS_WITH_ADMINS } from './GetTeachersWithAdmins';
 import { GET_WORKSHOPS } from './GetWorkshops';
 import { GET_SEASONS } from './GetSeasons';
 import { GET_USER } from './GetUser';
@@ -37,6 +38,7 @@ import { GET_MAZE_RUNNER_RESULTS } from './GetMazeRunnerResults';
 export const queries = {
   GET_GROUPS,
   GET_TEACHERS,
+  GET_TEACHERS_WITH_ADMINS,
   GET_WORKSHOPS,
   GET_SEASONS,
   GET_USER,

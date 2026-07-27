@@ -93,7 +93,7 @@ export default function TechnicalData() {
           <InputField width="80px" maxLength={3} value={lessonValue} onChange={setLessonValue} />
         </div>
         <div>
-          <Subtitle>Начало записи на мастеркласс</Subtitle>
+          <Subtitle>Начало записи на мастер-класс</Subtitle>
           <InputField width="120px" type="time" value={workshopStart} onChange={setWorkshopStart} />
         </div>
         <div>

@@ -50,11 +50,11 @@ export default function MyWorkshopPage() {
   return (
     <CenteredContainer>
       <Section>
-        <Title noMargin>Мои мастерклассы</Title>
+        <Title noMargin>Мои мастер-классы</Title>
       </Section>
       {activeWorkshops.length <= 0 && (
         <Section>
-          <Subtitle noMargin>Мастерклассов еще нет</Subtitle>
+          <Subtitle noMargin>Мастер-классов еще нет</Subtitle>
         </Section>
       )}
       {activeWorkshops.length > 0 &&
@@ -63,6 +63,7 @@ export default function MyWorkshopPage() {
             <Workshop
               name={workshop.name}
               description={workshop.description}
+              image={workshop.image}
               students={workshop.students ?? []}
               maxStudentAmount={workshop.maxStudents}
               place={workshop.place?.name}
@@ -94,6 +95,7 @@ export default function MyWorkshopPage() {
             <Workshop
               name={workshop.name}
               description={workshop.description}
+              image={workshop.image}
               students={workshop.students ?? []}
               maxStudentAmount={workshop.maxStudents}
               place={workshop.place?.name}
