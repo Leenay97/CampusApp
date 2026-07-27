@@ -12,11 +12,15 @@ import Section from '@/components/Section/Section';
 import Loader from '@/components/Loader/Loaader';
 import { useGlobalLoadingMutation } from '@/hooks/useGlobalLoadingMutation';
 import EmptyState from '@/components/EmptyState/EmptyState';
+import { isTimePassed } from '@/utils/time';
 
 export default function WorkShopsPage(): JSX.Element {
   const { data, loading, refetch } = useQuery(queries.GET_TODAY_WORKSHOPS);
+  const { data: technicalData } = useQuery(queries.GET_TECHICAL_DATA);
   const [joinWorkshop] = useGlobalLoadingMutation(JOIN_WORKSHOP);
   const { user } = useUser();
+
+  const registrationClosed = isTimePassed(technicalData?.technicalData?.workshopEnd);
 
   async function handleJoin(workshopId: string) {
     try {
@@ -72,6 +76,7 @@ export default function WorkShopsPage(): JSX.Element {
             maxAge={workshop.maxAge}
             handleJoin={() => handleJoin(workshop.id)}
             joined={workshop.students.some((student) => student.id === user?.id)}
+            registrationClosed={registrationClosed}
           />
         ))}
       </div>

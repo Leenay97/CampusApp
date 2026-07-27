@@ -148,7 +148,8 @@ const startServer = async () => {
         const stickers = fileEntries
           .filter(
             (entry) =>
-              entry.isFile() && STICKER_IMAGE_EXTENSIONS.has(path.extname(entry.name).toLowerCase()),
+              entry.isFile() &&
+              STICKER_IMAGE_EXTENSIONS.has(path.extname(entry.name).toLowerCase()),
           )
           .map((entry) => `/stickers/${packName}/${entry.name}`)
           .sort();

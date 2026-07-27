@@ -13,6 +13,7 @@ export type Workshop = {
   toClose?: boolean;
   isClosed?: boolean;
   noButtons?: boolean;
+  registrationClosed?: boolean;
   isSport?: boolean;
   date?: Date;
   image?: string;

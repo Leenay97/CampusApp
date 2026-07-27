@@ -7,6 +7,7 @@ export const technicalDataTypeDefs = gql`
     lessonValue: Int
     sportTimeStart: String
     workshopStart: String
+    workshopEnd: String
     isRatingShown: Boolean
     isElectionShown: Boolean
   }
@@ -22,6 +23,7 @@ export const technicalDataTypeDefs = gql`
       lessonValue: Int
       sportTimeStart: String
       workshopStart: String
+      workshopEnd: String
       isRatingShown: Boolean
       isElectionShown: Boolean
     ): TechnicalData

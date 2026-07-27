@@ -21,6 +21,7 @@ export default function TechnicalData() {
   const [sportValue, setSportValue] = useState<string>('');
   const [lessonValue, setLessonValue] = useState<string>('');
   const [workshopStart, setWorkshopStart] = useState<string>('');
+  const [workshopEnd, setWorkshopEnd] = useState<string>('');
   const [sportTimeStart, setSportTimeStart] = useState<string>('');
   const [showRating, setShowRating] = useState<boolean>(true);
 
@@ -33,6 +34,7 @@ export default function TechnicalData() {
       setSportValue(technicalData?.sportTimeValue?.toString() || '');
       setLessonValue(technicalData?.lessonValue?.toString() || '');
       setWorkshopStart(technicalData?.workshopStart || '');
+      setWorkshopEnd(technicalData?.workshopEnd || '');
       setSportTimeStart(technicalData?.sportTimeStart || '');
       setShowRating(technicalData?.isRatingShown ?? true);
     }
@@ -42,6 +44,7 @@ export default function TechnicalData() {
     technicalData?.sportTimeValue,
     technicalData?.lessonValue,
     technicalData?.workshopStart,
+    technicalData?.workshopEnd,
     technicalData?.workshopValue,
     technicalData?.isRatingShown,
   ]);
@@ -53,6 +56,7 @@ export default function TechnicalData() {
         sportTimeValue: Number(sportValue),
         lessonValue: Number(lessonValue),
         workshopStart: workshopStart.length ? workshopStart : null,
+        workshopEnd: workshopEnd.length ? workshopEnd : null,
         sportTimeStart: sportTimeStart.length ? sportTimeStart : null,
         isRatingShown: showRating,
       });
@@ -95,6 +99,10 @@ export default function TechnicalData() {
         <div>
           <Subtitle>Начало записи на мастер-класс</Subtitle>
           <InputField width="120px" type="time" value={workshopStart} onChange={setWorkshopStart} />
+        </div>
+        <div>
+          <Subtitle>Конец записи на мастер-класс</Subtitle>
+          <InputField width="120px" type="time" value={workshopEnd} onChange={setWorkshopEnd} />
         </div>
         <div>
           <Subtitle>Начало записи на Sport Time</Subtitle>

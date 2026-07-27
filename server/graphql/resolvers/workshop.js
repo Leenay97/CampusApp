@@ -7,6 +7,13 @@ import { logCoinTransaction } from './coinTransaction.js';
 
 const UserWorkshop = sequelize.models.UserWorkshop;
 
+function todayAt(time) {
+  const [hours, minutes] = time.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes || 0, 0, 0);
+  return date;
+}
+
 function deleteWorkshopImageFile(url) {
   if (!url) return;
   const filePath = path.join(process.cwd(), 'uploads', 'workshops', path.basename(url));
@@ -51,12 +58,7 @@ export const workshopResolvers = {
       const techData = await TechnicalData.findOne();
       const startTime = isSport ? techData?.sportTimeStart : techData?.workshopStart;
 
-      if (startTime) {
-        const [hours, minutes] = startTime.split(':').map(Number);
-        const opensAt = new Date();
-        opensAt.setHours(hours, minutes || 0, 0, 0);
-        if (new Date() < opensAt) return [];
-      }
+      if (startTime && new Date() < todayAt(startTime)) return [];
 
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
@@ -257,6 +259,13 @@ export const workshopResolvers = {
           // вызвать напрямую с id закрытого или вчерашнего мастер-класса.
           if (workshop.isClosed) {
             throw new Error('Мастеркласс уже закрыт');
+          }
+
+          // После конца записи (тех. данные) нельзя ни записаться, ни отменить
+          // запись: на фронте кнопка гасится, но мутацию можно позвать напрямую
+          const techData = await TechnicalData.findOne({ transaction });
+          if (techData?.workshopEnd && new Date() >= todayAt(techData.workshopEnd)) {
+            throw new Error('Запись на мастер-классы закрыта');
           }
 
           // Кнопка работает как переключатель, поэтому намерение (записаться или

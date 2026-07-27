@@ -16,6 +16,7 @@ export const technicalDataResolvers = {
         sportTimeValue,
         lessonValue,
         workshopStart,
+        workshopEnd,
         sportTimeStart,
         isRatingShown,
         isElectionShown,
@@ -30,6 +31,7 @@ export const technicalDataResolvers = {
           sportTimeValue,
           lessonValue,
           workshopStart,
+          workshopEnd,
           sportTimeStart,
         });
         return techData;
@@ -48,6 +50,10 @@ export const technicalDataResolvers = {
         existingTechData.workshopStart = workshopStart;
       }
 
+      if (workshopEnd !== undefined) {
+        existingTechData.workshopEnd = workshopEnd;
+      }
+
       if (sportTimeStart) {
         existingTechData.sportTimeStart = sportTimeStart;
       }
@@ -60,7 +66,7 @@ export const technicalDataResolvers = {
         existingTechData.isElectionShown = isElectionShown;
       }
 
-      existingTechData.save();
+      await existingTechData.save();
       return existingTechData;
     },
   },

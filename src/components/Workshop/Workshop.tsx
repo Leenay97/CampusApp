@@ -6,7 +6,6 @@ import WorkshopCounter from './WorkshopCounter/WorkshopCounter';
 import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
 import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import EditButton from '@components/EditButton/EditButton';
-import Image from 'next/image';
 
 function Workshop({
   name,
@@ -22,6 +21,7 @@ function Workshop({
   isClosed,
   isSport,
   noButtons,
+  registrationClosed,
   date,
   image,
   handleJoin,
@@ -96,9 +96,14 @@ function Workshop({
       {!noButtons && (
         <>
           {joined ? (
-            <SecondaryButton onClick={handleJoin}>Отменить</SecondaryButton>
+            <SecondaryButton disabled={registrationClosed} onClick={handleJoin}>
+              Отменить
+            </SecondaryButton>
           ) : (
-            <PrimaryButton disabled={isFull && !toClose} onClick={handleJoin}>
+            <PrimaryButton
+              disabled={(isFull && !toClose) || registrationClosed}
+              onClick={handleJoin}
+            >
               {toClose ? 'Закрыть' : 'Записаться'}
             </PrimaryButton>
           )}

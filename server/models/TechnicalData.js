@@ -6,6 +6,7 @@ export const TechnicalData = sequelize.define('TechnicalData', {
   lessonValue: { type: DataTypes.INTEGER, allowNull: true },
   sportTimeStart: { type: DataTypes.TIME, allowNull: true },
   workshopStart: { type: DataTypes.TIME, allowNull: true },
+  workshopEnd: { type: DataTypes.TIME, allowNull: true },
   isRatingShown: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   isElectionShown: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 });

@@ -6,6 +6,7 @@ export const UPDATE_TECHNICAL_DATA = gql`
     $sportTimeValue: Int
     $lessonValue: Int
     $workshopStart: String
+    $workshopEnd: String
     $sportTimeStart: String
     $isRatingShown: Boolean
     $isElectionShown: Boolean
@@ -15,6 +16,7 @@ export const UPDATE_TECHNICAL_DATA = gql`
       sportTimeValue: $sportTimeValue
       lessonValue: $lessonValue
       workshopStart: $workshopStart
+      workshopEnd: $workshopEnd
       sportTimeStart: $sportTimeStart
       isRatingShown: $isRatingShown
       isElectionShown: $isElectionShown
@@ -23,6 +25,7 @@ export const UPDATE_TECHNICAL_DATA = gql`
       sportTimeValue
       lessonValue
       workshopStart
+      workshopEnd
       sportTimeStart
       isRatingShown
       isElectionShown
